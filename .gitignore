@@ -1,0 +1,30 @@
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Node modules
+node_modules/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Workspace files
+package-lock.json
+tsconfig.json
+.vscode/
+.github/
+
+# Temporary files
+.backups/
+.editor
+*.log
+temp/
+*.tmp
