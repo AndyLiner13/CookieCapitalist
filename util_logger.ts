@@ -44,7 +44,7 @@ export class Logger {
 
   // #region 🔄 Lifecycle Events
   // Create a new logger instance
-  // @param file - Component/file name (e.g., "manager_players", "controller_player")
+  // @param file - Component/file name (e.g., "manager_player", "controller_player")
   constructor(file: string) {
     this.file = file;
   }

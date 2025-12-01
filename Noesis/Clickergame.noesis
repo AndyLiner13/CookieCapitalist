@@ -1,5 +1,5 @@
 <Project>
-  <Assembly>Clickergame</Assembly>
-  <DefaultDataNamespace>Clickergame</DefaultDataNamespace>
+  <Assembly>ClickerGame</Assembly>
+  <DefaultDataNamespace>ClickerGame</DefaultDataNamespace>
   <StartupDocument>MainPage.xaml</StartupDocument>
 </Project>
