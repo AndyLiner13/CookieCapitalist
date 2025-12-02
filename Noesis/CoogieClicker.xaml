@@ -8,7 +8,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   Width="393"
   Height="852">
-  <Border Width="393" Height="852" CornerRadius="48" ClipToBounds="True">
+  <Border Width="393" Height="852" ClipToBounds="True">
     <Border.Background>
       <LinearGradientBrush StartPoint="0.50,-0.00" EndPoint="0.50,1.00">
       <GradientStop Color="#2773ea" Offset="0.00"/>
@@ -31,19 +31,21 @@
           </StackPanel>
         </StackPanel>
       </Border>
-      <Image Source="Coogie.png" Width="256" Height="256" Stretch="UniformToFill" Grid.Row="2"/>
-      <Grid Width="393" Height="108" Grid.Row="4">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="93"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="93"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="93"/>
-        </Grid.ColumnDefinitions>
-        <Image Source="LeftTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="0"/>
-        <Image Source="MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="2"/>
-        <Image Source="RightTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="4"/>
-      </Grid>
+      <Image Source="Coogie.png" Width="256" Height="256" Stretch="UniformToFill" Grid.Row="2" HorizontalAlignment="Center"/>
+      <Border Width="393" Height="108" Padding="16,0,16,16" HorizontalAlignment="Stretch" Grid.Row="4">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="93"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="93"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="93"/>
+          </Grid.ColumnDefinitions>
+          <Image Source="LeftTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="0" VerticalAlignment="Center"/>
+          <Image Source="MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="2" VerticalAlignment="Center"/>
+          <Image Source="RightTab.png" Width="93" Height="92" Stretch="UniformToFill" Grid.Column="4" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
     </Grid>
   </Border>
 </Grid>
