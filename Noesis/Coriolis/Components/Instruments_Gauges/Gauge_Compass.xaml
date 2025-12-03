@@ -1,0 +1,179 @@
+
+<Component x:Name="Compass_Root"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d" xmlns:noesis="clr-namespace:NoesisGUIExtensions">
+  <Component.Resources>
+    <Storyboard x:Key="Gauge_Compass_IdleAnimation" RepeatBehavior="Forever" AutoReverse="True">
+      <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Rotating_Elements_IdleAnimation" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
+        <EasingDoubleKeyFrame KeyTime="00:00:00" Value="-2"/>
+        <EasingDoubleKeyFrame KeyTime="00:00:00.5000000" Value="2">
+          <EasingDoubleKeyFrame.EasingFunction>
+            <BounceEase EasingMode="EaseInOut" Bounces="2" Bounciness="3"/>
+          </EasingDoubleKeyFrame.EasingFunction>
+        </EasingDoubleKeyFrame>
+      </DoubleAnimationUsingKeyFrames>
+    </Storyboard>
+  </Component.Resources>
+
+  <Component.DynamicProperties>
+    <DynamicProperty Name="Bearing" Type="Float"/>
+  </Component.DynamicProperties>
+
+  <Grid x:Name="Gauge_Compass_Master" Width="180" Height="180">
+
+    <Grid.Clip>
+      <EllipseGeometry RadiusX="89" Center="90,90" RadiusY="89"/>
+    </Grid.Clip>
+
+    <Grid x:Name="Rotating_Elements_IdleAnimation" RenderTransformOrigin="0.5,0.5">
+      <Grid.RenderTransform>
+        <TransformGroup>
+          <ScaleTransform/>
+          <SkewTransform/>
+          <RotateTransform/>
+          <TranslateTransform/>
+        </TransformGroup>
+      </Grid.RenderTransform>
+      <Grid x:Name="Rotating_Elements" RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+          <TransformGroup>
+            <ScaleTransform/>
+            <SkewTransform/>
+            <RotateTransform Angle="{Binding Path=Bearing_Float, ElementName=Compass_Root}"/>
+            <TranslateTransform/>
+          </TransformGroup>
+        </Grid.RenderTransform>
+        <Grid x:Name="Ticks">
+          <noesis:RadialTicks x:Name="Ticks_Major" Padding="0" Maximum="360" TickLength="16" TickWidth="4" MaxAngle="180" MinAngle="-180" Spacing="15">
+            <noesis:RadialTicks.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialTicks.Brush>
+          </noesis:RadialTicks>
+          <noesis:RadialTicks x:Name="Ticks_Minor" Padding="8" TickLength="8" TickWidth="2" Maximum="720" MinAngle="-180" MaxAngle="180" Spacing="15">
+            <noesis:RadialTicks.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialTicks.Brush>
+          </noesis:RadialTicks>
+          <noesis:RadialNumbers x:Name="Ticks_Numbers_Q1" FontFamily="OCR A" MinAngle="30" MaxAngle="60" Maximum="6" Padding="32" FontSize="16" Spacing="3" Minimum="3" Rotated="True">
+            <noesis:RadialNumbers.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialNumbers.Brush>
+          </noesis:RadialNumbers>
+          <noesis:RadialNumbers x:Name="Ticks_Numbers_Q2" FontFamily="OCR A" Padding="32" Minimum="12" Maximum="15" FontSize="16" Spacing="3" MinAngle="120" MaxAngle="150" Rotated="True">
+            <noesis:RadialNumbers.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialNumbers.Brush>
+          </noesis:RadialNumbers>
+          <noesis:RadialNumbers x:Name="Ticks_Numbers_Q3" FontFamily="OCR A" Padding="32" Minimum="21" Maximum="24" FontSize="16" Spacing="3" MaxAngle="-120" MinAngle="-150" Rotated="True">
+            <noesis:RadialNumbers.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialNumbers.Brush>
+          </noesis:RadialNumbers>
+          <noesis:RadialNumbers x:Name="Ticks_Numbers_Q4" FontFamily="OCR A" Padding="32" Minimum="30" MaxAngle="-30" Maximum="33" FontSize="16" Spacing="3" MinAngle="-60" Rotated="True">
+            <noesis:RadialNumbers.Brush>
+              <SolidColorBrush Color="{DynamicResource White1}"/>
+            </noesis:RadialNumbers.Brush>
+          </noesis:RadialNumbers>
+        </Grid>
+        <Grid x:Name="CardinalPoints" Margin="20,20,20,20">
+          <TextBlock x:Name="North" Text="N" TextWrapping="Wrap" FontFamily="OCR A" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center">
+            <TextBlock.Foreground>
+              <SolidColorBrush Color="{DynamicResource Red1}"/>
+            </TextBlock.Foreground>
+          </TextBlock>
+          <TextBlock x:Name="South" FontFamily="OCR A" Foreground="#FFD1B62E" Text="S" FontSize="24" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center">
+            <TextBlock.LayoutTransform>
+              <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform Angle="180"/>
+                <TranslateTransform/>
+              </TransformGroup>
+            </TextBlock.LayoutTransform>
+          </TextBlock>
+          <TextBlock x:Name="East" FontFamily="OCR A" Foreground="#FFD1B62E" Text="E" FontSize="24" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Center" TextAlignment="Right">
+            <TextBlock.LayoutTransform>
+              <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform Angle="90"/>
+                <TranslateTransform/>
+              </TransformGroup>
+            </TextBlock.LayoutTransform>
+          </TextBlock>
+          <TextBlock x:Name="West" FontFamily="OCR A" Foreground="#FFD1B62E" Text="W" FontSize="24" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock.LayoutTransform>
+              <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform Angle="-90"/>
+                <TranslateTransform/>
+              </TransformGroup>
+            </TextBlock.LayoutTransform>
+          </TextBlock>
+        </Grid>
+      </Grid>
+    </Grid>
+    <Grid x:Name="NeedleFastening" RenderTransformOrigin="0.5,0.5">
+      <Grid.RenderTransform>
+        <TransformGroup>
+          <ScaleTransform/>
+          <SkewTransform/>
+          <RotateTransform/>
+          <TranslateTransform/>
+        </TransformGroup>
+      </Grid.RenderTransform>
+      <Ellipse x:Name="Base" Width="32" Height="32" StrokeThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Ellipse.Effect>
+          <DropShadowEffect Direction="-90" BlurRadius="4" ShadowDepth="2"/>
+        </Ellipse.Effect>
+        <Ellipse.Fill>
+          <SolidColorBrush Color="{DynamicResource Grey1}"/>
+        </Ellipse.Fill>
+      </Ellipse>
+      <noesis:RadialNeedle x:Name="Needle" MinAngle="0">
+        <noesis:RadialNeedle.RenderTransform>
+          <TransformGroup>
+            <ScaleTransform/>
+            <SkewTransform/>
+            <RotateTransform Angle="0"/>
+            <TranslateTransform/>
+          </TransformGroup>
+        </noesis:RadialNeedle.RenderTransform>
+        <Viewbox x:Name="Plane_Viewbox" Height="80">
+          <Viewbox.Effect>
+            <DropShadowEffect BlurRadius="2" ShadowDepth="2" Direction="-90"/>
+          </Viewbox.Effect>
+          <Viewbox.RenderTransform>
+            <TransformGroup>
+              <ScaleTransform/>
+              <SkewTransform/>
+              <RotateTransform/>
+              <TranslateTransform Y="40"/>
+            </TransformGroup>
+          </Viewbox.RenderTransform>
+          <Canvas Height="500" Width="426.55">
+            <Path Data="F1M426.55,277.79v-40.84l-176.96,-56.46c0.54,-34.4 0.5,-69.21 -0.59,-104.69C247.02,33.88 230.78,0 213.27,0s-33.74,33.88 -35.72,75.8c-1.09,35.48 -1.13,70.29 -0.59,104.69L0,236.95v40.84h179.85c2.26,55.2 5.02,109.91 7.01,164.92l-54.75,30.32v26.97h162.33v-26.97l-54.74,-30.32c1.98,-55.01 4.73,-109.72 7.01,-164.92h179.85z" Stretch="Fill" StrokeThickness="8" Height="508.00003" Width="434.56" Canvas.Top="-4" Canvas.Left="-4" StrokeLineJoin="Round">
+              <Path.Fill>
+                <SolidColorBrush Color="{DynamicResource Orange1}" Opacity="0.25"/>
+              </Path.Fill>
+              <Path.Stroke>
+                <SolidColorBrush Color="{DynamicResource Orange1}"/>
+              </Path.Stroke>
+            </Path>
+          </Canvas>
+        </Viewbox>
+      </noesis:RadialNeedle>
+      <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Fastener.xaml" Width="8" Height="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    </Grid>
+
+    <Grid.Triggers>
+      <EventTrigger RoutedEvent="Loaded">
+        <BeginStoryboard x:Name="Gauge_Compass_IdleAnimation_Begin" Storyboard="{StaticResource Gauge_Compass_IdleAnimation}"/>
+      </EventTrigger>
+    </Grid.Triggers>
+  </Grid>
+</Component>

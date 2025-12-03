@@ -1,0 +1,21 @@
+
+<Component
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d">
+  <Grid x:Name="Instrument_Bevel" Width="200" Height="200">
+    <Grid.Effect>
+      <DropShadowEffect Direction="-90" BlurRadius="8" ShadowDepth="4"/>
+    </Grid.Effect>
+    <Ellipse x:Name="Bevel" Width="{Binding Path=ActualHeight, ElementName=Bevel}">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#FF808080" Offset="0"/>
+          <GradientStop Color="#FF333333" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+  </Grid>
+</Component>

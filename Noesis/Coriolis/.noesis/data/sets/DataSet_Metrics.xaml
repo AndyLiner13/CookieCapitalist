@@ -1,0 +1,5 @@
+<vdctx:Screen_ViewModel xmlns:vdctx="clr-namespace:NoesisStudioInternals">
+  <vdctx:Screen_ViewModel.Metrics>
+    <vdctx:Metrics_ViewModel Pitch="3" Altitude="4964" Heading="76" Airspeed="32"/>
+  </vdctx:Screen_ViewModel.Metrics>
+</vdctx:Screen_ViewModel>

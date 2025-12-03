@@ -1,0 +1,5 @@
+<Project>
+  <Assembly>Paradigm</Assembly>
+  <DefaultDataNamespace>Paradigm</DefaultDataNamespace>
+  <StartupDocument>MainPage.xaml</StartupDocument>
+</Project>

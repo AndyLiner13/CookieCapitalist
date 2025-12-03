@@ -1,0 +1,115 @@
+
+<Component
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d" xmlns:noesis="clr-namespace:NoesisGUIExtensions">
+  <Grid x:Name="Instrument_RotatorKnob">
+    <Grid.Effect>
+      <DropShadowEffect ShadowDepth="4" Direction="-90" BlurRadius="4" Color="{DynamicResource Grey1}"/>
+    </Grid.Effect>
+    <Viewbox>
+      <Grid x:Name="Parts" Width="16" Height="16">
+        <Ellipse x:Name="Base" Stroke="#FF000000">
+          <Ellipse.Fill>
+            <SolidColorBrush Color="#FF000000"/>
+          </Ellipse.Fill>
+        </Ellipse>
+        <Ellipse x:Name="Dark1" RenderTransformOrigin="0.5,0.5">
+          <Ellipse.RenderTransform>
+            <TransformGroup>
+              <ScaleTransform/>
+              <SkewTransform/>
+              <RotateTransform Angle="-135"/>
+              <TranslateTransform/>
+            </TransformGroup>
+          </Ellipse.RenderTransform>
+          <Ellipse.Effect>
+            <BlurEffect Radius="1"/>
+          </Ellipse.Effect>
+          <Ellipse.Fill>
+            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+              <LinearGradientBrush.RelativeTransform>
+                <TransformGroup>
+                  <ScaleTransform/>
+                  <SkewTransform/>
+                  <RotateTransform/>
+                  <TranslateTransform/>
+                </TransformGroup>
+              </LinearGradientBrush.RelativeTransform>
+              <LinearGradientBrush.Transform>
+                <TransformGroup>
+                  <ScaleTransform/>
+                  <SkewTransform/>
+                  <RotateTransform/>
+                  <TranslateTransform/>
+                </TransformGroup>
+              </LinearGradientBrush.Transform>
+              <GradientStop Offset="1"/>
+              <GradientStop Color="#00000000" Offset="0.5"/>
+              <GradientStop Color="#FF000000" Offset="0.49637324"/>
+            </LinearGradientBrush>
+          </Ellipse.Fill>
+        </Ellipse>
+        <Ellipse x:Name="Dark2" RenderTransformOrigin="0.5,0.5">
+          <Ellipse.Effect>
+            <BlurEffect Radius="1"/>
+          </Ellipse.Effect>
+          <Ellipse.RenderTransform>
+            <TransformGroup>
+              <ScaleTransform/>
+              <SkewTransform/>
+              <RotateTransform Angle="135"/>
+              <TranslateTransform/>
+            </TransformGroup>
+          </Ellipse.RenderTransform>
+          <Ellipse.Fill>
+            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+              <LinearGradientBrush.RelativeTransform>
+                <TransformGroup>
+                  <ScaleTransform/>
+                  <SkewTransform/>
+                  <RotateTransform/>
+                  <TranslateTransform/>
+                </TransformGroup>
+              </LinearGradientBrush.RelativeTransform>
+              <LinearGradientBrush.Transform>
+                <TransformGroup>
+                  <ScaleTransform/>
+                  <SkewTransform/>
+                  <RotateTransform/>
+                  <TranslateTransform/>
+                </TransformGroup>
+              </LinearGradientBrush.Transform>
+              <GradientStop Offset="1"/>
+              <GradientStop Color="#00000000" Offset="0.5"/>
+              <GradientStop Color="#FF000000" Offset="0.49637324"/>
+            </LinearGradientBrush>
+          </Ellipse.Fill>
+        </Ellipse>
+        <noesis:RadialTicks x:Name="Ticks_Outer" Spacing="4" Padding="0" TickWidth="0.25" MinAngle="-180" MaxAngle="180" Maximum="256" TickLength="1">
+          <noesis:RadialTicks.Brush>
+            <SolidColorBrush Color="{DynamicResource Grey2}"/>
+          </noesis:RadialTicks.Brush>
+        </noesis:RadialTicks>
+        <Ellipse x:Name="Mesa" HorizontalAlignment="Center" VerticalAlignment="Center" Width="8" Height="8" StrokeThickness="0.25">
+          <Ellipse.Stroke>
+            <SolidColorBrush Color="{DynamicResource Grey1}"/>
+          </Ellipse.Stroke>
+          <Ellipse.Fill>
+            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+              <GradientStop Color="#FF000000" Offset="1"/>
+              <GradientStop Color="#FF0A0A0A" Offset="0"/>
+            </LinearGradientBrush>
+          </Ellipse.Fill>
+        </Ellipse>
+        <noesis:RadialTicks x:Name="Ticks_Middle" TickWidth="0.25" TickLength="5" Padding="1" Spacing="4" MaxAngle="180" MinAngle="-180" Maximum="256" Opacity="0.25">
+          <noesis:RadialTicks.Brush>
+            <SolidColorBrush Color="{DynamicResource Grey2}"/>
+          </noesis:RadialTicks.Brush>
+        </noesis:RadialTicks>
+      </Grid>
+    </Viewbox>
+  </Grid>
+</Component>

@@ -1,0 +1,7 @@
+<Class Name="Metrics_ViewModel">
+  <Property Name="Airspeed" Type="Number" NumberMinValue="0" NumberMaxValue="80"/>
+  <Property Name="Heading" Type="Number" NumberMinValue="0" NumberMaxValue="360"/>
+  <Property Name="Climb" Type="Number" NumberMinValue="0" NumberMaxValue="20"/>
+  <Property Name="Pitch" Type="Number" NumberMinValue="-30" NumberMaxValue="30"/>
+  <Property Name="Altitude" Type="Number" NumberMinValue="0" NumberMaxValue="10000"/>
+</Class>

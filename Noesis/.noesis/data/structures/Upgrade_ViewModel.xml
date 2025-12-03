@@ -1,0 +1,8 @@
+<Class Name="Upgrade_ViewModel">
+  <Property Name="name" Type="String"/>
+  <Property Name="image" Type="String"/>
+  <Property Name="buyLabel" Type="String"/>
+  <Property Name="price" Type="String"/>
+  <Property Name="rate" Type="String"/>
+  <Property Name="buyCommand" Type="Command"/>
+</Class>

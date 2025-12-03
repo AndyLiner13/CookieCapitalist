@@ -1,0 +1,20 @@
+
+<Component x:Name="Instrument_Speedometer_Root"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d" xmlns:noesis="clr-namespace:NoesisGUIExtensions">
+  <Component.DynamicProperties>
+    <DynamicProperty Name="Airspeed" Type="Float"/>
+  </Component.DynamicProperties>
+  <Grid x:Name="Speedometer_Master" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Housing.xaml"/>
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Bevel.xaml"/>
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Socket.xaml"/>
+    <Component Source="/Root;component/Components/Instruments_Gauges/Gauge_Speedometer.xaml" Airspeed_Float="{Binding Path=Airspeed_Float, ElementName=Instrument_Speedometer_Root}"/>
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Glint.xaml"/>
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Ring.xaml"/>
+    <Component Source="/Root;component/Components/Instruments_Generic/Instrument_Generic_Labels.xaml" Label_Bottom_Str="| 1 KNOT = 1.15 MPH |" Label_Top_Str="AIRSPEED"/>
+  </Grid>
+</Component>

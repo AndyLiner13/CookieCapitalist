@@ -1,0 +1,6 @@
+<Class Name="MenuItem">
+  <Property Name="String" Type="String" StringMinWordCount="1" StringMaxWordCount="2"/>
+  <Property Name="Banner" Type="Object" SubType="ImageSource" ImageSourcePath="Assets/Banners"/>
+  <Property Name="MenuCommand" Type="String" StringMinWordCount="1" StringMaxWordCount="1"/>
+  <Property Name="HasBanner" Type="Boolean"/>
+</Class>

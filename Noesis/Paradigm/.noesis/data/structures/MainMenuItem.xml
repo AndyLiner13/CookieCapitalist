@@ -1,0 +1,4 @@
+<Class Name="MainMenuItem" Base="Paradigm.MenuItem">
+  <Property Name="SubItems" Type="Collection" SubType="Paradigm.MenuItem" CollectionMinItemCount="0" CollectionMaxItemCount="10"/>
+  <Property Name="IconCode" Type="String" StringMinWordCount="1" StringMaxWordCount="1"/>
+</Class>
