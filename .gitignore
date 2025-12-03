@@ -17,6 +17,7 @@ node_modules/
 Thumbs.db
 
 # Workspace files
+Noesis/Paradigm/
 package-lock.json
 tsconfig.json
 .vscode/
