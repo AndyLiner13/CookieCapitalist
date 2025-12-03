@@ -58,7 +58,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_1.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -74,7 +74,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_2.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -90,7 +90,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_3.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -106,7 +106,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_4.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -122,7 +122,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_5.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -138,7 +138,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_6.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
@@ -154,7 +154,7 @@
                   <ColumnDefinition Width="61"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                  <Image Source="avatarimage_7.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <Image Source="avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
                   <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0"/>
                 </StackPanel>
                 <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>

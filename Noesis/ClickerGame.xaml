@@ -126,54 +126,150 @@
         <!-- Region: HOME PAGE - Clickable Cookie                                                    -->
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
         <Grid x:Name="HomePage">
-          <!-- Ring of Pointers around Cookie -->
-          <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" Width="256" Height="256">
-            <!-- Pointer at 0° (top) - rotated 180° to point down toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="112" Canvas.Top="-48" RenderTransformOrigin="0.5,0.5">
-              <Image.RenderTransform>
-                <RotateTransform Angle="180"/>
-              </Image.RenderTransform>
-            </Image>
-            <!-- Pointer at 45° (top-right) - rotated 225° to point toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="219" Canvas.Top="-5" RenderTransformOrigin="0.5,0.5">
-              <Image.RenderTransform>
-                <RotateTransform Angle="225"/>
-              </Image.RenderTransform>
-            </Image>
-            <!-- Pointer at 90° (right) - rotated 270° to point left toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="262" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
-              <Image.RenderTransform>
-                <RotateTransform Angle="270"/>
-              </Image.RenderTransform>
-            </Image>
-            <!-- Pointer at 135° (bottom-right) - rotated 315° to point toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="219" Canvas.Top="219" RenderTransformOrigin="0.5,0.5">
-              <Image.RenderTransform>
-                <RotateTransform Angle="315"/>
-              </Image.RenderTransform>
-            </Image>
-            <!-- Pointer at 180° (bottom) - rotated 0° (already pointing up toward center) -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="112" Canvas.Top="262" RenderTransformOrigin="0.5,0.5">
+          <!-- Ring of Clicker Images around Cookie (24 images, 15° apart) -->
+          <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336">
+            <!-- Clicker 0° (bottom) -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <RotateTransform Angle="0"/>
               </Image.RenderTransform>
             </Image>
-            <!-- Pointer at 225° (bottom-left) - rotated 45° to point toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="-5" Canvas.Top="219" RenderTransformOrigin="0.5,0.5">
+            <!-- Clicker 15° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
-                <RotateTransform Angle="45"/>
+                <RotateTransform Angle="-15"/>
               </Image.RenderTransform>
             </Image>
-            <!-- Pointer at 270° (left) - rotated 90° to point right toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="-48" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
+            <!-- Clicker 30° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-30"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 45° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-45"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 60° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-60"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 75° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-75"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 90° (right) -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-90"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 105° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-105"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 120° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-120"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 135° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-135"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 150° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-150"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 165° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="-165"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 180° (top) -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="180"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 195° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="165"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 210° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="150"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 225° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="135"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 240° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="120"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 255° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="105"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 270° (left) -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <RotateTransform Angle="90"/>
               </Image.RenderTransform>
             </Image>
-            <!-- Pointer at 315° (top-left) - rotated 135° to point toward center -->
-            <Image Source="Pointer.png" Width="32" Height="32" Canvas.Left="-5" Canvas.Top="-5" RenderTransformOrigin="0.5,0.5">
+            <!-- Clicker 285° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
-                <RotateTransform Angle="135"/>
+                <RotateTransform Angle="75"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 300° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="60"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 315° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="45"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 330° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="30"/>
+              </Image.RenderTransform>
+            </Image>
+            <!-- Clicker 345° -->
+            <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
+              <Image.RenderTransform>
+                <RotateTransform Angle="15"/>
               </Image.RenderTransform>
             </Image>
           </Canvas>
