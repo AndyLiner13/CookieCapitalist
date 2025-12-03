@@ -63,7 +63,7 @@
               <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
               </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="StatsPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
               </ObjectAnimationUsingKeyFrames>
             </Storyboard>
@@ -78,14 +78,14 @@
               <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
               </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="StatsPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
               </ObjectAnimationUsingKeyFrames>
             </Storyboard>
           </VisualState>
           
-          <!-- Stats State -->
-          <VisualState x:Name="StatsState">
+          <!-- Leaderboard State -->
+          <VisualState x:Name="LeaderboardState">
             <Storyboard>
               <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HomePage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
@@ -93,7 +93,7 @@
               <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
               </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="StatsPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
               </ObjectAnimationUsingKeyFrames>
             </Storyboard>
@@ -145,7 +145,7 @@
               </EventTrigger>
             </Canvas.Triggers>
             <!-- Clicker 0° (bottom) -->
-            <Image x:Name="Clicker0" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker0" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate0"/>
@@ -163,7 +163,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 15° -->
-            <Image x:Name="Clicker15" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker15" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate15"/>
@@ -181,7 +181,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 30° -->
-            <Image x:Name="Clicker30" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker30" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate30"/>
@@ -199,7 +199,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 45° -->
-            <Image x:Name="Clicker45" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker45" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate45"/>
@@ -217,7 +217,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 60° -->
-            <Image x:Name="Clicker60" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker60" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate60"/>
@@ -235,7 +235,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 75° -->
-            <Image x:Name="Clicker75" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker75" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate75"/>
@@ -253,7 +253,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 90° (right) -->
-            <Image x:Name="Clicker90" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker90" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate90"/>
@@ -271,7 +271,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 105° -->
-            <Image x:Name="Clicker105" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker105" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="294" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate105"/>
@@ -289,7 +289,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 120° -->
-            <Image x:Name="Clicker120" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker120" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate120"/>
@@ -307,7 +307,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 135° -->
-            <Image x:Name="Clicker135" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker135" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="252" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate135"/>
@@ -325,7 +325,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 150° -->
-            <Image x:Name="Clicker150" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker150" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate150"/>
@@ -343,7 +343,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 165° -->
-            <Image x:Name="Clicker165" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker165" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="188" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate165"/>
@@ -361,7 +361,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 180° (top) -->
-            <Image x:Name="Clicker180" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker180" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate180"/>
@@ -379,7 +379,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 195° -->
-            <Image x:Name="Clicker195" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker195" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="6" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate195"/>
@@ -397,7 +397,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 210° -->
-            <Image x:Name="Clicker210" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker210" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate210"/>
@@ -415,7 +415,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 225° -->
-            <Image x:Name="Clicker225" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker225" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="48" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate225"/>
@@ -433,7 +433,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 240° -->
-            <Image x:Name="Clicker240" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker240" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate240"/>
@@ -451,7 +451,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 255° -->
-            <Image x:Name="Clicker255" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker255" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="112" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate255"/>
@@ -469,7 +469,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 270° (left) -->
-            <Image x:Name="Clicker270" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker270" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate270"/>
@@ -487,7 +487,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 285° -->
-            <Image x:Name="Clicker285" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker285" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="6" Canvas.Top="188" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate285"/>
@@ -505,7 +505,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 300° -->
-            <Image x:Name="Clicker300" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker300" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate300"/>
@@ -523,7 +523,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 315° -->
-            <Image x:Name="Clicker315" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker315" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="48" Canvas.Top="252" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate315"/>
@@ -541,7 +541,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 330° -->
-            <Image x:Name="Clicker330" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker330" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate330"/>
@@ -559,7 +559,7 @@
               </Image.Triggers>
             </Image>
             <!-- Clicker 345° -->
-            <Image x:Name="Clicker345" Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
+            <Image x:Name="Clicker345" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="112" Canvas.Top="294" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
                 <TransformGroup>
                   <TranslateTransform x:Name="Translate345"/>
@@ -580,7 +580,7 @@
           
           <!-- Clickable Cookie (centered) -->
           <Button Command="{Binding Path=onCookieClick}" Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
+            <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
           </Button>
         </Grid>
 
@@ -592,7 +592,7 @@
             <!-- Upgrade Card 1: Clicker -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="+1 Cookie Clicker" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -617,7 +617,7 @@
             <!-- Upgrade Card 2: Grandma -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Grandma" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -642,7 +642,7 @@
             <!-- Upgrade Card 3: Farm -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cookie Farm" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -667,7 +667,7 @@
             <!-- Upgrade Card 4: Factory -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cookie Factory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -692,7 +692,7 @@
             <!-- Upgrade Card 5: Laboratory -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cookie Laboratory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -717,7 +717,7 @@
             <!-- Upgrade Card 6: Fabricator -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cookie Fabricator" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -742,7 +742,7 @@
             <!-- Upgrade Card 7: Planet -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+                <Image Source="Images/PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
                   <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
                     <TextBlock Text="Cookie Planet" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
@@ -767,36 +767,139 @@
         </ScrollViewer>
 
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
-        <!-- Region: STATS PAGE - Player Statistics                                                  -->
+        <!-- Region: LEADERBOARD PAGE - Player Rankings                                              -->
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
-        <Grid x:Name="StatsPage" Visibility="Hidden" Margin="16,16,16,16">
-          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <!-- Stats Title -->
-            <TextBlock Text="Your Stats" FontFamily="Fonts/#Anton-Regular" FontSize="32" Foreground="#ffffff" TextAlignment="Center" Margin="0,0,0,20"/>
-            
-            <!-- Stats Cards -->
-            <Border Width="361" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Cookies Per Click:" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" Width="200"/>
-                <TextBlock Text="5" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#fa9750"/>
-              </StackPanel>
+        <ScrollViewer x:Name="LeaderboardPage" Visibility="Hidden" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="8,8,8,8">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <!-- Leaderboard Entry 1 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
             </Border>
             
-            <Border Width="361" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Cookies Per Second:" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" Width="200"/>
-                <TextBlock Text="1,234" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#fa9750"/>
-              </StackPanel>
+            <!-- Leaderboard Entry 2 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
             </Border>
             
-            <Border Width="361" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Total Upgrades:" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" Width="200"/>
-                <TextBlock Text="42" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#fa9750"/>
-              </StackPanel>
+            <!-- Leaderboard Entry 3 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+            
+            <!-- Leaderboard Entry 4 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+            
+            <!-- Leaderboard Entry 5 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+            
+            <!-- Leaderboard Entry 6 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+            
+            <!-- Leaderboard Entry 7 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+            
+            <!-- Leaderboard Entry 8 -->
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="171"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="61"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="Images/avatarimage.png" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="Username" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="100,000" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center"/>
+              </Grid>
             </Border>
           </StackPanel>
-        </Grid>
+        </ScrollViewer>
 
       </Grid>
 
@@ -818,7 +921,7 @@
                 <b:GoToStateAction StateName="ShopState"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
-            <Image Source="LeftTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+            <Image Source="Images/LeftTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
           </Button>
           <Button Grid.Column="2" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Center">
             <b:Interaction.Triggers>
@@ -826,15 +929,15 @@
                 <b:GoToStateAction StateName="HomeState"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
-            <Image Source="MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+            <Image Source="Images/MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
           </Button>
           <Button Grid.Column="4" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Center">
             <b:Interaction.Triggers>
               <b:EventTrigger EventName="Click">
-                <b:GoToStateAction StateName="StatsState"/>
+                <b:GoToStateAction StateName="LeaderboardState"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
-            <Image Source="RightTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+            <Image Source="Images/RightTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
           </Button>
         </Grid>
       </Border>
