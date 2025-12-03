@@ -265,8 +265,8 @@
       <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
     </Button.RenderTransform>
     <b:Interaction.Triggers>
-      <!-- Press down - shrink -->
-      <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+      <!-- DataTrigger: When isClicking becomes true, play shrink animation -->
+      <b:DataTrigger Binding="{Binding isClicking}" Value="True">
         <b:ControlStoryboardAction>
           <b:ControlStoryboardAction.Storyboard>
             <Storyboard>
@@ -275,9 +275,9 @@
             </Storyboard>
           </b:ControlStoryboardAction.Storyboard>
         </b:ControlStoryboardAction>
-      </b:EventTrigger>
-      <!-- Release - bounce back -->
-      <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+      </b:DataTrigger>
+      <!-- DataTrigger: When isClicking becomes false, play bounce back animation -->
+      <b:DataTrigger Binding="{Binding isClicking}" Value="False">
         <b:ControlStoryboardAction>
           <b:ControlStoryboardAction.Storyboard>
             <Storyboard>
@@ -294,7 +294,7 @@
             </Storyboard>
           </b:ControlStoryboardAction.Storyboard>
         </b:ControlStoryboardAction>
-      </b:EventTrigger>
+      </b:DataTrigger>
     </b:Interaction.Triggers>
     <Grid>
       <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>

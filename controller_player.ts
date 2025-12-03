@@ -7,9 +7,10 @@
 // Must use Local execution mode - runs on the owning player's client.
 // #endregion
 
-import { Component, Player, PropTypes, Vec3, Quaternion } from "horizon/core";
+import { Component, Player, PropTypes, Vec3, Quaternion, PlayerControls, RaycastGizmo } from "horizon/core";
 import LocalCamera from "horizon/camera";
 import { Logger } from "./util_logger";
+import { LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
 // #endregion
@@ -18,6 +19,7 @@ class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     cookieButtonGizmo: { type: PropTypes.Entity },
+    raycastGizmo: { type: PropTypes.Entity }, // Raycast gizmo configured with "coogie" tag
   };
   // #endregion
 
@@ -121,7 +123,7 @@ class Default extends Component<typeof Default> {
     
     // Position camera IN FRONT of the gizmo (along its forward direction)
     // NoesisUI renders on the front face of the gizmo
-    const cameraDistance = .70; // Close to cookie
+    const cameraDistance = 0.70; // Close to cookie
     const cameraPos = gizmoPos.add(gizmoForward.mul(cameraDistance));
     
     // Calculate rotation to look back at the gizmo
@@ -140,7 +142,12 @@ class Default extends Component<typeof Default> {
     // Disable perspective switching
     LocalCamera.perspectiveSwitchingEnabled.set(false);
     
-    log.info("Entering focused interaction mode");
+    // Listen for clicks in focused interaction mode
+    // PlayerControls events are static LocalEvents - connect with broadcast
+    this.connectLocalBroadcastEvent(
+      PlayerControls.onFocusedInteractionInputStarted,
+      (data) => this.onClickDetected(data)
+    );
     
     // Enter focused interaction mode permanently
     // disableFocusExitButton: true prevents the player from ever exiting
@@ -149,7 +156,35 @@ class Default extends Component<typeof Default> {
     });
     
     this.hasForcedInteraction = true;
-    log.info("Camera set and focused interaction mode enabled");
+    log.info("Camera set and focused interaction mode enabled - listening for clicks");
+  }
+  
+  // Handle click detected in focused interaction mode
+  // InteractionInfo provides worldRayOrigin and worldRayDirection directly!
+  private onClickDetected(data: { interactionInfo: Array<{ screenPosition: Vec3, worldRayOrigin: Vec3, worldRayDirection: Vec3 }> }): void {
+    const log = this.log.active("onClickDetected");
+    
+    // Get raycast gizmo
+    const raycastGizmo = this.props.raycastGizmo?.as(RaycastGizmo);
+    if (!raycastGizmo) {
+      log.error("No raycast gizmo configured! Please set the raycastGizmo prop.");
+      return;
+    }
+    
+    // Check each touch/click position
+    for (const info of data.interactionInfo) {
+      // Use the built-in world ray from InteractionInfo - no manual calculation needed!
+      const hit = raycastGizmo.raycast(info.worldRayOrigin, info.worldRayDirection, {
+        maxDistance: 100,
+        stopOnFirstHit: true,
+      });
+      
+      if (hit) {
+        log.info(`Cookie hit at ${hit.hitPoint.toString()}`);
+        this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
+        return;
+      }
+    }
   }
   // #endregion
 }

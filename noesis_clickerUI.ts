@@ -16,6 +16,7 @@ import {
   UIEventPayload,
   GameEvents,
   UIEvents,
+  LocalUIEvents,
   UPGRADE_CONFIGS,
   calculateUpgradeCost,
   formatCookieDisplay,
@@ -250,6 +251,11 @@ class Default extends Component<typeof Default> {
     
     log.info(`Navigating from ${this.currentPage} to ${page}`);
     this.currentPage = page;
+    
+    // Show/hide cookie based on current page
+    // Cookie is only visible on home page
+    const cookieVisible = page === "home";
+    this.sendLocalBroadcastEvent(LocalUIEvents.setCookieVisible, { visible: cookieVisible });
     
     this.updateUI();
   }

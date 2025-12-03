@@ -11,7 +11,7 @@
 import { Component, Player } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
-import { GameEventPayload, UIEventPayload, GameEvents, UIEvents } from "./util_gameData";
+import { GameEventPayload, UIEventPayload, GameEvents, UIEvents, LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
 // #endregion
@@ -44,8 +44,18 @@ class Default extends Component<typeof Default> {
     // Get local player reference (null on server)
     this.localPlayer = this.world.getLocalPlayer();
     
-    // Only run client-side code if we have a local player
-    // The focused interaction is now handled by controller_player.ts
+    // Listen for local cookie click events from player controller
+    // This is triggered when player clicks in focused interaction mode
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.cookieClicked,
+      () => this.onCookieClick()
+    );
+    
+    // Listen for visibility changes (when navigating between pages)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.setCookieVisible,
+      (data: { visible: boolean }) => this.setCookieVisible(data.visible)
+    );
     
     // Listen for state updates from game manager to get cookiesPerClick
     this.connectNetworkBroadcastEvent(
@@ -66,15 +76,37 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 🎯 Main Logic
+  // Set cookie visibility
+  private setCookieVisible(visible: boolean): void {
+    const log = this.log.active("setCookieVisible");
+    log.info(`Setting cookie visible: ${visible}`);
+    this.entity.visible.set(visible);
+  }
+  
   private buildDataContext(): void {
     this.dataContext = {
       onCookieClick: () => this.onCookieClick(),
+      isClicking: false,
     };
   }
   
   private onCookieClick(): void {
     const log = this.log.active("onCookieClick");
     log.info("Cookie clicked!");
+    
+    // Trigger click animation by toggling isClicking
+    if (this.noesisGizmo) {
+      this.dataContext.isClicking = true;
+      this.noesisGizmo.dataContext = this.dataContext;
+      
+      // Reset after animation duration
+      this.async.setTimeout(() => {
+        this.dataContext.isClicking = false;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+      }, 150);
+    }
     
     // Show +# popup using Text Gizmo pool
     this.sendNetworkBroadcastEvent(UIEvents.showClickPopup, {
