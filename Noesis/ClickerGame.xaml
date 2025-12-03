@@ -22,12 +22,12 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<Grid Width="393" Height="852">
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Main Container                                                                      -->
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border Width="393" Height="852" ClipToBounds="True">
+  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
     <Border.Background>
       <LinearGradientBrush StartPoint="0.50,-0.00" EndPoint="0.50,1.00">
         <GradientStop Color="#2773ea" Offset="0.00"/>
@@ -110,7 +110,7 @@
       <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
       <!-- Region: Header - Cookie Count (Shared across all pages)                                   -->
       <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-      <Border Width="393" Height="143" Background="#80000000" Padding="16,58,16,8" Grid.Row="0">
+      <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
           <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
           <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
@@ -633,15 +633,15 @@
                     <TextBlock Text="+1 Cookie Clicker" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="15 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="15 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="0.1s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -658,15 +658,15 @@
                     <TextBlock Text="Grandma" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="1s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -683,15 +683,15 @@
                     <TextBlock Text="Cookie Farm" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="1,100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="1,100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="8s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -708,15 +708,15 @@
                     <TextBlock Text="Cookie Factory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="12,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="12,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="47s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -733,15 +733,15 @@
                     <TextBlock Text="Cookie Laboratory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="130,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="130,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="260s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -758,15 +758,15 @@
                     <TextBlock Text="Cookie Fabricator" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="1.4M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="1.4M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="1,400s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -783,15 +783,15 @@
                     <TextBlock Text="Cookie Planet" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                    <Button Width="163" Height="47" Background="Transparent" BorderThickness="0" Padding="0">
-                      <Border Width="163" Height="47" CornerRadius="5" Background="#fa9750">
+                    <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
+                      <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-                          <TextBlock Text="20M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff"/>
+                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
+                          <TextBlock Text="20M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
                         </StackPanel>
                       </Border>
                     </Button>
-                    <Border Width="73" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                    <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="7,800s" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                   </StackPanel>
@@ -941,14 +941,14 @@
       <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
       <!-- Region: Footer - Navigation Tabs                                                          -->
       <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-      <Border Width="393" Height="124" Background="#80000000" Padding="16" Grid.Row="2" HorizontalAlignment="Center">
-        <Grid>
+      <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16" Grid.Row="2">
+        <Grid HorizontalAlignment="Center">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="93"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="93"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="93"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
           </Grid.ColumnDefinitions>
           
           <!-- Left Tab (Shop) -->
