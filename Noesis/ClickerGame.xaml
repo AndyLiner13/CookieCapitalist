@@ -595,7 +595,7 @@
                   </b:ControlStoryboardAction.Storyboard>
                 </b:ControlStoryboardAction>
               </b:EventTrigger>
-              <!-- Release - bounce back -->
+              <!-- Release - bounce back and show +1 popup -->
               <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
                 <b:ControlStoryboardAction>
                   <b:ControlStoryboardAction.Storyboard>
@@ -613,9 +613,35 @@
                     </Storyboard>
                   </b:ControlStoryboardAction.Storyboard>
                 </b:ControlStoryboardAction>
+                <!-- Trigger +1 popup animation -->
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <!-- Single +1 popup animation -->
+                      <DoubleAnimation Storyboard.TargetName="Popup1" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+                      <DoubleAnimation Storyboard.TargetName="Popup1Translate" Storyboard.TargetProperty="Y" From="0" To="-50" Duration="0:0:0.6">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
               </b:EventTrigger>
             </b:Interaction.Triggers>
-            <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
+            <Grid>
+              <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
+              
+              <!-- +1 Popup Container -->
+              <Canvas Width="256" Height="256" IsHitTestVisible="False">
+                <!-- Single +1 Popup - Center -->
+                <TextBlock x:Name="Popup1" Text="+1" FontFamily="Fonts/#Anton-Regular" FontSize="28" Foreground="#ffffff" Stroke="#000000" StrokeThickness="2" Opacity="0" Canvas.Left="110" Canvas.Top="100" IsHitTestVisible="False">
+                  <TextBlock.RenderTransform>
+                    <TranslateTransform x:Name="Popup1Translate" Y="0"/>
+                  </TextBlock.RenderTransform>
+                </TextBlock>
+              </Canvas>
+            </Grid>
           </Button>
         </Grid>
 
@@ -623,7 +649,7 @@
         <!-- Region: SHOP PAGE - Upgrade Cards                                                       -->
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
         <ScrollViewer x:Name="ShopPage" Visibility="Hidden" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
-          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,16">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,16" ClipToBounds="False">
             <!-- Upgrade Card 1: Clicker -->
             <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
