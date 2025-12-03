@@ -127,7 +127,23 @@
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
         <Grid x:Name="HomePage">
           <!-- Ring of Clicker Images around Cookie (24 images, 15° apart) -->
-          <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336">
+          <Canvas x:Name="PointerRingCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336" RenderTransformOrigin="0.5,0.5">
+            <Canvas.RenderTransform>
+              <RotateTransform x:Name="PointerRingRotate" Angle="0"/>
+            </Canvas.RenderTransform>
+            <Canvas.Triggers>
+              <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PointerRingRotate"
+                                     Storyboard.TargetProperty="Angle"
+                                     From="0" To="360"
+                                     Duration="0:1:0"
+                                     RepeatBehavior="Forever"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger>
+            </Canvas.Triggers>
             <!-- Clicker 0° (bottom) -->
             <Image Source="ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
               <Image.RenderTransform>
