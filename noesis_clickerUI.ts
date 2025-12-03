@@ -230,11 +230,13 @@ class Default extends Component<typeof Default> {
   
   // Handle cookie click on home page
   private onCookieClick(): void {
-    const log = this.log.inactive("onCookieClick");
-    log.info("Cookie clicked!");
+    const log = this.log.active("onCookieClick");
     
-    // Optimistic update for responsiveness
+    // Increment cookies
     this.cookies += this.cookiesPerClick;
+    log.info(`Cookie clicked! Total: ${this.cookies}`);
+    
+    // Update UI immediately
     this.updateUI();
     
     // Send to game manager

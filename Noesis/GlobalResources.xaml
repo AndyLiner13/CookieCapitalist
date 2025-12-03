@@ -159,6 +159,22 @@
     <Setter Property="Padding" Value="0"/>
   </Style>
   
+  <!-- Invisible button style - no hover/click visual feedback -->
+  <Style x:Key="InvisibleButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
   <Style x:Key="BuyButtonBorderStyle" TargetType="Border">
     <Setter Property="Width" Value="163"/>
     <Setter Property="Height" Value="47"/>
