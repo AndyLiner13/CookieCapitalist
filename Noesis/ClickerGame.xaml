@@ -655,16 +655,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="+1 Cookie Clicker" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="ClickerProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="ClickerProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="+1 Cookie Clicker" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="15 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="15 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -680,16 +692,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Grandma" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="GrandmaProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="GrandmaProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Grandma" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -705,16 +729,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Cookie Farm" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="FarmProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="FarmProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Cookie Farm" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="1,100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="1,100 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -730,16 +766,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Cookie Factory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="FactoryProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="FactoryProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Cookie Factory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="12,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="12,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -755,16 +803,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Cookie Laboratory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="LabProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="LabProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Cookie Laboratory" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="130,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="130,000 cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -780,16 +840,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Cookie Fabricator" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="FabProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="FabProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Cookie Fabricator" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="1.4M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="1.4M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
@@ -805,16 +877,28 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="Images/PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
                 <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" Padding="8,0" HorizontalAlignment="Stretch">
-                    <TextBlock Text="Cookie Planet" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center"/>
+                  <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress Fill -->
+                      <Border x:Name="PlanetProgress" Width="0" Height="30" CornerRadius="5" Background="#2773ea" HorizontalAlignment="Left">
+                        <Border.Triggers>
+                          <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                              <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="PlanetProgress" Storyboard.TargetProperty="Width" From="0" To="240" Duration="0:0:15"/>
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                        </Border.Triggers>
+                      </Border>
+                      <!-- Title Text -->
+                      <TextBlock Text="Cookie Planet" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </Grid>
                   </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
                     <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}">
                       <Border Width="160" Height="47" CornerRadius="5" Background="#fa9750">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <TextBlock Text="Buy x1" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                          <TextBlock Text="20M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="12" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1"/>
-                        </StackPanel>
+                        <TextBlock Text="20M cookies" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Stroke="#000000" StrokeThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                       </Border>
                     </Button>
                     <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
