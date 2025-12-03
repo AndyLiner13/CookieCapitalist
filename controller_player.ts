@@ -121,7 +121,7 @@ class Default extends Component<typeof Default> {
     
     // Position camera IN FRONT of the gizmo (along its forward direction)
     // NoesisUI renders on the front face of the gizmo
-    const cameraDistance = 1.5;
+    const cameraDistance = .70; // Close to cookie
     const cameraPos = gizmoPos.add(gizmoForward.mul(cameraDistance));
     
     // Calculate rotation to look back at the gizmo
