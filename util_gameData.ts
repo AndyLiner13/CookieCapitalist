@@ -59,6 +59,8 @@ export const GameEvents = {
 // Events sent from Game Manager (server) to UI (client)
 export const UIEvents = {
   toClient: new NetworkEvent<UIEventPayload>("game_to_client"),
+  showClickPopup: new NetworkEvent<UIEventPayload>("ui_show_click_popup"),
+  setFocusedInteraction: new NetworkEvent<UIEventPayload>("ui_set_focused_interaction"),
 };
 // #endregion
 

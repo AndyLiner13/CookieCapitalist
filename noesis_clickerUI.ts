@@ -130,9 +130,9 @@ class Default extends Component<typeof Default> {
   
   // Build home page specific data
   private buildHomePageData(): IUiViewModelObject {
-    return {
-      onCookieClick: () => this.onCookieClick(),
-    };
+    // Cookie button is now in a separate gizmo (CookieButton.xaml)
+    // This page is empty - just a placeholder for navigation state
+    return {};
   }
   
   // Build shop page specific data
@@ -226,21 +226,6 @@ class Default extends Component<typeof Default> {
       log.info(`Purchase failed: ${data.message}`);
     }
     // Could show a toast notification here
-  }
-  
-  // Handle cookie click on home page
-  private onCookieClick(): void {
-    const log = this.log.active("onCookieClick");
-    
-    // Increment cookies
-    this.cookies += this.cookiesPerClick;
-    log.info(`Cookie clicked! Total: ${this.cookies}`);
-    
-    // Update UI immediately
-    this.updateUI();
-    
-    // Send to game manager
-    this.sendToManager({ type: "cookie_clicked" });
   }
   
   // Handle buying an upgrade

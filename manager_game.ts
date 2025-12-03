@@ -7,9 +7,10 @@
 // - Cookie production tick (passive income)
 // - Purchase validation and processing
 // - State synchronization with UI
+// - Player controller ownership assignment
 // #endregion
 
-import { Component, Player, CodeBlockEvents } from "horizon/core";
+import { Component, Player, CodeBlockEvents, PropTypes, Entity } from "horizon/core";
 import { Logger } from "./util_logger";
 import {
   GameState,
@@ -30,7 +31,11 @@ import {
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
-  static propsDefinition = {};
+  static propsDefinition = {
+    playerControllerEntity: { type: PropTypes.Entity },
+    cookieButtonGizmo: { type: PropTypes.Entity },
+    clickerUIGizmo: { type: PropTypes.Entity },
+  };
   // #endregion
 
   // #region 📊 State
@@ -77,11 +82,18 @@ class Default extends Component<typeof Default> {
     // Start game tick
     this.async.setInterval(() => this.gameTick(), TICK_INTERVAL_MS);
     
-    // Handle any players already in world
+    // Handle any players already in world (e.g., in Desktop Editor preview)
     const players = this.world.getPlayers();
     if (players.length > 0) {
       this.activePlayer = players[0];
       log.info(`Found existing player: ${this.activePlayer.name.get()}`);
+      
+      // Transfer ownership of player controller entity to the existing player
+      if (this.props.playerControllerEntity) {
+        this.props.playerControllerEntity.owner.set(this.activePlayer);
+        log.info(`Transferred player controller ownership to existing player ${this.activePlayer.name.get()}`);
+      }
+      
       // Send initial state after a short delay to let UI initialize
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
     }
@@ -125,6 +137,15 @@ class Default extends Component<typeof Default> {
     
     // For single player, just track the active player
     this.activePlayer = player;
+    
+    // Transfer ownership of player controller entity to the player
+    // This triggers focused interaction mode on their client
+    if (this.props.playerControllerEntity) {
+      this.props.playerControllerEntity.owner.set(player);
+      log.info(`Transferred player controller ownership to ${player.name.get()}`);
+    } else {
+      log.warn("No playerControllerEntity configured - player won't enter focused interaction mode");
+    }
     
     // Send initial state after a short delay
     this.async.setTimeout(() => this.broadcastStateUpdate(), 500);

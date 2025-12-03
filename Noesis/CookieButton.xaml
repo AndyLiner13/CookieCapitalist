@@ -1,0 +1,306 @@
+<!-- 
+  CookieButton - Standalone cookie clicker button
+  Designed to be placed behind Text Gizmos in 3D space
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DesignWidth="400"
+  d:DesignHeight="400">
+
+<Page.Resources>
+  <ResourceDictionary>
+    <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source="GlobalResources.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+  </ResourceDictionary>
+</Page.Resources>
+
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+  
+  <!-- Ring of Clicker Images around Cookie (24 images, 15° apart) -->
+  <Canvas x:Name="PointerRingCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336" RenderTransformOrigin="0.5,0.5">
+    <Canvas.RenderTransform>
+      <RotateTransform x:Name="PointerRingRotate" Angle="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Triggers>
+      <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+        <BeginStoryboard>
+          <Storyboard RepeatBehavior="Forever">
+            <!-- Spin the whole ring -->
+            <DoubleAnimation Storyboard.TargetName="PointerRingRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360"
+                             Duration="0:1:0"/>
+          </Storyboard>
+        </BeginStoryboard>
+      </EventTrigger>
+    </Canvas.Triggers>
+    <!-- Clicker 0° (bottom) -->
+    <Image x:Name="Clicker0" Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate0"/>
+          <RotateTransform Angle="0"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate0" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15" BeginTime="0:0:0"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 30° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate30"/>
+          <RotateTransform Angle="-30"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate30" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 60° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate60"/>
+          <RotateTransform Angle="-60"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate60" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 90° (right) -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate90"/>
+          <RotateTransform Angle="-90"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate90" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 120° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="276" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate120"/>
+          <RotateTransform Angle="-120"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate120" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 150° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="223" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate150"/>
+          <RotateTransform Angle="-150"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate150" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 180° (top) -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate180"/>
+          <RotateTransform Angle="-180"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate180" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 210° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="24" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate210"/>
+          <RotateTransform Angle="150"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate210" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 240° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="77" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate240"/>
+          <RotateTransform Angle="120"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate240" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 270° (left) -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate270"/>
+          <RotateTransform Angle="90"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate270" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 300° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="24" Canvas.Top="223" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate300"/>
+          <RotateTransform Angle="60"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate300" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+    <!-- Clicker 330° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="77" Canvas.Top="276" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="Translate330"/>
+          <RotateTransform Angle="30"/>
+        </TransformGroup>
+      </Image.RenderTransform>
+      <Image.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+          <BeginStoryboard>
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="Translate330" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
+            </Storyboard>
+          </BeginStoryboard>
+        </EventTrigger>
+      </Image.Triggers>
+    </Image>
+  </Canvas>
+  
+  <!-- Clickable Cookie (centered) -->
+  <Button x:Name="CookieButton" Style="{StaticResource InvisibleButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Command="{Binding onCookieClick}">
+    <Button.RenderTransform>
+      <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
+    </Button.RenderTransform>
+    <b:Interaction.Triggers>
+      <!-- Press down - shrink -->
+      <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+              <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:EventTrigger>
+      <!-- Release - bounce back -->
+      <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                <DoubleAnimation.EasingFunction>
+                  <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                <DoubleAnimation.EasingFunction>
+                  <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <Grid>
+      <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
+    </Grid>
+  </Button>
+
+</Grid>
+
+</Page>

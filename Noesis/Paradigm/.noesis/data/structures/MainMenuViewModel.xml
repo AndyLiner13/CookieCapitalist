@@ -1,5 +1,0 @@
-<Class Name="MainMenuViewModel">
-  <Property Name="MenuItems" Type="Collection" SubType="Paradigm.MainMenuItem" CollectionMinItemCount="5" CollectionMaxItemCount="8"/>
-  <Property Name="User" Type="Object" SubType="Paradigm.User"/>
-  <Property Name="Selection" Type="Object" SubType="Paradigm.MenuItem"/>
-</Class>

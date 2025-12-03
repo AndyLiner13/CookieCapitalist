@@ -1,3 +1,0 @@
-<Class Name="Screen_ViewModel">
-  <Property Name="Metrics" Type="Object" SubType="NoesisStudioInternals.Metrics_ViewModel"/>
-</Class>

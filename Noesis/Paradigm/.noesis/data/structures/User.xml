@@ -1,6 +1,0 @@
-<Class Name="User">
-  <Property Name="Name" Type="String" StringMinWordCount="1" StringMaxWordCount="1"/>
-  <Property Name="Money" Type="Number" NumberMinValue="0" NumberMaxValue="999"/>
-  <Property Name="Rank" Type="Number" NumberMinValue="1" NumberMaxValue="9"/>
-  <Property Name="IsKing" Type="Boolean"/>
-</Class>
