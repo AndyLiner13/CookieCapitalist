@@ -176,7 +176,7 @@
             </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <!-- Animated finger image: rotated toward center, with subtle bobbing -->
+                <!-- Animated finger image: rotated toward center, clicking only when isClicking=true -->
                 <Image Source="Images/ClickerImage.png" Width="36" Height="36" RenderTransformOrigin="0.5,0.5">
                   <Image.RenderTransform>
                     <TransformGroup>
@@ -184,15 +184,22 @@
                       <RotateTransform Angle="{Binding rotation}"/>
                     </TransformGroup>
                   </Image.RenderTransform>
-                  <Image.Triggers>
-                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                      <BeginStoryboard>
-                        <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                          <DoubleAnimation Storyboard.TargetName="FingerBob" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.15"/>
-                        </Storyboard>
-                      </BeginStoryboard>
-                    </EventTrigger>
-                  </Image.Triggers>
+                  <b:Interaction.Triggers>
+                    <b:DataTrigger Binding="{Binding isClicking}" Value="True">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <!-- Single click: up then down -->
+                            <DoubleAnimation Storyboard.TargetName="FingerBob" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.075" AutoReverse="True">
+                              <DoubleAnimation.EasingFunction>
+                                <QuadraticEase EasingMode="EaseOut"/>
+                              </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:DataTrigger>
+                  </b:Interaction.Triggers>
                 </Image>
               </DataTemplate>
             </ItemsControl.ItemTemplate>

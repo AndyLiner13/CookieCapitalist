@@ -28,6 +28,8 @@ import {
 // #region 🏷️ Type Definitions
 const POPUP_COUNT = 10;
 const POPUP_DURATION_MS = 600; // Match animation duration in XAML
+const FINGER_COUNT = 24;
+const FINGER_CLICK_INTERVAL_MS = 150; // ms between each finger "click" in the ring
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -53,6 +55,9 @@ class Default extends Component<typeof Default> {
   
   // Popup system state - round-robin index for next popup slot
   private nextPopupIndex: number = 0;
+  
+  // Finger ring state - which finger is currently "clicking"
+  private activeFingerIndex: number = 0;
   
   // Data context for Noesis binding
   private dataContext: IUiViewModelObject = {};
@@ -86,6 +91,9 @@ class Default extends Component<typeof Default> {
     // Build and set initial UI
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
+    
+    // Start sequential finger click animation loop
+    this.startFingerClickLoop();
     
     // Request initial state from game manager
     this.async.setTimeout(() => {
@@ -143,8 +151,10 @@ class Default extends Component<typeof Default> {
       // Popup style configuration
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
-      // Finger positions for the rotating ring (24 fingers, 15° apart)
-      fingerPositions: this.generateFingerPositions(24, 150), // 24 fingers, radius 150
+      // Finger positions for the rotating ring
+      // Uses FINGER_COUNT fingers around the circle, all clicking at the same speed
+      // but staggered so only one finger "clicks" at a time
+      fingerPositions: this.generateFingerPositions(FINGER_COUNT, 150),
     };
     
     // Preserve existing popup state or initialize to defaults
@@ -159,9 +169,9 @@ class Default extends Component<typeof Default> {
   }
   
   // Generate finger positions around a circle
-  // Returns array of {left, top, rotation} for each finger
-  private generateFingerPositions(count: number, radius: number): Array<{left: number, top: number, rotation: number}> {
-    const positions = [];
+  // Returns array of {left, top, rotation, isClicking} for each finger
+  private generateFingerPositions(count: number, radius: number): Array<{left: number; top: number; rotation: number; isClicking: boolean}> {
+    const positions: Array<{left: number; top: number; rotation: number; isClicking: boolean}> = [];
     const centerX = 168 - 18; // Canvas center (336/2) minus half finger width (36/2)
     const centerY = 168 - 18;
     
@@ -176,10 +186,24 @@ class Default extends Component<typeof Default> {
       // Rotation to point finger toward center (opposite of position angle)
       const rotation = -angleDegrees;
       
-      positions.push({ left, top, rotation });
+      // Mark this finger as the active "clicking" finger if its index matches
+      const isClicking = i === this.activeFingerIndex;
+      
+      positions.push({ left, top, rotation, isClicking });
     }
     
     return positions;
+  }
+  
+  // Start loop that advances which finger is currently "clicking"
+  private startFingerClickLoop(): void {
+    // Advance active finger index in a simple endless loop
+    this.async.setInterval(() => {
+      // Step in the opposite direction around the ring
+      this.activeFingerIndex = (this.activeFingerIndex - 1 + FINGER_COUNT) % FINGER_COUNT;
+      // Rebuild only the parts of the UI that depend on activeFingerIndex
+      this.updateUI();
+    }, FINGER_CLICK_INTERVAL_MS);
   }
   
   // Build shop page specific data
