@@ -30,6 +30,7 @@ const POPUP_COUNT = 10;
 const POPUP_DURATION_MS = 600; // Match animation duration in XAML
 
 const FINGER_COUNT = 24;
+const RAIN_COOKIE_COUNT = 10;
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -41,6 +42,10 @@ class Default extends Component<typeof Default> {
     fingerCascadeIntervalMs: { type: PropTypes.Number, default: 60 },
     // How long one full rotation takes in seconds (0 = no spin). Default 60 = 1 rotation/min.
     fingerSpinDurationSeconds: { type: PropTypes.Number, default: 60 },
+    // Rain cookie animation duration in ms
+    rainCookieDurationMs: { type: PropTypes.Number, default: 2000 },
+    // Rain cookie scale (1.0 = 100%)
+    rainCookieScale: { type: PropTypes.Number, default: 0.5 },
   };
   // #endregion
 
@@ -63,6 +68,9 @@ class Default extends Component<typeof Default> {
   // Finger ring state - which finger is currently "clicking" (for trigger only)
   private activeFingerIndex: number = 0;
   private fingerClickStates: boolean[] = new Array(FINGER_COUNT).fill(false);
+  
+  // Rain cookie state - round-robin index for next rain cookie slot
+  private nextRainCookieIndex: number = 0;
   
   // Data context for Noesis binding
   private dataContext: IUiViewModelObject = {};
@@ -162,7 +170,17 @@ class Default extends Component<typeof Default> {
       fingerPositions: this.generateFingerPositions(FINGER_COUNT, 150),
       // Duration for one full rotation (used by XAML animation)
       fingerSpinDuration: `0:0:${this.props.fingerSpinDurationSeconds}`,
+      // Rain cookie configuration
+      rainCookieScale: this.props.rainCookieScale,
+      rainCookieDuration: `0:0:${this.props.rainCookieDurationMs / 1000}`,
     };
+    
+    // Preserve existing rain cookie state or initialize to defaults
+    for (let i = 0; i < RAIN_COOKIE_COUNT; i++) {
+      homeData[`RainCookie${i}Visible`] = this.dataContext[`RainCookie${i}Visible`] || "Collapsed";
+      homeData[`RainCookie${i}Animate`] = this.dataContext[`RainCookie${i}Animate`] || false;
+      homeData[`RainCookie${i}Left`] = this.dataContext[`RainCookie${i}Left`] || 0;
+    }
     
     // Preserve existing popup state or initialize to defaults
     for (let i = 0; i < POPUP_COUNT; i++) {
@@ -358,6 +376,9 @@ class Default extends Component<typeof Default> {
     // Show +# popup (immediate visual feedback)
     this.showPopup(`+${this.cookiesPerClick}`);
     
+    // Trigger a rain cookie in the background
+    this.triggerRainCookie();
+    
     // Send click to game manager (server will validate and sync)
     this.sendToManager({ type: "cookie_clicked" });
   }
@@ -402,6 +423,47 @@ class Default extends Component<typeof Default> {
     }
     
     log.info(`Showing popup ${popupIndex}: ${text}`);
+  }
+  
+  // Trigger a rain cookie falling from a random horizontal position
+  private triggerRainCookie(): void {
+    const log = this.log.inactive("triggerRainCookie");
+    
+    // Use round-robin slot selection
+    const rainIndex = this.nextRainCookieIndex;
+    this.nextRainCookieIndex = (rainIndex + 1) % RAIN_COOKIE_COUNT;
+    
+    // Random horizontal position (0-100% of viewport width, accounting for cookie size)
+    const randomLeft = Math.floor(Math.random() * 350); // 0 to ~350px for 400px wide viewport
+    
+    // Reset animation state first, then set new values
+    this.dataContext[`RainCookie${rainIndex}Animate`] = false;
+    this.dataContext[`RainCookie${rainIndex}Visible`] = "Visible";
+    this.dataContext[`RainCookie${rainIndex}Left`] = randomLeft;
+    
+    // Apply changes and trigger animation
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+      
+      // Trigger animation on next frame
+      this.async.setTimeout(() => {
+        this.dataContext[`RainCookie${rainIndex}Animate`] = true;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+        
+        // Hide the cookie after animation completes
+        this.async.setTimeout(() => {
+          this.dataContext[`RainCookie${rainIndex}Visible`] = "Collapsed";
+          this.dataContext[`RainCookie${rainIndex}Animate`] = false;
+          if (this.noesisGizmo) {
+            this.noesisGizmo.dataContext = this.dataContext;
+          }
+        }, this.props.rainCookieDurationMs);
+      }, 1);
+    }
+    
+    log.info(`Triggering rain cookie ${rainIndex} at x=${randomLeft}`);
   }
   // #endregion
 
