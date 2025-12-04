@@ -20,11 +20,9 @@
       <ResourceDictionary Source="GlobalResources.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
-    <!-- Popup text style -->
+    <!-- Popup text base style -->
     <Style x:Key="PopupTextStyle" TargetType="TextBlock">
       <Setter Property="FontFamily" Value="Fonts/#Anton"/>
-      <Setter Property="FontSize" Value="48"/>
-      <Setter Property="Foreground" Value="#FFFFFF"/>
       <Setter Property="HorizontalAlignment" Value="Center"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
@@ -314,7 +312,7 @@
   
   <!-- Popup Text Elements (10 total, each independently controlled) -->
   <!-- Popup 0 -->
-  <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible}" Margin="{Binding Popup0Margin}">
+  <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible}" Margin="{Binding Popup0Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup0Translate" Y="0"/>
@@ -338,7 +336,7 @@
   </TextBlock>
   
   <!-- Popup 1 -->
-  <TextBlock x:Name="Popup1" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup1Text}" Visibility="{Binding Popup1Visible}" Margin="{Binding Popup1Margin}">
+  <TextBlock x:Name="Popup1" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup1Text}" Visibility="{Binding Popup1Visible}" Margin="{Binding Popup1Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup1Translate" Y="0"/>
@@ -362,7 +360,7 @@
   </TextBlock>
   
   <!-- Popup 2 -->
-  <TextBlock x:Name="Popup2" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup2Text}" Visibility="{Binding Popup2Visible}" Margin="{Binding Popup2Margin}">
+  <TextBlock x:Name="Popup2" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup2Text}" Visibility="{Binding Popup2Visible}" Margin="{Binding Popup2Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup2Translate" Y="0"/>
@@ -386,7 +384,7 @@
   </TextBlock>
   
   <!-- Popup 3 -->
-  <TextBlock x:Name="Popup3" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup3Text}" Visibility="{Binding Popup3Visible}" Margin="{Binding Popup3Margin}">
+  <TextBlock x:Name="Popup3" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup3Text}" Visibility="{Binding Popup3Visible}" Margin="{Binding Popup3Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup3Translate" Y="0"/>
@@ -410,7 +408,7 @@
   </TextBlock>
   
   <!-- Popup 4 -->
-  <TextBlock x:Name="Popup4" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup4Text}" Visibility="{Binding Popup4Visible}" Margin="{Binding Popup4Margin}">
+  <TextBlock x:Name="Popup4" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup4Text}" Visibility="{Binding Popup4Visible}" Margin="{Binding Popup4Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup4Translate" Y="0"/>
@@ -434,7 +432,7 @@
   </TextBlock>
   
   <!-- Popup 5 -->
-  <TextBlock x:Name="Popup5" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup5Text}" Visibility="{Binding Popup5Visible}" Margin="{Binding Popup5Margin}">
+  <TextBlock x:Name="Popup5" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup5Text}" Visibility="{Binding Popup5Visible}" Margin="{Binding Popup5Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup5Translate" Y="0"/>
@@ -458,7 +456,7 @@
   </TextBlock>
   
   <!-- Popup 6 -->
-  <TextBlock x:Name="Popup6" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup6Text}" Visibility="{Binding Popup6Visible}" Margin="{Binding Popup6Margin}">
+  <TextBlock x:Name="Popup6" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup6Text}" Visibility="{Binding Popup6Visible}" Margin="{Binding Popup6Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup6Translate" Y="0"/>
@@ -482,7 +480,7 @@
   </TextBlock>
   
   <!-- Popup 7 -->
-  <TextBlock x:Name="Popup7" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup7Text}" Visibility="{Binding Popup7Visible}" Margin="{Binding Popup7Margin}">
+  <TextBlock x:Name="Popup7" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup7Text}" Visibility="{Binding Popup7Visible}" Margin="{Binding Popup7Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup7Translate" Y="0"/>
@@ -506,7 +504,7 @@
   </TextBlock>
   
   <!-- Popup 8 -->
-  <TextBlock x:Name="Popup8" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup8Text}" Visibility="{Binding Popup8Visible}" Margin="{Binding Popup8Margin}">
+  <TextBlock x:Name="Popup8" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup8Text}" Visibility="{Binding Popup8Visible}" Margin="{Binding Popup8Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup8Translate" Y="0"/>
@@ -530,7 +528,7 @@
   </TextBlock>
   
   <!-- Popup 9 -->
-  <TextBlock x:Name="Popup9" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup9Text}" Visibility="{Binding Popup9Visible}" Margin="{Binding Popup9Margin}">
+  <TextBlock x:Name="Popup9" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup9Text}" Visibility="{Binding Popup9Visible}" Margin="{Binding Popup9Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
     <TextBlock.RenderTransform>
       <TransformGroup>
         <TranslateTransform x:Name="Popup9Translate" Y="0"/>

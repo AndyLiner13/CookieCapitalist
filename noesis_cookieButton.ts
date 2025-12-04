@@ -7,7 +7,7 @@
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
-import { Component, Player } from "horizon/core";
+import { Component, Player, PropTypes } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
 import { GameEventPayload, UIEventPayload, GameEvents, UIEvents, LocalUIEvents } from "./util_gameData";
@@ -19,7 +19,10 @@ const POPUP_DURATION_MS = 600; // Match animation duration in XAML
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
-  static propsDefinition = {};
+  static propsDefinition = {
+    popupFontSize: { type: PropTypes.Number, default: 48 },
+    popupColor: { type: PropTypes.String, default: "#FFFFFF" },
+  };
   // #endregion
 
   // #region 📊 State
@@ -92,6 +95,9 @@ class Default extends Component<typeof Default> {
     this.dataContext = {
       onCookieClick: () => this.onCookieClick(),
       isClicking: false,
+      // Popup style configuration (shared by all popups)
+      PopupFontSize: this.props.popupFontSize,
+      PopupColor: this.props.popupColor,
     };
     
     // Initialize all popup bindings
