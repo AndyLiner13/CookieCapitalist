@@ -143,6 +143,8 @@ class Default extends Component<typeof Default> {
       // Popup style configuration
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
+      // Finger positions for the rotating ring (24 fingers, 15° apart)
+      fingerPositions: this.generateFingerPositions(24, 150), // 24 fingers, radius 150
     };
     
     // Preserve existing popup state or initialize to defaults
@@ -154,6 +156,30 @@ class Default extends Component<typeof Default> {
     }
     
     return homeData;
+  }
+  
+  // Generate finger positions around a circle
+  // Returns array of {left, top, rotation} for each finger
+  private generateFingerPositions(count: number, radius: number): Array<{left: number, top: number, rotation: number}> {
+    const positions = [];
+    const centerX = 168 - 18; // Canvas center (336/2) minus half finger width (36/2)
+    const centerY = 168 - 18;
+    
+    for (let i = 0; i < count; i++) {
+      const angleDegrees = (i * 360) / count;
+      const angleRadians = (angleDegrees * Math.PI) / 180;
+      
+      // Position on circle (0° is at bottom, going clockwise)
+      const left = centerX + radius * Math.sin(angleRadians);
+      const top = centerY + radius * Math.cos(angleRadians);
+      
+      // Rotation to point finger toward center (opposite of position angle)
+      const rotation = -angleDegrees;
+      
+      positions.push({ left, top, rotation });
+    }
+    
+    return positions;
   }
   
   // Build shop page specific data
