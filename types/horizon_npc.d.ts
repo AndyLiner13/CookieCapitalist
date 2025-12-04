@@ -341,6 +341,7 @@ export declare const NpcEvents: {
  */
 export declare class NpcConversation {
     protected readonly entity: Npc;
+    readonly actions: ActionSystem;
     constructor(entity: Npc);
     /**
      * The audio settings for speech capabilities of NPC. This setting will take effect on every
@@ -439,7 +440,7 @@ export declare class NpcConversation {
      * Resets all current session memory of NPC without long term memory. Calling this method will result in NPC forgetting all previous interactions within the current world instance.
      * If this method is called while Long Term Memory is enabled within the NPC's configuration, it will override the previous long term memory id until the end of the session.
      *
-     * Note: resetMemory also prevents the AI model response from degrading over time so please use this to reset in the logic to have a good repsonse quality.
+     * Note: resetMemory also prevents the AI model response from degrading over time so please use this to reset in the logic to have a good response quality.
      */
     resetMemory(): Promise<void>;
     /**
@@ -515,15 +516,22 @@ export declare class NpcConversation {
      * @returns - A promise that resolves to true if AI is available, false otherwise
      */
     static isAiAvailable(): Promise<boolean>;
+    /**
+     * Manages a collection of dynamic actions for an NPC, providing methods to
+     * add, remove, retrieve, and synchronize actions with the NPC's AI context.
+     */
+    private ActionSystem;
 }
 /**
  * A player associated with an NPC.
  */
 export declare class NpcPlayer extends Player {
     /**
-     * The entity that is attached to the NPC.
+     * @param id - The ID of the player.
+     * @param entity - An optional NPC Gizmo entity associated with the player.
+     * @returns The new player.
      */
-    entity: Entity;
+    constructor(id: number, entity?: Entity);
     /**
      * The current locomotion target of the NPC. Undefined if the NPC isn't currently moving.
      */
@@ -661,5 +669,143 @@ export declare class Npc extends Entity {
      */
     static playerIsNpc(player: Player): boolean;
 }
+/**
+ * Definition of an action parameter that describes what input is expected
+ * for a dynamic action. Used to configure parameters for AI-generated actions.
+ *
+ * @example
+ * {
+ *   name: 'action',
+ *   description: 'The action to do with the entity',
+ * }
+ */
+export declare type ActionParameterDefinition = {
+    /** The name/identifier of the parameter */
+    name: string;
+    /** Optional description explaining what this parameter represents */
+    description?: string;
+};
+/**
+ * An actual parameter value passed to an action during execution.
+ * Contains both the parameter name and its concrete value.
+ *
+ */
+export declare type ActionParameter = {
+    /** The name/identifier of the parameter */
+    name: string;
+    /** The actual value being passed for this parameter */
+    value: string;
+};
+/**
+ * An example that demonstrates how a specific action should behave.
+ * Used to train the AI on proper action usage and expected responses.
+ *
+ * @example
+ * {
+ *   query: 'Give me 6 bananas',
+ *   context: 'I am currently holding 12 bananas that I can give the user.',
+ *   response: 'Here you go!',
+ *   // Example of how the action extracts parameters from the query
+ *   output_parameters: [
+ *     {
+ *       name: 'action',
+ *       value: 'give',
+ *     },
+ *     {
+ *       name: 'entity',
+ *       value: 'bananas',
+ *     },
+ *     {
+ *       name: 'quantity',
+ *       value: '6',
+ *     }
+ *   ]
+ * }
+ */
+export declare type ActionExample = {
+    /** The user's input query that triggers this example */
+    query: string;
+    /** The contextual information describing how the NPC might perceive the world when this action gets called.
+     * This helps the NPC understand when it might return this particular example due to the provided user input.
+     * @example "I'm currently holding 12 bananas. I can give any number of them away" */
+    context: string;
+    /** The expected response text from the NPC */
+    response: string;
+    /** Parameters that should be extracted and passed to the action callback */
+    output_parameters: ActionParameter[];
+};
+/**
+ * Represents a dynamic action that an NPC can perform in response to user interactions.
+ * Actions can be defined with parameters, examples, and callback functions to enable
+ * AI-powered NPC behavior with custom logic execution.
+ *
+ * @example
+ * const action = {
+ *   name: 'Subject',
+ *   description: 'Triggered when someone asks you to do something with some quantity of things.',
+ *   // Define the parameters this action can extract from user input
+ *   action_parameters: [
+ *     {
+ *       name: 'action',
+ *       description: 'The action to do with the entity',
+ *     },
+ *     {
+ *       name: 'entity',
+ *       description: 'The entity to do something with',
+ *     },
+ *     {
+ *       name: 'quantity',
+ *       description: 'The quantity of things to do something with',
+ *     }
+ *   ],
+ *   examples: [
+ *     {
+ *       query: 'Give me 6 bananas',
+ *       context: 'I am currently holding 12 bananas that I can give the user.',
+ *       response: 'Here you go!',
+ *       // Example of how the action extracts parameters from the query
+ *       output_parameters: [
+ *         {
+ *           name: 'action',
+ *           value: 'give',
+ *         },
+ *         {
+ *           name: 'entity',
+ *           value: 'bananas',
+ *         },
+ *         {
+ *           name: 'quantity',
+ *           value: '6',
+ *         }
+ *       ]
+ *     }
+ *   ]
+ * }
+ *
+ * npc.conversation.actions.setAction(action);
+ */
+export declare type Action = {
+    /** Unique identifier for the action */
+    name: string;
+    /** Optional description explaining what this action does */
+    description?: string;
+    /** Parameters that this action expects to receive */
+    action_parameters?: ActionParameterDefinition[];
+    /** Training examples showing how this action should be used */
+    examples?: ActionExample[];
+    /** Callback function to execute when this action is triggered by the AI (not sent to AI) */
+    callback?: (parameters: any) => void;
+};
+/**
+ * Container for a collection of dynamic actions that can be used by an NPC.
+ * This structure is serialized and sent to the AI to inform it about available actions.
+ */
+export declare type DynamicActions = {
+    /** General description of what these actions enable */
+    description?: string;
+    /** Array of available actions the NPC can perform */
+    actions?: Action[];
+};
+export declare type ActionSystem = InstanceType<NpcConversation['ActionSystem']>;
 
 }

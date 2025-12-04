@@ -1342,6 +1342,7 @@ export declare type ImageStyle = ViewStyle & {
  * section of the Custom UI Examples tutorial.
  */
 export declare class ImageSource {
+    private readonly _magicType;
     /**
      * Gets an image based on a texture asset.
      * @param texture - The texture asset to use as the source.

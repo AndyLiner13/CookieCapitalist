@@ -3,11 +3,13 @@ declare module 'horizon/capturing' {
  * (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
  *
  * @format
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 import { Player, Vec3 } from 'horizon/core';
 /**
  * A {@link CameraMovementPreset} option that provides a first
  * person camera view.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type FirstPersonMovementCameraMovementPreset = {
     strategy: 'FirstPerson';
@@ -16,6 +18,7 @@ export declare type FirstPersonMovementCameraMovementPreset = {
  * A {@link CameraMovementPreset} option that provides a
  * third-person over-the-shoulder camera view where the camera is
  * positioned slightly above and behind the player avatar.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type ThirdPersonOverShoulderCameraMovementPreset = {
     strategy: 'ThirdPersonOverShoulder';
@@ -23,6 +26,7 @@ export declare type ThirdPersonOverShoulderCameraMovementPreset = {
 /**
  * A {@link CameraMovementPreset} option that keeps the player avatar
  * in the center of the frame from a fixed position.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type FixedPositionTrackingPlayerCameraMovementPreset = {
     strategy: 'FixedLocationTrackingPlayer';
@@ -40,6 +44,7 @@ export declare type FixedPositionTrackingPlayerCameraMovementPreset = {
  * {@link ThirdPersonOverShoulderCameraMovementPreset}
  *
  * {@link FixedPositionTrackingPlayerCameraMovementPreset}
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type CameraMovementPreset = FirstPersonMovementCameraMovementPreset | ThirdPersonOverShoulderCameraMovementPreset | FixedPositionTrackingPlayerCameraMovementPreset;
 /**
@@ -47,6 +52,7 @@ export declare type CameraMovementPreset = FirstPersonMovementCameraMovementPres
  *
  * @privateRemarks
  * Must remain in sync with VideoCaptureNotifications in IScriptingRuntime.cs.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare enum VideoCaptureNotifications {
     /**
@@ -74,6 +80,7 @@ export declare enum VideoCaptureNotifications {
  * `saveOnDurationReached`: true
  *
  * `notifications`: VideoCaptureNotifications.All
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare const DefaultStartVideoCaptureOptions: StartVideoCaptureOptions;
 /**
@@ -81,6 +88,7 @@ export declare const DefaultStartVideoCaptureOptions: StartVideoCaptureOptions;
  *
  * @remarks
  * `save`: true
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare const DefaultStopVideoCaptureOptions: StopVideoCaptureOptions;
 /**
@@ -89,6 +97,7 @@ export declare const DefaultStopVideoCaptureOptions: StopVideoCaptureOptions;
  * @remarks This class contains methods for recording in-game footage from
  * the players point of view at key moments during game play. For details,
  * see the {@link https://developers.meta.com/horizon-worlds/learn/documentation/typescript/api-references-and-examples/instant-replay | Instant Replay } guide.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare class PlayerCapturing extends Player {
     /**
@@ -101,6 +110,7 @@ export declare class PlayerCapturing extends Player {
      * Special characters are not allowed.
      * @param options - The options for how to record the video.
      * {@link DefaultStartVideoCaptureOptions} specifies the default options.
+     * @deprecated This module is deprecated and will be removed in a future version.
      */
     startVideoCapture(momentName: string, options?: Partial<StartVideoCaptureOptions>): Promise<VideoCaptureResponseCode>;
     /**
@@ -111,6 +121,7 @@ export declare class PlayerCapturing extends Player {
      *
      * @param options - The options for how to record the video.
      * {@link DefaultStopVideoCaptureOptions} specifies the default options.
+     * @deprecated This module is deprecated and will be removed in a future version.
      */
     stopVideoCapture(options?: Partial<StopVideoCaptureOptions>): Promise<VideoCaptureResponseCode>;
 }
@@ -119,6 +130,7 @@ export declare class PlayerCapturing extends Player {
  *
  * @remarks
  * {@link DefaultStartVideoCaptureOptions} specifies the default options.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type StartVideoCaptureOptions = {
     /**
@@ -146,6 +158,7 @@ export declare type StartVideoCaptureOptions = {
  *
  * @remarks
  * {@link DefaultStopVideoCaptureOptions} specifies the default options.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare type StopVideoCaptureOptions = {
     /**
@@ -159,6 +172,7 @@ export declare type StopVideoCaptureOptions = {
  *
  * @privateRemarks
  * Must remain in sync with VideoCaptureResponseCode in IScriptingRuntime.cs.
+ * @deprecated This module is deprecated and will be removed in a future version.
  */
 export declare enum VideoCaptureResponseCode {
     /**

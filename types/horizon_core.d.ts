@@ -5270,8 +5270,29 @@ export declare enum WorldVariableUpdateErrorType {
  * A persistent storage object, which contains a set of functions that interact with persistent variables.
  */
 export interface IPersistentStorageWorld {
+    /**
+     * Get a world persistent variable value for current world from the persistent storage.
+     *
+     * @param key - The name of the world persistent variable.
+     * @returns - The value of the world persistent variable.
+     */
     getWorldVariable<T extends PersistentSerializableState>(key: string): T | null;
+    /**
+     * Get a world counter value for current world from the persistent storage.
+     *
+     * @param key - The name of the world counter.
+     * @returns - The value of the world counter.
+     */
     getWorldCounter(key: string): number;
+    /**
+     * Increment a world counter value for current world from the persistent storage.
+     *
+     * @param key - The name of the world counter.
+     * @param amount - (optional) The amount to increment the world counter by.
+     *                 If not specified, the default value is 1.
+     *                 Can take a negative value for decrementing.
+     * @returns - A promise which resolves to the updated value of the world counter.
+     */
     incrementWorldCounterAsync(key: string, amount: number): Promise<number>;
     setWorldVariableAcrossAllInstancesAsync<T extends PersistentSerializableState>(key: string, value: T, allowConcurrentOverride?: true): Promise<T>;
     setWorldVariableAcrossAllInstancesAsync<T extends PersistentSerializableState>(key: string, value: T, allowConcurrentOverride: false): Promise<WorldVariableUpdateResult<T>>;
