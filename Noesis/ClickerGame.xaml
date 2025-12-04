@@ -151,7 +151,7 @@
           <ItemsControl x:Name="PointerRing" ItemsSource="{Binding fingerPositions}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
-                <!-- Rotating canvas: ring spins around cookie -->
+                <!-- Smooth XAML-driven rotation animation -->
                 <Canvas Width="336" Height="336" RenderTransformOrigin="0.5,0.5">
                   <Canvas.RenderTransform>
                     <RotateTransform x:Name="PointerRingRotate" Angle="0"/>
@@ -189,8 +189,8 @@
                       <b:ControlStoryboardAction>
                         <b:ControlStoryboardAction.Storyboard>
                           <Storyboard>
-                            <!-- Single click: up then down -->
-                            <DoubleAnimation Storyboard.TargetName="FingerBob" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.075" AutoReverse="True">
+                            <!-- Single click: up then down (slower) -->
+                            <DoubleAnimation Storyboard.TargetName="FingerBob" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.12" AutoReverse="True">
                               <DoubleAnimation.EasingFunction>
                                 <QuadraticEase EasingMode="EaseOut"/>
                               </DoubleAnimation.EasingFunction>

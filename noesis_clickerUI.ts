@@ -28,8 +28,8 @@ import {
 // #region 🏷️ Type Definitions
 const POPUP_COUNT = 10;
 const POPUP_DURATION_MS = 600; // Match animation duration in XAML
+
 const FINGER_COUNT = 24;
-const FINGER_CLICK_INTERVAL_MS = 150; // ms between each finger "click" in the ring
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -37,6 +37,10 @@ class Default extends Component<typeof Default> {
   static propsDefinition = {
     popupFontSize: { type: PropTypes.Number, default: 48 },
     popupColor: { type: PropTypes.String, default: "#FFFFFF" },
+    // Time between starting each finger click in the cascade (ms)
+    fingerCascadeIntervalMs: { type: PropTypes.Number, default: 60 },
+    // How long one full rotation takes in seconds (0 = no spin). Default 60 = 1 rotation/min.
+    fingerSpinDurationSeconds: { type: PropTypes.Number, default: 60 },
   };
   // #endregion
 
@@ -56,8 +60,9 @@ class Default extends Component<typeof Default> {
   // Popup system state - round-robin index for next popup slot
   private nextPopupIndex: number = 0;
   
-  // Finger ring state - which finger is currently "clicking"
+  // Finger ring state - which finger is currently "clicking" (for trigger only)
   private activeFingerIndex: number = 0;
+  private fingerClickStates: boolean[] = new Array(FINGER_COUNT).fill(false);
   
   // Data context for Noesis binding
   private dataContext: IUiViewModelObject = {};
@@ -155,6 +160,8 @@ class Default extends Component<typeof Default> {
       // Uses FINGER_COUNT fingers around the circle, all clicking at the same speed
       // but staggered so only one finger "clicks" at a time
       fingerPositions: this.generateFingerPositions(FINGER_COUNT, 150),
+      // Duration for one full rotation (used by XAML animation)
+      fingerSpinDuration: `0:0:${this.props.fingerSpinDurationSeconds}`,
     };
     
     // Preserve existing popup state or initialize to defaults
@@ -186,8 +193,9 @@ class Default extends Component<typeof Default> {
       // Rotation to point finger toward center (opposite of position angle)
       const rotation = -angleDegrees;
       
-      // Mark this finger as the active "clicking" finger if its index matches
-      const isClicking = i === this.activeFingerIndex;
+      // This finger is currently in its click animation if its state flag is true.
+      // Multiple fingers can be true at once, creating a cascading overlap.
+      const isClicking = this.fingerClickStates[i] || false;
       
       positions.push({ left, top, rotation, isClicking });
     }
@@ -199,11 +207,23 @@ class Default extends Component<typeof Default> {
   private startFingerClickLoop(): void {
     // Advance active finger index in a simple endless loop
     this.async.setInterval(() => {
+      if (!this.noesisGizmo) return;
+
       // Step in the opposite direction around the ring
       this.activeFingerIndex = (this.activeFingerIndex - 1 + FINGER_COUNT) % FINGER_COUNT;
-      // Rebuild only the parts of the UI that depend on activeFingerIndex
-      this.updateUI();
-    }, FINGER_CLICK_INTERVAL_MS);
+      const index = this.activeFingerIndex;
+
+      // Trigger click animation for this finger by toggling isClicking true then false.
+      // The XAML storyboard handles the full down-and-up animation duration.
+      this.fingerClickStates[index] = true;
+      this.updateFingerPositions();
+
+      // Immediately set back to false on next frame so the trigger can fire again next cycle
+      this.async.setTimeout(() => {
+        this.fingerClickStates[index] = false;
+        // No need to updateFingerPositions here - the animation is already running
+      }, 1);
+    }, this.props.fingerCascadeIntervalMs);
   }
   
   // Build shop page specific data
@@ -393,6 +413,13 @@ class Default extends Component<typeof Default> {
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
   }
+
+   // Update just the finger positions without rebuilding the full data context
+   private updateFingerPositions(): void {
+     if (!this.noesisGizmo) return;
+     this.dataContext.fingerPositions = this.generateFingerPositions(FINGER_COUNT, 150);
+     this.noesisGizmo.dataContext = this.dataContext;
+   }
   
   // Send event to game manager (server)
   private sendToManager(data: GameEventPayload): void {
