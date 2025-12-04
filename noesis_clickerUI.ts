@@ -1,13 +1,14 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with HomePage.xaml
+// Desktop Editor Setup: Attach to NoesisUI entity with ClickerGame.xaml. Use Shared execution mode.
 
 // #region 📋 README
 // Unified Noesis UI controller for Cookie Clicker.
 // Handles all three pages (Home, Shop, Stats) with navigation.
+// Includes cookie button with click animations and +# popup system.
 // Communicates with manager_game.ts via NetworkEvents.
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
-import { Component } from "horizon/core";
+import { Component, PropTypes } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
 import {
@@ -26,12 +27,16 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-// (Types are now in util_gameData.ts)
+const POPUP_COUNT = 10;
+const POPUP_DURATION_MS = 600; // Match animation duration in XAML
 // #endregion
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
-  static propsDefinition = {};
+  static propsDefinition = {
+    popupFontSize: { type: PropTypes.Number, default: 48 },
+    popupColor: { type: PropTypes.String, default: "#FFFFFF" },
+  };
   // #endregion
 
   // #region 📊 State
@@ -46,6 +51,10 @@ class Default extends Component<typeof Default> {
   private cookiesPerSecond: number = 0;
   private cookiesPerClick: number = 1;
   private upgrades: { [upgradeId: string]: number } = {};
+  
+  // Popup system state
+  private nextPopupIndex: number = 0;
+  private popupInUse: boolean[] = new Array(POPUP_COUNT).fill(false);
   
   // Data context for Noesis binding
   private dataContext: IUiViewModelObject = {};
@@ -67,6 +76,12 @@ class Default extends Component<typeof Default> {
     for (const config of UPGRADE_CONFIGS) {
       this.upgrades[config.id] = 0;
     }
+    
+    // Listen for local cookie click events from player controller
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.cookieClicked,
+      () => this.onCookieClick()
+    );
     
     // Listen for state updates from game manager
     this.connectNetworkBroadcastEvent(
@@ -131,9 +146,23 @@ class Default extends Component<typeof Default> {
   
   // Build home page specific data
   private buildHomePageData(): IUiViewModelObject {
-    // Cookie button is now in a separate gizmo (CookieButton.xaml)
-    // This page is empty - just a placeholder for navigation state
-    return {};
+    const homeData: IUiViewModelObject = {
+      onCookieClick: () => this.onCookieClick(),
+      isClicking: this.dataContext.isClicking || false,
+      // Popup style configuration
+      PopupFontSize: this.props.popupFontSize,
+      PopupColor: this.props.popupColor,
+    };
+    
+    // Preserve existing popup state or initialize to defaults
+    for (let i = 0; i < POPUP_COUNT; i++) {
+      homeData[`Popup${i}Text`] = this.dataContext[`Popup${i}Text`] || "";
+      homeData[`Popup${i}Visible`] = this.dataContext[`Popup${i}Visible`] || "Collapsed";
+      homeData[`Popup${i}Animate`] = this.dataContext[`Popup${i}Animate`] || false;
+      homeData[`Popup${i}Margin`] = this.dataContext[`Popup${i}Margin`] || "0,0,0,0";
+    }
+    
+    return homeData;
   }
   
   // Build shop page specific data
@@ -252,12 +281,104 @@ class Default extends Component<typeof Default> {
     log.info(`Navigating from ${this.currentPage} to ${page}`);
     this.currentPage = page;
     
-    // Show/hide cookie based on current page
-    // Cookie is only visible on home page
-    const cookieVisible = page === "home";
-    this.sendLocalBroadcastEvent(LocalUIEvents.setCookieVisible, { visible: cookieVisible });
-    
     this.updateUI();
+  }
+  // #endregion
+
+  // #region 🍪 Cookie Click & Popup Logic
+  private onCookieClick(): void {
+    const log = this.log.active("onCookieClick");
+    log.info("Cookie clicked!");
+    
+    // Trigger click animation by toggling isClicking
+    if (this.noesisGizmo) {
+      this.dataContext.isClicking = true;
+      this.noesisGizmo.dataContext = this.dataContext;
+      
+      // Reset after animation duration
+      this.async.setTimeout(() => {
+        this.dataContext.isClicking = false;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+      }, 150);
+    }
+    
+    // Show +# popup
+    this.showPopup(`+${this.cookiesPerClick}`);
+    
+    // Send click to game manager
+    this.sendToManager({ type: "cookie_clicked" });
+  }
+  
+  private showPopup(text: string): void {
+    const log = this.log.active("showPopup");
+    
+    // Find an available popup slot
+    let popupIndex = -1;
+    for (let i = 0; i < POPUP_COUNT; i++) {
+      const checkIndex = (this.nextPopupIndex + i) % POPUP_COUNT;
+      if (!this.popupInUse[checkIndex]) {
+        popupIndex = checkIndex;
+        break;
+      }
+    }
+    
+    if (popupIndex === -1) {
+      log.info("All popups in use, skipping");
+      return;
+    }
+    
+    // Mark as in use
+    this.popupInUse[popupIndex] = true;
+    this.nextPopupIndex = (popupIndex + 1) % POPUP_COUNT;
+    
+    // Generate random position anywhere on the cookie (256x256 cookie area)
+    const offsetX = Math.floor((Math.random() - 0.5) * 256);
+    const offsetY = Math.floor((Math.random() - 0.5) * 256);
+    
+    // Update data context for this popup
+    this.dataContext[`Popup${popupIndex}Text`] = text;
+    this.dataContext[`Popup${popupIndex}Visible`] = "Visible";
+    this.dataContext[`Popup${popupIndex}Margin`] = `${offsetX},${offsetY},0,0`;
+    this.dataContext[`Popup${popupIndex}Animate`] = false;
+    
+    // Apply changes
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    // Trigger animation on next frame
+    this.async.setTimeout(() => {
+      this.dataContext[`Popup${popupIndex}Animate`] = true;
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 16);
+    
+    log.info(`Showing popup ${popupIndex}: ${text}`);
+    
+    // Hide popup after animation completes
+    this.async.setTimeout(() => {
+      this.hidePopup(popupIndex);
+    }, POPUP_DURATION_MS);
+  }
+  
+  private hidePopup(index: number): void {
+    const log = this.log.inactive("hidePopup");
+    
+    // Reset popup state
+    this.dataContext[`Popup${index}Text`] = "";
+    this.dataContext[`Popup${index}Visible`] = "Collapsed";
+    this.dataContext[`Popup${index}Animate`] = false;
+    this.popupInUse[index] = false;
+    
+    // Apply changes
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    log.info(`Hidden popup ${index}`);
   }
   // #endregion
 
