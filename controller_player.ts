@@ -33,6 +33,12 @@ class Default extends Component<typeof Default> {
   start(): void {
     const log = this.log.active("start");
     
+    log.info("controller_player start() called");
+    
+    // Log prop configuration
+    log.info(`cookieButtonGizmo prop: ${this.props.cookieButtonGizmo ? "SET" : "NULL"}`);
+    log.info(`raycastGizmo prop: ${this.props.raycastGizmo ? "SET" : "NULL"}`);
+    
     // Get local player and server player references
     this.localPlayer = this.world.getLocalPlayer();
     const serverPlayer = this.world.getServerPlayer();
@@ -67,6 +73,8 @@ class Default extends Component<typeof Default> {
     _state: {}
   ): void {
     const log = this.log.active("receiveOwnership");
+    
+    log.info("receiveOwnership() called!");
     
     // Update local player reference
     this.localPlayer = this.world.getLocalPlayer();
@@ -164,6 +172,8 @@ class Default extends Component<typeof Default> {
   private onClickDetected(data: { interactionInfo: Array<{ screenPosition: Vec3, worldRayOrigin: Vec3, worldRayDirection: Vec3 }> }): void {
     const log = this.log.active("onClickDetected");
     
+    log.info("Click detected in focused interaction mode!");
+    
     // Get raycast gizmo
     const raycastGizmo = this.props.raycastGizmo?.as(RaycastGizmo);
     if (!raycastGizmo) {
@@ -173,6 +183,8 @@ class Default extends Component<typeof Default> {
     
     // Check each touch/click position
     for (const info of data.interactionInfo) {
+      log.info(`Ray origin: ${info.worldRayOrigin.toString()}, direction: ${info.worldRayDirection.toString()}`);
+      
       // Use the built-in world ray from InteractionInfo - no manual calculation needed!
       const hit = raycastGizmo.raycast(info.worldRayOrigin, info.worldRayDirection, {
         maxDistance: 100,
@@ -180,9 +192,11 @@ class Default extends Component<typeof Default> {
       });
       
       if (hit) {
-        log.info(`Cookie hit at ${hit.hitPoint.toString()}`);
+        log.info(`Cookie HIT at ${hit.hitPoint.toString()}`);
         this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
         return;
+      } else {
+        log.info("Raycast missed - no hit");
       }
     }
   }

@@ -140,11 +140,12 @@ class Default extends Component<typeof Default> {
     
     // Transfer ownership of player controller entity to the player
     // This triggers focused interaction mode on their client
+    log.info(`playerControllerEntity prop: ${this.props.playerControllerEntity ? "SET" : "NULL"}`);
     if (this.props.playerControllerEntity) {
       this.props.playerControllerEntity.owner.set(player);
       log.info(`Transferred player controller ownership to ${player.name.get()}`);
     } else {
-      log.warn("No playerControllerEntity configured - player won't enter focused interaction mode");
+      log.error("playerControllerEntity is NOT SET! Drag the controller_player entity into this prop in the Desktop Editor.");
     }
     
     // Send initial state after a short delay

@@ -1,6 +1,7 @@
 <!-- 
   CookieButton - Standalone cookie clicker button
   Designed to be placed behind Text Gizmos in 3D space
+  Includes 10 popup text elements for +# indicators
 -->
 
 <Page
@@ -18,6 +19,16 @@
     <ResourceDictionary.MergedDictionaries>
       <ResourceDictionary Source="GlobalResources.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+    
+    <!-- Popup text style -->
+    <Style x:Key="PopupTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="Fonts/#Anton"/>
+      <Setter Property="FontSize" Value="48"/>
+      <Setter Property="Foreground" Value="#FFFFFF"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+    </Style>
   </ResourceDictionary>
 </Page.Resources>
 
@@ -300,6 +311,247 @@
       <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
     </Grid>
   </Button>
+  
+  <!-- Popup Text Elements (10 total, each independently controlled) -->
+  <!-- Popup 0 -->
+  <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible}" Margin="{Binding Popup0Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup0Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup0Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup0Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup0" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 1 -->
+  <TextBlock x:Name="Popup1" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup1Text}" Visibility="{Binding Popup1Visible}" Margin="{Binding Popup1Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup1Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup1Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup1Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup1" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 2 -->
+  <TextBlock x:Name="Popup2" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup2Text}" Visibility="{Binding Popup2Visible}" Margin="{Binding Popup2Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup2Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup2Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup2Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup2" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 3 -->
+  <TextBlock x:Name="Popup3" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup3Text}" Visibility="{Binding Popup3Visible}" Margin="{Binding Popup3Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup3Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup3Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup3Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup3" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 4 -->
+  <TextBlock x:Name="Popup4" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup4Text}" Visibility="{Binding Popup4Visible}" Margin="{Binding Popup4Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup4Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup4Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup4Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup4" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 5 -->
+  <TextBlock x:Name="Popup5" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup5Text}" Visibility="{Binding Popup5Visible}" Margin="{Binding Popup5Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup5Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup5Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup5Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup5" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 6 -->
+  <TextBlock x:Name="Popup6" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup6Text}" Visibility="{Binding Popup6Visible}" Margin="{Binding Popup6Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup6Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup6Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup6Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup6" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 7 -->
+  <TextBlock x:Name="Popup7" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup7Text}" Visibility="{Binding Popup7Visible}" Margin="{Binding Popup7Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup7Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup7Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup7Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup7" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 8 -->
+  <TextBlock x:Name="Popup8" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup8Text}" Visibility="{Binding Popup8Visible}" Margin="{Binding Popup8Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup8Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup8Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup8Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup8" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
+  
+  <!-- Popup 9 -->
+  <TextBlock x:Name="Popup9" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup9Text}" Visibility="{Binding Popup9Visible}" Margin="{Binding Popup9Margin}">
+    <TextBlock.RenderTransform>
+      <TransformGroup>
+        <TranslateTransform x:Name="Popup9Translate" Y="0"/>
+        <ScaleTransform ScaleX="1" ScaleY="1"/>
+      </TransformGroup>
+    </TextBlock.RenderTransform>
+    <b:Interaction.Triggers>
+      <b:DataTrigger Binding="{Binding Popup9Animate}" Value="True">
+        <b:ControlStoryboardAction>
+          <b:ControlStoryboardAction.Storyboard>
+            <Storyboard>
+              <DoubleAnimation Storyboard.TargetName="Popup9Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6">
+                <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+              </DoubleAnimation>
+              <DoubleAnimation Storyboard.TargetName="Popup9" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/>
+            </Storyboard>
+          </b:ControlStoryboardAction.Storyboard>
+        </b:ControlStoryboardAction>
+      </b:DataTrigger>
+    </b:Interaction.Triggers>
+  </TextBlock>
 
 </Grid>
 

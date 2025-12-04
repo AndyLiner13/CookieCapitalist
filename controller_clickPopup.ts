@@ -1,137 +1,128 @@
-// Desktop Editor Setup: Attach to any entity. Pre-spawn Text Gizmos with tag "textGizmo" in the scene.
+// Desktop Editor Setup: Attach to each Text Gizmo entity. Use Default execution mode.
+// Position the Text Gizmo in front of the cookie in the scene, facing the camera.
 
 // #region 📋 README
-// Controller for managing a pool of pre-spawned Text Gizmos.
-// Shows +# popup text when player clicks the cookie.
-// Each text gizmo is positioned in front of the player, floats up, then returns to pool.
-// Must use Local execution mode - runs on each player's client independently.
+// Controller for a single Text Gizmo in the click popup pool.
+// Listens for popup events and displays the text at the gizmo's original position.
+// Each text gizmo manages its own availability state.
+// Text appears at its scene position, faces the camera, floats up, then hides.
+// Uses Default (server) execution mode for single-player game.
 // #endregion
 
-import { Component, PropTypes, Entity, TextGizmo, Vec3, Player } from "horizon/core";
+import { Component, PropTypes, TextGizmo, Vec3, Player, Quaternion } from "horizon/core";
 import { Logger } from "./util_logger";
 import { UIEvents, UIEventPayload } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-type PooledTextGizmo = {
-  entity: Entity;
-  gizmo: TextGizmo;
-  inUse: boolean;
-};
 // #endregion
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
-    floatDistance: { type: PropTypes.Number, default: 0.5 },
-    floatDuration: { type: PropTypes.Number, default: 0.8 },
-    spawnDistance: { type: PropTypes.Number, default: 2.0 },
-    textGizmoTag: { type: PropTypes.String, default: "textGizmo" },
+    displayDuration: { type: PropTypes.Number, default: 0.8 },
+    floatDistance: { type: PropTypes.Number, default: 0.3 },
+    cameraEntity: { type: PropTypes.Entity },
   };
   // #endregion
 
   // #region 📊 State
   private log = new Logger("controller_clickPopup");
-  private textGizmoPool: PooledTextGizmo[] = [];
-  private localPlayer: Player | null = null;
+  private textGizmo: TextGizmo | null = null;
+  private inUse: boolean = false;
+  private originalPosition: Vec3 = Vec3.zero;
+  private originalRotation: Quaternion = Quaternion.identity;
   // #endregion
 
   // #region 🔄 Lifecycle Events
   start(): void {
     const log = this.log.active("start");
     
-    // Get local player reference
-    this.localPlayer = this.world.getLocalPlayer();
+    // Get TextGizmo reference from this entity
+    this.textGizmo = this.entity.as(TextGizmo);
     
-    // Find all text gizmos with the specified tag
-    const textEntities = this.world.getEntitiesWithTags([this.props.textGizmoTag]);
-    
-    if (textEntities.length === 0) {
-      log.error(`No entities found with tag "${this.props.textGizmoTag}"`);
+    if (!this.textGizmo) {
+      log.error("Entity is not a TextGizmo!");
       return;
     }
     
-    // Initialize pool with all found text gizmos
-    for (const entity of textEntities) {
-      const gizmo = entity.as(TextGizmo);
-      if (gizmo) {
-        // Hide initially by moving far away
-        entity.position.set(new Vec3(0, -1000, 0));
-        gizmo.text.set("");
-        
-        this.textGizmoPool.push({
-          entity,
-          gizmo,
-          inUse: false,
-        });
-      }
-    }
+    // Store original position and rotation (where the gizmo is placed in the scene)
+    this.originalPosition = this.entity.position.get();
+    this.originalRotation = this.entity.rotation.get();
+    log.info(`Original position: ${this.originalPosition.toString()}`);
+    log.info(`Original rotation: ${this.originalRotation.toString()}`);
     
-    log.info(`Initialized pool with ${this.textGizmoPool.length} text gizmos`);
+    // Clear text initially (but keep position)
+    this.textGizmo.text.set("");
     
     // Listen for click popup events from the UI
     this.connectNetworkBroadcastEvent(
       UIEvents.showClickPopup,
-      (data: UIEventPayload) => {
-        this.showPopup(data.text as string);
+      (data: UIEventPayload, fromPlayer: Player) => {
+        this.showPopup(data.text as string, fromPlayer);
       }
     );
+    
+    log.info("Click popup text gizmo initialized");
   }
   // #endregion
 
   // #region 🎯 Main Logic
-  private showPopup(text: string): void {
+  private showPopup(text: string, player: Player): void {
     const log = this.log.active("showPopup");
     
-    if (!this.localPlayer) {
-      log.warn("No local player available");
+    if (!this.textGizmo) {
+      log.error("No textGizmo reference!");
       return;
     }
     
-    // Find an available text gizmo from the pool
-    const available = this.textGizmoPool.find(item => !item.inUse);
-    
-    if (!available) {
-      log.warn("No available text gizmos in pool");
+    // Skip if already showing text
+    if (this.inUse) {
+      log.info("Skipping - already in use");
       return;
     }
     
     // Mark as in use
-    available.inUse = true;
+    this.inUse = true;
     
-    // Calculate spawn position in front of player's head with random offset
-    const headPos = this.localPlayer.head.position.get();
-    const headForward = this.localPlayer.head.forward.get();
-    const headUp = this.localPlayer.head.up.get();
+    // Add small random offset to original position
+    const randomOffsetX = (Math.random() - 0.5) * 0.4;
+    const randomOffsetY = (Math.random() - 0.5) * 0.2;
     
-    // Random horizontal offset (-0.3 to 0.3)
-    const randomOffsetX = (Math.random() - 0.5) * 0.6;
-    const randomOffsetY = (Math.random() - 0.5) * 0.3;
+    const spawnPos = this.originalPosition.add(new Vec3(randomOffsetX, randomOffsetY, 0));
     
-    // Calculate right vector from forward and up
-    const right = headForward.cross(headUp).normalize();
+    // Set position
+    this.entity.position.set(spawnPos);
     
-    // Position: in front of head + random offset
-    const spawnPos = headPos
-      .add(headForward.mul(this.props.spawnDistance))
-      .add(right.mul(randomOffsetX))
-      .add(headUp.mul(randomOffsetY));
+    // Make text face the camera/player
+    // Get camera position (use cameraEntity prop if set, otherwise use player head)
+    let cameraPos: Vec3;
+    if (this.props.cameraEntity) {
+      cameraPos = this.props.cameraEntity.position.get();
+      log.info(`Using cameraEntity position: ${cameraPos.toString()}`);
+    } else {
+      cameraPos = player.head.position.get();
+      log.info(`Using player head position: ${cameraPos.toString()}`);
+    }
     
-    // Set text and position
-    available.gizmo.text.set(text);
-    available.entity.position.set(spawnPos);
+    // Look at camera position
+    this.entity.lookAt(cameraPos, Vec3.up);
+    log.info(`Text positioned at: ${spawnPos.toString()}, looking at: ${cameraPos.toString()}`);
+    
+    // Set text AFTER positioning
+    this.textGizmo.text.set(text);
+    log.info(`Text set to: "${text}"`);
     
     // Animate floating up
-    this.animateFloat(available, spawnPos, headUp);
+    this.animateFloat(spawnPos);
   }
   
-  private animateFloat(item: PooledTextGizmo, startPos: Vec3, upDirection: Vec3): void {
+  private animateFloat(startPos: Vec3): void {
     const log = this.log.inactive("animateFloat");
     
-    const duration = this.props.floatDuration * 1000; // Convert to ms
+    const duration = this.props.displayDuration * 1000;
     const floatDistance = this.props.floatDistance;
     const startTime = Date.now();
     
-    // Animation loop
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -139,31 +130,32 @@ class Default extends Component<typeof Default> {
       // Ease out curve for smooth deceleration
       const easedProgress = 1 - Math.pow(1 - progress, 2);
       
-      // Move up along the up direction
-      const currentPos = startPos.add(upDirection.mul(floatDistance * easedProgress));
-      item.entity.position.set(currentPos);
+      // Move up (Y axis is up in Horizon)
+      const currentPos = startPos.add(new Vec3(0, floatDistance * easedProgress, 0));
+      this.entity.position.set(currentPos);
       
       if (progress < 1) {
-        // Continue animation
         this.async.setTimeout(animate, 16); // ~60fps
       } else {
-        // Animation complete - return to pool
-        this.returnToPool(item);
+        this.clearPopup();
       }
     };
     
     animate();
   }
   
-  private returnToPool(item: PooledTextGizmo): void {
-    const log = this.log.inactive("returnToPool");
+  private clearPopup(): void {
+    const log = this.log.inactive("clearPopup");
     
-    // Hide by moving far away and clearing text
-    item.entity.position.set(new Vec3(0, -1000, 0));
-    item.gizmo.text.set("");
-    item.inUse = false;
+    if (this.textGizmo) {
+      this.textGizmo.text.set("");
+    }
+    // Return to original position and rotation
+    this.entity.position.set(this.originalPosition);
+    this.entity.rotation.set(this.originalRotation);
+    this.inUse = false;
     
-    log.info("Text gizmo returned to pool");
+    log.info("Popup cleared");
   }
   // #endregion
 }
