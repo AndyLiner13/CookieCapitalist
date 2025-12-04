@@ -7,10 +7,9 @@
 // - Cookie production tick (passive income)
 // - Purchase validation and processing
 // - State synchronization with UI
-// - Player controller ownership assignment
 // #endregion
 
-import { Component, Player, CodeBlockEvents, PropTypes, Entity } from "horizon/core";
+import { Component, Player, CodeBlockEvents, PropTypes } from "horizon/core";
 import { Logger } from "./util_logger";
 import {
   GameState,
@@ -32,9 +31,7 @@ import {
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
-    playerControllerEntity: { type: PropTypes.Entity },
-    cookieButtonGizmo: { type: PropTypes.Entity },
-    clickerUIGizmo: { type: PropTypes.Entity },
+    clickerUIGizmo: { type: PropTypes.Entity }, // NoesisUI gizmo with ClickerGame.xaml
   };
   // #endregion
 
@@ -49,6 +46,11 @@ class Default extends Component<typeof Default> {
   
   // Tick accumulator for fractional cookies
   private cookieAccumulator: number = 0;
+  
+  // Throttle state broadcasts to avoid network flooding
+  private pendingStateUpdate: boolean = false;
+  private lastBroadcastTime: number = 0;
+  private static readonly BROADCAST_THROTTLE_MS = 100; // Max 10 updates per second
   
   // Active player reference
   private activePlayer: Player | null = null;
@@ -87,12 +89,6 @@ class Default extends Component<typeof Default> {
     if (players.length > 0) {
       this.activePlayer = players[0];
       log.info(`Found existing player: ${this.activePlayer.name.get()}`);
-      
-      // Transfer ownership of player controller entity to the existing player
-      if (this.props.playerControllerEntity) {
-        this.props.playerControllerEntity.owner.set(this.activePlayer);
-        log.info(`Transferred player controller ownership to existing player ${this.activePlayer.name.get()}`);
-      }
       
       // Send initial state after a short delay to let UI initialize
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
@@ -137,16 +133,6 @@ class Default extends Component<typeof Default> {
     
     // For single player, just track the active player
     this.activePlayer = player;
-    
-    // Transfer ownership of player controller entity to the player
-    // This triggers focused interaction mode on their client
-    log.info(`playerControllerEntity prop: ${this.props.playerControllerEntity ? "SET" : "NULL"}`);
-    if (this.props.playerControllerEntity) {
-      this.props.playerControllerEntity.owner.set(player);
-      log.info(`Transferred player controller ownership to ${player.name.get()}`);
-    } else {
-      log.error("playerControllerEntity is NOT SET! Drag the controller_player entity into this prop in the Desktop Editor.");
-    }
     
     // Send initial state after a short delay
     this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
@@ -198,7 +184,8 @@ class Default extends Component<typeof Default> {
     
     log.info(`Cookie clicked! Total: ${this.gameState.cookies}`);
     
-    this.broadcastStateUpdate();
+    // Use throttled broadcast to avoid network flooding during rapid clicks
+    this.throttledBroadcastStateUpdate();
   }
   
   // Handle upgrade purchase
@@ -240,6 +227,31 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 🛠️ Helper Methods
+  // Throttled broadcast - limits how often state updates are sent during rapid clicks
+  private throttledBroadcastStateUpdate(): void {
+    const now = Date.now();
+    const timeSinceLastBroadcast = now - this.lastBroadcastTime;
+    
+    if (timeSinceLastBroadcast >= Default.BROADCAST_THROTTLE_MS) {
+      // Enough time has passed, broadcast immediately
+      this.broadcastStateUpdate();
+      this.lastBroadcastTime = now;
+      this.pendingStateUpdate = false;
+    } else if (!this.pendingStateUpdate) {
+      // Schedule a delayed broadcast
+      this.pendingStateUpdate = true;
+      const delay = Default.BROADCAST_THROTTLE_MS - timeSinceLastBroadcast;
+      this.async.setTimeout(() => {
+        if (this.pendingStateUpdate) {
+          this.broadcastStateUpdate();
+          this.lastBroadcastTime = Date.now();
+          this.pendingStateUpdate = false;
+        }
+      }, delay);
+    }
+    // If pendingStateUpdate is already true, a broadcast is already scheduled
+  }
+  
   // Broadcast state to all players
   private broadcastStateUpdate(): void {
     const log = this.log.inactive("broadcastStateUpdate");

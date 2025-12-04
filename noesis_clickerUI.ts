@@ -17,7 +17,6 @@ import {
   UIEventPayload,
   GameEvents,
   UIEvents,
-  LocalUIEvents,
   UPGRADE_CONFIGS,
   calculateUpgradeCost,
   formatCookieDisplay,
@@ -52,9 +51,8 @@ class Default extends Component<typeof Default> {
   private cookiesPerClick: number = 1;
   private upgrades: { [upgradeId: string]: number } = {};
   
-  // Popup system state
+  // Popup system state - round-robin index for next popup slot
   private nextPopupIndex: number = 0;
-  private popupInUse: boolean[] = new Array(POPUP_COUNT).fill(false);
   
   // Data context for Noesis binding
   private dataContext: IUiViewModelObject = {};
@@ -76,12 +74,6 @@ class Default extends Component<typeof Default> {
     for (const config of UPGRADE_CONFIGS) {
       this.upgrades[config.id] = 0;
     }
-    
-    // Listen for local cookie click events from player controller
-    this.connectLocalBroadcastEvent(
-      LocalUIEvents.cookieClicked,
-      () => this.onCookieClick()
-    );
     
     // Listen for state updates from game manager
     this.connectNetworkBroadcastEvent(
@@ -148,7 +140,6 @@ class Default extends Component<typeof Default> {
   private buildHomePageData(): IUiViewModelObject {
     const homeData: IUiViewModelObject = {
       onCookieClick: () => this.onCookieClick(),
-      isClicking: this.dataContext.isClicking || false,
       // Popup style configuration
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
@@ -287,98 +278,60 @@ class Default extends Component<typeof Default> {
 
   // #region 🍪 Cookie Click & Popup Logic
   private onCookieClick(): void {
-    const log = this.log.active("onCookieClick");
+    const log = this.log.inactive("onCookieClick");
     log.info("Cookie clicked!");
     
-    // Trigger click animation by toggling isClicking
-    if (this.noesisGizmo) {
-      this.dataContext.isClicking = true;
-      this.noesisGizmo.dataContext = this.dataContext;
-      
-      // Reset after animation duration
-      this.async.setTimeout(() => {
-        this.dataContext.isClicking = false;
-        if (this.noesisGizmo) {
-          this.noesisGizmo.dataContext = this.dataContext;
-        }
-      }, 150);
-    }
+    // Optimistic local update - immediately update UI without waiting for server
+    this.cookies += this.cookiesPerClick;
+    this.updateCookieDisplay();
     
-    // Show +# popup
+    // Show +# popup (immediate visual feedback)
     this.showPopup(`+${this.cookiesPerClick}`);
     
-    // Send click to game manager
+    // Send click to game manager (server will validate and sync)
     this.sendToManager({ type: "cookie_clicked" });
   }
   
+  // Update just the cookie display without rebuilding entire data context
+  private updateCookieDisplay(): void {
+    if (!this.noesisGizmo) return;
+    
+    this.dataContext.cookieCount = formatCookieDisplay(this.cookies);
+    this.noesisGizmo.dataContext = this.dataContext;
+  }
+  
   private showPopup(text: string): void {
-    const log = this.log.active("showPopup");
+    const log = this.log.inactive("showPopup");
     
-    // Find an available popup slot
-    let popupIndex = -1;
-    for (let i = 0; i < POPUP_COUNT; i++) {
-      const checkIndex = (this.nextPopupIndex + i) % POPUP_COUNT;
-      if (!this.popupInUse[checkIndex]) {
-        popupIndex = checkIndex;
-        break;
-      }
-    }
-    
-    if (popupIndex === -1) {
-      log.info("All popups in use, skipping");
-      return;
-    }
-    
-    // Mark as in use
-    this.popupInUse[popupIndex] = true;
+    // Use round-robin slot selection - always use the next slot
+    // This ensures even distribution and avoids "in use" checks
+    const popupIndex = this.nextPopupIndex;
     this.nextPopupIndex = (popupIndex + 1) % POPUP_COUNT;
     
     // Generate random position anywhere on the cookie (256x256 cookie area)
     const offsetX = Math.floor((Math.random() - 0.5) * 256);
     const offsetY = Math.floor((Math.random() - 0.5) * 256);
     
-    // Update data context for this popup
+    // Reset animation state first, then set new values
+    this.dataContext[`Popup${popupIndex}Animate`] = false;
     this.dataContext[`Popup${popupIndex}Text`] = text;
     this.dataContext[`Popup${popupIndex}Visible`] = "Visible";
     this.dataContext[`Popup${popupIndex}Margin`] = `${offsetX},${offsetY},0,0`;
-    this.dataContext[`Popup${popupIndex}Animate`] = false;
     
-    // Apply changes
+    // Apply changes and trigger animation in one update
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
+      
+      // Trigger animation on next frame
+      this.async.setTimeout(() => {
+        this.dataContext[`Popup${popupIndex}Animate`] = true;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+      }, 1);
     }
-    
-    // Trigger animation on next frame
-    this.async.setTimeout(() => {
-      this.dataContext[`Popup${popupIndex}Animate`] = true;
-      if (this.noesisGizmo) {
-        this.noesisGizmo.dataContext = this.dataContext;
-      }
-    }, 16);
     
     log.info(`Showing popup ${popupIndex}: ${text}`);
-    
-    // Hide popup after animation completes
-    this.async.setTimeout(() => {
-      this.hidePopup(popupIndex);
-    }, POPUP_DURATION_MS);
-  }
-  
-  private hidePopup(index: number): void {
-    const log = this.log.inactive("hidePopup");
-    
-    // Reset popup state
-    this.dataContext[`Popup${index}Text`] = "";
-    this.dataContext[`Popup${index}Visible`] = "Collapsed";
-    this.dataContext[`Popup${index}Animate`] = false;
-    this.popupInUse[index] = false;
-    
-    // Apply changes
-    if (this.noesisGizmo) {
-      this.noesisGizmo.dataContext = this.dataContext;
-    }
-    
-    log.info(`Hidden popup ${index}`);
   }
   // #endregion
 

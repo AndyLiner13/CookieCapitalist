@@ -16,21 +16,40 @@
 
 <Page.Resources>
   <ResourceDictionary>
-    <ResourceDictionary.MergedDictionaries>
-      <ResourceDictionary Source="GlobalResources.xaml"/>
-    </ResourceDictionary.MergedDictionaries>
-    
     <!-- Popup text base style -->
     <Style x:Key="PopupTextStyle" TargetType="TextBlock">
       <Setter Property="FontFamily" Value="Fonts/#Anton"/>
       <Setter Property="HorizontalAlignment" Value="Center"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+    
+    <!-- Invisible button style - no hover/click visual feedback -->
+    <Style x:Key="InvisibleButtonStyle" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
     </Style>
   </ResourceDictionary>
 </Page.Resources>
 
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+  <Grid.Background>
+    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+      <GradientStop Color="#2773EA" Offset="0"/>
+      <GradientStop Color="#1E4DCE" Offset="1"/>
+    </LinearGradientBrush>
+  </Grid.Background>
 
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Main Container                                                                      -->
@@ -129,7 +148,7 @@
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
         <Grid x:Name="HomePage">
           <!-- Ring of Clicker Images around Cookie (12 images, 30° apart) -->
-          <Canvas x:Name="PointerRingCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336" RenderTransformOrigin="0.5,0.5">
+          <Canvas x:Name="PointerRingCanvas" HorizontalAlignment="Center" VerticalAlignment="Center" Width="336" Height="336" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
             <Canvas.RenderTransform>
               <RotateTransform x:Name="PointerRingRotate" Angle="0"/>
             </Canvas.RenderTransform>
@@ -210,7 +229,8 @@
               <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
             </Button.RenderTransform>
             <b:Interaction.Triggers>
-              <b:DataTrigger Binding="{Binding isClicking}" Value="True">
+              <!-- Shrink on press -->
+              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
                 <b:ControlStoryboardAction>
                   <b:ControlStoryboardAction.Storyboard>
                     <Storyboard>
@@ -219,8 +239,9 @@
                     </Storyboard>
                   </b:ControlStoryboardAction.Storyboard>
                 </b:ControlStoryboardAction>
-              </b:DataTrigger>
-              <b:DataTrigger Binding="{Binding isClicking}" Value="False">
+              </b:EventTrigger>
+              <!-- Bounce back on release -->
+              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
                 <b:ControlStoryboardAction>
                   <b:ControlStoryboardAction.Storyboard>
                     <Storyboard>
@@ -229,7 +250,7 @@
                     </Storyboard>
                   </b:ControlStoryboardAction.Storyboard>
                 </b:ControlStoryboardAction>
-              </b:DataTrigger>
+              </b:EventTrigger>
             </b:Interaction.Triggers>
             <Grid>
               <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>

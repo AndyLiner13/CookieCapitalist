@@ -3,7 +3,7 @@
 // This file contains no Component - it's a pure utility module.
 // #endregion
 
-import { NetworkEvent, LocalEvent, SerializableState } from "horizon/core";
+import { NetworkEvent, SerializableState } from "horizon/core";
 
 // #region 🏷️ Type Definitions
 // Serializable game state for persistence
@@ -59,16 +59,6 @@ export const GameEvents = {
 // Events sent from Game Manager (server) to UI (client)
 export const UIEvents = {
   toClient: new NetworkEvent<UIEventPayload>("game_to_client"),
-  showClickPopup: new NetworkEvent<UIEventPayload>("ui_show_click_popup"),
-  setFocusedInteraction: new NetworkEvent<UIEventPayload>("ui_set_focused_interaction"),
-};
-
-// Local events (client-side only, for communication between local scripts)
-export const LocalUIEvents = {
-  // Fired when player clicks in focused interaction mode - triggers cookie click
-  cookieClicked: new LocalEvent("local_cookie_clicked"),
-  // Fired when navigating pages - shows/hides cookie
-  setCookieVisible: new LocalEvent<{ visible: boolean }>("local_set_cookie_visible"),
 };
 // #endregion
 
