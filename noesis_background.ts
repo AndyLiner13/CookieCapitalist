@@ -16,7 +16,7 @@ import { Logger } from "./util_logger";
 import { PageType, LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-const RAIN_COOKIE_COUNT = 1;
+const RAIN_COOKIE_COUNT = 10;
 const RAIN_STAGGER_INTERVAL_MS = 20; // Stagger between each cookie rain start
 const RAIN_COOKIE_DURATION_MS = 3000; // Must match XAML DoubleAnimation Duration (0:0:3)
 // #endregion
