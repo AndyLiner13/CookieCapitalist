@@ -101,7 +101,7 @@ export const UPGRADE_CONFIGS: UpgradeConfig[] = [
 export const COST_MULTIPLIER = 1.15;
 
 // Base cookies per click
-export const BASE_COOKIES_PER_CLICK = 100;
+export const BASE_COOKIES_PER_CLICK = 100000000;
 
 // Game tick interval in milliseconds
 export const TICK_INTERVAL_MS = 100;
