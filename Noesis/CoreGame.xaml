@@ -294,8 +294,13 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!-- Image: fills height with locked aspect ratio -->
-            <Image Grid.Column="0" Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <!-- Image with tier progress overlay -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <!-- Content: responsive width -->
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <!-- Progress Bar / Name Bar -->
@@ -368,12 +373,9 @@
                     <TextBlock Text="{Binding clicker.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <!-- Tier Progress / Timer display -->
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <!-- Timer display -->
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -387,7 +389,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -453,11 +460,8 @@
                     <TextBlock Text="{Binding grandma.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -471,7 +475,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -537,11 +546,8 @@
                     <TextBlock Text="{Binding farm.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -555,7 +561,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -621,11 +632,8 @@
                     <TextBlock Text="{Binding factory.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -639,7 +647,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -705,11 +718,8 @@
                     <TextBlock Text="{Binding lab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -723,7 +733,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -789,11 +804,8 @@
                     <TextBlock Text="{Binding fab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
@@ -807,7 +819,12 @@
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+              <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
+                <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
+              </Border>
+            </Grid>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
@@ -873,11 +890,8 @@
                     <TextBlock Text="{Binding planet.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
-                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  </StackPanel>
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                  <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
