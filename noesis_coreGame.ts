@@ -63,6 +63,9 @@ class Default extends hz.Component<typeof Default> {
   
   // Popup system state
   private nextPopupIndex: number = 0;
+  
+  // Player info for leaderboard
+  private playerName: string = "You";
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -73,6 +76,17 @@ class Default extends hz.Component<typeof Default> {
     if (!this.noesisGizmo) {
       log.error("Entity is not a NoesisGizmo!");
       return;
+    }
+    
+    // Get local player name for leaderboard
+    try {
+      const localPlayer = this.world.getLocalPlayer();
+      if (localPlayer) {
+        this.playerName = localPlayer.name.get();
+        log.info(`Local player: ${this.playerName}`);
+      }
+    } catch (e) {
+      log.warn("Could not get local player name");
     }
     
     // Initialize upgrades map and production progress
@@ -174,11 +188,14 @@ class Default extends hz.Component<typeof Default> {
     }
     
     // Build leaderboard data
+    // Note: Horizon Worlds API only allows SETTING leaderboard scores, not READING them
+    // Real leaderboard rankings are shown via the World Leaderboard Gizmo in-world
+    // This custom UI shows placeholder data with the current player's real score
     const leaderboardData = {
       leaderboard1: { username: "CookieMaster", score: "1.2M" },
       leaderboard2: { username: "ClickKing", score: "890K" },
       leaderboard3: { username: "BakerPro", score: "654K" },
-      leaderboard4: { username: "You", score: formatNumber(this.cookies) },
+      leaderboard4: { username: this.playerName, score: formatNumber(this.cookies), rank: "4" },
       leaderboard5: { username: "NewPlayer", score: "12K" },
     };
     

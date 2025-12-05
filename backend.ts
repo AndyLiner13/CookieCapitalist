@@ -31,6 +31,9 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
+// Leaderboard configuration - must match the leaderboard name created in Systems > Leaderboards
+const LEADERBOARD_NAME = "TotalCookies";
+const LEADERBOARD_UPDATE_THROTTLE_MS = 2000; // Don't spam leaderboard updates
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -56,6 +59,10 @@ class Default extends Component<typeof Default> {
   private pendingStateUpdate: boolean = false;
   private lastBroadcastTime: number = 0;
   private static readonly BROADCAST_THROTTLE_MS = 100;
+  
+  // Leaderboard throttle
+  private lastLeaderboardUpdate: number = 0;
+  private lastLeaderboardScore: number = 0;
   
   // Active player reference
   private activePlayer: Player | null = null;
@@ -271,6 +278,47 @@ class Default extends Component<typeof Default> {
     
     this.sendNetworkBroadcastEvent(UIEvents.toClient, stateData);
     log.info(`State broadcast: ${this.gameState.cookies} cookies`);
+    
+    // Update leaderboard (throttled)
+    this.updateLeaderboard();
+  }
+  
+  // Update leaderboard score for the active player (throttled)
+  private updateLeaderboard(): void {
+    const log = this.log.inactive("updateLeaderboard");
+    
+    if (!this.activePlayer) {
+      return;
+    }
+    
+    const now = Date.now();
+    const timeSinceLastUpdate = now - this.lastLeaderboardUpdate;
+    const totalCookies = this.gameState.totalCookiesEarned;
+    
+    // Only update if enough time has passed AND score has changed
+    if (timeSinceLastUpdate < LEADERBOARD_UPDATE_THROTTLE_MS) {
+      return;
+    }
+    
+    if (totalCookies <= this.lastLeaderboardScore) {
+      return;
+    }
+    
+    try {
+      // Update the leaderboard - override=false means it only updates if higher
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_NAME,
+        this.activePlayer,
+        totalCookies,
+        false // Don't override lower scores - leaderboard tracks highest
+      );
+      
+      this.lastLeaderboardUpdate = now;
+      this.lastLeaderboardScore = totalCookies;
+      log.info(`Leaderboard updated: ${totalCookies} total cookies for ${this.activePlayer.name.get()}`);
+    } catch (error) {
+      log.warn(`Failed to update leaderboard: ${error}`);
+    }
   }
   // #endregion
 }
