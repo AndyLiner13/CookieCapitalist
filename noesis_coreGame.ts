@@ -162,7 +162,7 @@ class Default extends hz.Component<typeof Default> {
         buyCommand: () => this.purchaseUpgrade(config.id),
         // Production timer data
         progress: progress,                              // 0.0 to 1.0
-        progressWidth: Math.floor(progress * 240),       // Width for progress bar (240 max)
+        progressWidth: Math.min(240, Math.round(progress * 240)), // Width for progress bar (240 max)
         timeRemaining: formatTimeRemaining(timeRemainingMs),
         isProducing: isProducing,
         rateDisplay: isProducing ? formatRateDisplay(actualCookiesPerCycle) : config.rateDisplay,
@@ -244,7 +244,7 @@ class Default extends hz.Component<typeof Default> {
         upgradeObj.isMaxed = isMaxed;
         // Production timer data
         upgradeObj.progress = progress;
-        upgradeObj.progressWidth = Math.floor(progress * 240);
+        upgradeObj.progressWidth = Math.min(240, Math.round(progress * 240));
         upgradeObj.timeRemaining = formatTimeRemaining(timeRemainingMs);
         upgradeObj.isProducing = isProducing;
         upgradeObj.rateDisplay = isProducing ? formatRateDisplay(actualCookiesPerCycle) : config.rateDisplay;
@@ -305,7 +305,7 @@ class Default extends hz.Component<typeof Default> {
         const progress = this.productionProgress[config.id];
         const timeRemainingMs = (1 - progress) * effectiveProductionTime;
         upgradeObj.progress = progress;
-        upgradeObj.progressWidth = Math.floor(progress * 240);
+        upgradeObj.progressWidth = Math.min(240, Math.round(progress * 240));
         upgradeObj.timeRemaining = formatTimeRemaining(timeRemainingMs);
         upgradeObj.isProducing = true;
         dataChanged = true;
