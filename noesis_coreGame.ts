@@ -22,6 +22,9 @@ import {
   formatPrice,
   formatNumber,
   formatTimeRemaining,
+  getTier,
+  getNextTierThreshold,
+  getTierSpeedMultiplier,
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
@@ -135,8 +138,15 @@ class Default extends hz.Component<typeof Default> {
       const canAfford = this.cookies >= cost;
       const isMaxed = config.id === "clicker" && owned >= 24;
       const progress = this.productionProgress[config.id] || 0;
-      const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+      
+      // Tier calculations
+      const tier = getTier(owned);
+      const speedMultiplier = getTierSpeedMultiplier(tier);
+      const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
+      const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
       const isProducing = owned > 0;
+      const nextTierThreshold = getNextTierThreshold(owned);
+      const tierProgress = nextTierThreshold ? `${owned}/${nextTierThreshold}` : `${owned} MAX`;
       
       upgradeData[config.id] = {
         name: config.name,
@@ -151,6 +161,10 @@ class Default extends hz.Component<typeof Default> {
         timeRemaining: formatTimeRemaining(timeRemaining),
         isProducing: isProducing,
         rateDisplay: config.rateDisplay,
+        // Tier data
+        tier: tier,
+        tierProgress: tierProgress,                      // e.g. "5/10" or "1000 MAX"
+        speedMultiplier: `${speedMultiplier}x`,
       };
     }
     
@@ -204,8 +218,15 @@ class Default extends hz.Component<typeof Default> {
       const canAfford = this.cookies >= cost;
       const isMaxed = config.id === "clicker" && owned >= 24;
       const progress = this.productionProgress[config.id] || 0;
-      const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+      
+      // Tier calculations
+      const tier = getTier(owned);
+      const speedMultiplier = getTierSpeedMultiplier(tier);
+      const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
+      const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
       const isProducing = owned > 0;
+      const nextTierThreshold = getNextTierThreshold(owned);
+      const tierProgress = nextTierThreshold ? `${owned}/${nextTierThreshold}` : `${owned} MAX`;
       
       const upgradeObj = this.dataContext[config.id] as any;
       if (upgradeObj) {
@@ -218,6 +239,10 @@ class Default extends hz.Component<typeof Default> {
         upgradeObj.progressWidth = Math.floor(progress * 240);
         upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);
         upgradeObj.isProducing = isProducing;
+        // Tier data
+        upgradeObj.tier = tier;
+        upgradeObj.tierProgress = tierProgress;
+        upgradeObj.speedMultiplier = `${speedMultiplier}x`;
       }
     }
     
@@ -240,8 +265,13 @@ class Default extends hz.Component<typeof Default> {
       const owned = this.upgrades[config.id] || 0;
       if (owned <= 0) continue;
       
-      // Progress increment based on delta time
-      const progressIncrement = deltaTime / config.productionTimeMs;
+      // Calculate tier and speed multiplier
+      const tier = getTier(owned);
+      const speedMultiplier = getTierSpeedMultiplier(tier);
+      const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
+      
+      // Progress increment based on delta time and effective production time
+      const progressIncrement = deltaTime / effectiveProductionTime;
       this.productionProgress[config.id] = (this.productionProgress[config.id] || 0) + progressIncrement;
       
       // Check if production cycle completed
@@ -264,7 +294,7 @@ class Default extends hz.Component<typeof Default> {
       const upgradeObj = this.dataContext[config.id] as any;
       if (upgradeObj) {
         const progress = this.productionProgress[config.id];
-        const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+        const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
         upgradeObj.progress = progress;
         upgradeObj.progressWidth = Math.floor(progress * 240);
         upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);

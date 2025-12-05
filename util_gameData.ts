@@ -108,6 +108,32 @@ export const TICK_INTERVAL_MS = 100;
 
 // Auto-save interval in milliseconds
 export const AUTO_SAVE_INTERVAL_MS = 30000;
+
+// Tier thresholds - each tier doubles production speed
+export const TIER_THRESHOLDS = [10, 25, 50, 100, 150, 200, 350, 500, 750, 1000];
+
+// Get current tier (0-10) based on owned count
+export function getTier(owned: number): number {
+  let tier = 0;
+  for (const threshold of TIER_THRESHOLDS) {
+    if (owned >= threshold) tier++;
+    else break;
+  }
+  return tier;
+}
+
+// Get next tier threshold, or null if at max tier
+export function getNextTierThreshold(owned: number): number | null {
+  for (const threshold of TIER_THRESHOLDS) {
+    if (owned < threshold) return threshold;
+  }
+  return null; // Max tier reached
+}
+
+// Get speed multiplier based on tier (2^tier)
+export function getTierSpeedMultiplier(tier: number): number {
+  return Math.pow(2, tier);
+}
 // #endregion
 
 // #region 🛠️ Utility Functions

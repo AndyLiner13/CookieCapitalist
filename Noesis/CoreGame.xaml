@@ -280,11 +280,11 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="143"/>
       <RowDefinition Height="*"/>
-      <RowDefinition Height="124"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
-      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,16" ClipToBounds="False">
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,140">
         
         <!-- Upgrade Card 1: Clicker (has max limit of 24) -->
         <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
@@ -357,15 +357,12 @@
                     <TextBlock Text="{Binding clicker.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <!-- Timer / Owned display -->
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding clicker.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding clicker.isProducing}" Value="True"><Setter Property="Text" Value="{Binding clicker.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <!-- Tier Progress / Timer display -->
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -438,14 +435,11 @@
                     <TextBlock Text="{Binding grandma.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding grandma.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding grandma.isProducing}" Value="True"><Setter Property="Text" Value="{Binding grandma.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -518,14 +512,11 @@
                     <TextBlock Text="{Binding farm.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding farm.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding farm.isProducing}" Value="True"><Setter Property="Text" Value="{Binding farm.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -598,14 +589,11 @@
                     <TextBlock Text="{Binding factory.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding factory.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding factory.isProducing}" Value="True"><Setter Property="Text" Value="{Binding factory.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -678,14 +666,11 @@
                     <TextBlock Text="{Binding lab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding lab.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding lab.isProducing}" Value="True"><Setter Property="Text" Value="{Binding lab.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -758,14 +743,11 @@
                     <TextBlock Text="{Binding fab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding fab.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding fab.isProducing}" Value="True"><Setter Property="Text" Value="{Binding fab.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -838,14 +820,11 @@
                     <TextBlock Text="{Binding planet.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Style>
-                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding planet.owned}"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding planet.isProducing}" Value="True"><Setter Property="Text" Value="{Binding planet.timeRemaining}"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </TextBlock.Style>
-                  </TextBlock>
+                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                  <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  </StackPanel>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -863,11 +842,11 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="143"/>
       <RowDefinition Height="*"/>
-      <RowDefinition Height="124"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="8,8,8,8">
-      <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,140">
         
         <!-- Leaderboard Entry 1 -->
         <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
