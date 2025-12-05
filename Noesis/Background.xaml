@@ -40,9 +40,21 @@
     <!-- 100 Rain Cookies (0-99) -->
     <!-- Each cookie uses the same animation; TypeScript staggers start times and positions. -->
     <!-- Rain Cookie 0 -->
-    <Image x:Name="RainCookie0" Source="Images/Coogie.png" Width="128" Height="128" Visibility="{Binding RainCookie0Visible, Converter={StaticResource BoolToVis}}" Canvas.Left="{Binding RainCookie0Left}" Canvas.Top="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+    <Image x:Name="RainCookie0" Source="Images/Coogie.png" Width="128" Height="128" Opacity="{Binding RainCookie0Opacity}" Visibility="{Binding RainCookie0Visible, Converter={StaticResource BoolToVis}}" Canvas.Left="{Binding RainCookie0Left}" Canvas.Top="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+      <Image.Resources>
+        <Storyboard x:Key="Rain0Story">
+          <DoubleAnimation Storyboard.TargetName="RainCookie0Translate" Storyboard.TargetProperty="Y" From="-120" To="{Binding RelativeSource={RelativeSource AncestorType=Canvas}, Path=ActualHeight}" Duration="0:0:3" FillBehavior="HoldEnd"/>
+        </Storyboard>
+      </Image.Resources>
       <Image.RenderTransform><TransformGroup><ScaleTransform ScaleX="0.87" ScaleY="0.87"/><TranslateTransform x:Name="RainCookie0Translate" Y="0"/></TransformGroup></Image.RenderTransform>
-      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding RainCookie0Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="RainCookie0Translate" Storyboard.TargetProperty="Y" From="-120" To="{Binding RelativeSource={RelativeSource AncestorType=Canvas}, Path=ActualHeight}" Duration="0:0:3" FillBehavior="Stop"/><DoubleAnimation Storyboard.TargetName="RainCookie0" Storyboard.TargetProperty="Opacity" From="1.0" To="1.0" Duration="0:0:3" FillBehavior="Stop"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+      <b:Interaction.Triggers>
+        <b:DataTrigger Binding="{Binding RainCookie0Animate}" Value="True">
+          <b:ControlStoryboardAction Storyboard="{StaticResource Rain0Story}" ControlStoryboardOption="Play"/>
+        </b:DataTrigger>
+        <b:DataTrigger Binding="{Binding RainCookie0Animate}" Value="False">
+          <b:ControlStoryboardAction Storyboard="{StaticResource Rain0Story}" ControlStoryboardOption="Stop"/>
+        </b:DataTrigger>
+      </b:Interaction.Triggers>
     </Image>
     <!-- Rain Cookie 1 -->
     <Image x:Name="RainCookie1" Source="Images/Coogie.png" Width="128" Height="128" Visibility="{Binding RainCookie1Visible, Converter={StaticResource BoolToVis}}" Canvas.Left="{Binding RainCookie1Left}" Canvas.Top="-150" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">

@@ -106,6 +106,7 @@ class Default extends hz.Component<typeof Default> {
       this.dataContext[`RainCookie${i}Visible`] = false;
       this.dataContext[`RainCookie${i}Animate`] = false;
       this.dataContext[`RainCookie${i}Left`] = 0;
+      this.dataContext[`RainCookie${i}Opacity`] = 0;
     }
   }
 
@@ -179,39 +180,55 @@ class Default extends hz.Component<typeof Default> {
     // Mark as in use
     this.rainCookieInUse[rainIndex] = true;
 
-    // Reset animation state first (required to re-trigger DataTrigger)
+    // Set opacity to 0 and position BEFORE making visible (prevents jitter)
     this.dataContext[`RainCookie${rainIndex}Animate`] = false;
-    this.dataContext[`RainCookie${rainIndex}Visible`] = true;
+    this.dataContext[`RainCookie${rainIndex}Opacity`] = 0;
     this.dataContext[`RainCookie${rainIndex}Left`] = randomLeft;
-
+    
     if (this.noesisGizmo) {
+      // First update: set new position while opacity is 0
       this.noesisGizmo.dataContext = this.dataContext;
-
-      // Small delay to ensure XAML processes the false->true transition
+      
+      // Small delay to let position update, then show and animate
       this.async.setTimeout(() => {
-        this.dataContext[`RainCookie${rainIndex}Animate`] = true;
+        this.dataContext[`RainCookie${rainIndex}Visible`] = true;
+        this.dataContext[`RainCookie${rainIndex}Opacity`] = 1;
         if (this.noesisGizmo) {
           this.noesisGizmo.dataContext = this.dataContext;
         }
-
-        // When animation completes, immediately check for queued cookies
+        
+        // Another small delay to ensure visible is processed before animate
         this.async.setTimeout(() => {
-          // Mark cookie available
-          this.rainCookieInUse[rainIndex] = false;
-          
-          // If there are queued cookies, immediately re-trigger this same cookie
-          if (this.rainQueue > 0) {
-            this.rainQueue--;
-            this.triggerRainCookie(rainIndex);
-          } else {
-            // No more queued - hide and reset
-            this.dataContext[`RainCookie${rainIndex}Animate`] = false;
-            this.dataContext[`RainCookie${rainIndex}Visible`] = false;
+          this.dataContext[`RainCookie${rainIndex}Animate`] = true;
+          if (this.noesisGizmo) {
+            this.noesisGizmo.dataContext = this.dataContext;
+          }
+
+          // When animation completes, immediately check for queued cookies
+          this.async.setTimeout(() => {
+            // Set opacity to 0 immediately (hides cookie at bottom before repositioning)
+            this.dataContext[`RainCookie${rainIndex}Opacity`] = 0;
             if (this.noesisGizmo) {
               this.noesisGizmo.dataContext = this.dataContext;
             }
-          }
-        }, RAIN_COOKIE_DURATION_MS);
+            
+            // Mark cookie available
+            this.rainCookieInUse[rainIndex] = false;
+            
+            // If there are queued cookies, immediately re-trigger this same cookie
+            if (this.rainQueue > 0) {
+              this.rainQueue--;
+              this.triggerRainCookie(rainIndex);
+            } else {
+              // No more queued - hide and reset
+              this.dataContext[`RainCookie${rainIndex}Animate`] = false;
+              this.dataContext[`RainCookie${rainIndex}Visible`] = false;
+              if (this.noesisGizmo) {
+                this.noesisGizmo.dataContext = this.dataContext;
+              }
+            }
+          }, RAIN_COOKIE_DURATION_MS);
+        }, 1);
       }, 1);
     }
 
