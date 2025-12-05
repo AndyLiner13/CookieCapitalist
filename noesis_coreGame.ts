@@ -256,9 +256,11 @@ class Default extends hz.Component<typeof Default> {
     const popupIndex = this.nextPopupIndex;
     this.nextPopupIndex = (popupIndex + 1) % POPUP_COUNT;
     
-    // Random position around cookie center
-    const offsetX = Math.floor((Math.random() - 0.5) * 200);
-    const offsetY = Math.floor((Math.random() - 0.5) * 200);
+    // Random position within circular cookie area (cookie is 256x256, radius ~110 for good spread)
+    const angle = Math.random() * 2 * Math.PI;
+    const radius = Math.random() * 110;
+    const offsetX = Math.floor(Math.cos(angle) * radius);
+    const offsetY = Math.floor(Math.sin(angle) * radius);
     
     // Reset and set new values
     this.dataContext[`Popup${popupIndex}Animate`] = false;

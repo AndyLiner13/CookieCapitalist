@@ -3,6 +3,7 @@
   Display Mode: Screen Overlay, Render Order: 2 (behind cookie)
   Input Mode: No Interaction (visual only)
   24 fingers with sequential clicking animation, counter-clockwise rotation
+  Finger visibility controlled by TypeScript based on purchased clicker upgrades
 -->
 
 <Page
@@ -15,6 +16,10 @@
   d:DataContext="Clickers_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852">
+
+<Page.Resources>
+  <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+</Page.Resources>
 
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
   
@@ -185,99 +190,99 @@
     
     <!-- 24 fingers at 15° intervals (radius=150, center=150) -->
     <!-- Finger 0: 0° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger0Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger0Bob" Y="0"/><RotateTransform Angle="0"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 1: 15° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="295" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="295" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger1Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger1Bob" Y="0"/><RotateTransform Angle="-15"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 2: 30° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="280" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="280" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger2Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger2Bob" Y="0"/><RotateTransform Angle="-30"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 3: 45° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="256" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="256" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger3Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger3Bob" Y="0"/><RotateTransform Angle="-45"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 4: 60° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="225" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="225" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger4Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger4Bob" Y="0"/><RotateTransform Angle="-60"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 5: 75° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="189" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="189" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger5Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger5Bob" Y="0"/><RotateTransform Angle="-75"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 6: 90° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger6Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger6Bob" Y="0"/><RotateTransform Angle="-90"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 7: 105° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="111" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="111" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger7Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger7Bob" Y="0"/><RotateTransform Angle="-105"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 8: 120° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="75" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="75" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger8Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger8Bob" Y="0"/><RotateTransform Angle="-120"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 9: 135° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="44" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="44" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger9Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger9Bob" Y="0"/><RotateTransform Angle="-135"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 10: 150° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="20" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="20" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger10Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger10Bob" Y="0"/><RotateTransform Angle="-150"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 11: 165° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="5" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="5" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger11Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger11Bob" Y="0"/><RotateTransform Angle="-165"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 12: 180° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger12Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger12Bob" Y="0"/><RotateTransform Angle="-180"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 13: 195° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="5" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="5" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger13Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger13Bob" Y="0"/><RotateTransform Angle="-195"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 14: 210° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="20" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="20" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger14Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger14Bob" Y="0"/><RotateTransform Angle="-210"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 15: 225° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="44" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="44" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger15Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger15Bob" Y="0"/><RotateTransform Angle="-225"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 16: 240° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="75" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="75" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger16Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger16Bob" Y="0"/><RotateTransform Angle="-240"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 17: 255° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="111" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="111" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger17Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger17Bob" Y="0"/><RotateTransform Angle="-255"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 18: 270° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger18Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger18Bob" Y="0"/><RotateTransform Angle="-270"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 19: 285° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="189" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="189" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger19Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger19Bob" Y="0"/><RotateTransform Angle="-285"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 20: 300° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="225" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="225" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger20Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger20Bob" Y="0"/><RotateTransform Angle="-300"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 21: 315° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="256" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="256" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger21Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger21Bob" Y="0"/><RotateTransform Angle="-315"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 22: 330° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="280" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="280" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger22Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger22Bob" Y="0"/><RotateTransform Angle="-330"/></TransformGroup></Image.RenderTransform>
     </Image>
     <!-- Finger 23: 345° -->
-    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="295" RenderTransformOrigin="0.5,0.5">
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="295" RenderTransformOrigin="0.5,0.5" Visibility="{Binding Finger23Visible, Converter={StaticResource BoolToVis}}">
       <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger23Bob" Y="0"/><RotateTransform Angle="-345"/></TransformGroup></Image.RenderTransform>
     </Image>
   </Canvas>
