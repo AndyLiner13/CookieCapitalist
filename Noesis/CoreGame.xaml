@@ -286,27 +286,86 @@
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
       <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,16" ClipToBounds="False">
         
-        <!-- Upgrade Card 1: Clicker -->
+        <!-- Upgrade Card 1: Clicker (has max limit of 24) -->
         <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding clicker.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <!-- Progress fill (green when producing) -->
+                  <Border Width="{Binding clicker.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <!-- Name and rate text -->
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding clicker.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding clicker.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="ClickerBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="ClickerBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding clicker.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding clicker.isMaxed}" Value="True"><Setter Property="Background" Value="#4CAF50"/></DataTrigger>
+                          <DataTrigger Binding="{Binding clicker.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger>
+                        </Style.Triggers>
                       </Style>
                     </Border.Style>
                     <TextBlock Text="{Binding clicker.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
+                <!-- Timer / Owned display -->
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding clicker.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding clicker.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding clicker.isProducing}" Value="True"><Setter Property="Text" Value="{Binding clicker.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -318,11 +377,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding grandma.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding grandma.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding grandma.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding grandma.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="GrandmaBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="GrandmaBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -333,7 +439,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding grandma.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding grandma.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding grandma.isProducing}" Value="True"><Setter Property="Text" Value="{Binding grandma.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -345,11 +457,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding farm.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding farm.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding farm.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding farm.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="FarmBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="FarmBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -360,7 +519,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding farm.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding farm.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding farm.isProducing}" Value="True"><Setter Property="Text" Value="{Binding farm.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -372,11 +537,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding factory.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding factory.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding factory.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding factory.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="FactoryBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="FactoryBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -387,7 +599,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding factory.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding factory.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding factory.isProducing}" Value="True"><Setter Property="Text" Value="{Binding factory.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -399,11 +617,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding lab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding lab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding lab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding lab.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="LabBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="LabBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -414,7 +679,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding lab.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding lab.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding lab.isProducing}" Value="True"><Setter Property="Text" Value="{Binding lab.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -426,11 +697,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding fab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding fab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding fab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding fab.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="FabBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="FabBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -441,7 +759,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding fab.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding fab.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding fab.isProducing}" Value="True"><Setter Property="Text" Value="{Binding fab.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>
@@ -453,11 +777,58 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Source="Images/PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+              <!-- Progress Bar / Name Bar -->
               <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <TextBlock Text="{Binding planet.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Grid>
+                  <Border Width="{Binding planet.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding planet.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
+                    <TextBlock Text="{Binding planet.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Grid>
               </Border>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Button x:Name="PlanetBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                  <Button.RenderTransform>
+                    <ScaleTransform x:Name="PlanetBuyScale" ScaleX="1" ScaleY="1"/>
+                  </Button.RenderTransform>
+                  <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                    <b:EventTrigger EventName="MouseLeave">
+                      <b:ControlStoryboardAction>
+                        <b:ControlStoryboardAction.Storyboard>
+                          <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                          </Storyboard>
+                        </b:ControlStoryboardAction.Storyboard>
+                      </b:ControlStoryboardAction>
+                    </b:EventTrigger>
+                  </b:Interaction.Triggers>
                   <Border Width="160" Height="47" CornerRadius="5">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
@@ -468,7 +839,13 @@
                   </Border>
                 </Button>
                 <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding planet.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <TextBlock FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock"><Setter Property="Text" Value="{Binding planet.owned}"/>
+                        <Style.Triggers><DataTrigger Binding="{Binding planet.isProducing}" Value="True"><Setter Property="Text" Value="{Binding planet.timeRemaining}"/></DataTrigger></Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
                 </Border>
               </StackPanel>
             </StackPanel>

@@ -21,6 +21,7 @@ import {
   calculateUpgradeCost,
   formatPrice,
   formatNumber,
+  formatTimeRemaining,
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
@@ -50,6 +51,11 @@ class Default extends hz.Component<typeof Default> {
   private cookiesPerSecond: number = 0;
   private upgrades: { [upgradeId: string]: number } = {};
   
+  // Production timer state (progress 0-1 for each upgrade type)
+  private productionProgress: { [upgradeId: string]: number } = {};
+  private lastTickTime: number = 0;
+  private static readonly TICK_RATE_MS = 50; // Update progress every 50ms
+  
   // Popup system state
   private nextPopupIndex: number = 0;
   // #endregion
@@ -64,9 +70,10 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Initialize upgrades map
+    // Initialize upgrades map and production progress
     for (const config of UPGRADE_CONFIGS) {
       this.upgrades[config.id] = 0;
+      this.productionProgress[config.id] = 0;
     }
 
     // Listen for state updates via NETWORK event (from Backend)
@@ -84,6 +91,10 @@ class Default extends hz.Component<typeof Default> {
     // Build and set initial data context
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
+    
+    // Start production timer tick
+    this.lastTickTime = Date.now();
+    this.async.setInterval(() => this.productionTick(), Default.TICK_RATE_MS);
 
     log.info("CoreGame initialized - Home page visible");
   }
@@ -122,13 +133,24 @@ class Default extends hz.Component<typeof Default> {
       const owned = this.upgrades[config.id] || 0;
       const cost = calculateUpgradeCost(config.baseCost, owned);
       const canAfford = this.cookies >= cost;
+      const isMaxed = config.id === "clicker" && owned >= 24;
+      const progress = this.productionProgress[config.id] || 0;
+      const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+      const isProducing = owned > 0;
       
       upgradeData[config.id] = {
         name: config.name,
         owned: owned.toString(),
-        price: formatPrice(cost),
-        canAfford: canAfford,
+        price: isMaxed ? "MAXED OUT" : formatPrice(cost),
+        canAfford: isMaxed ? false : canAfford,
+        isMaxed: isMaxed,
         buyCommand: () => this.purchaseUpgrade(config.id),
+        // Production timer data
+        progress: progress,                              // 0.0 to 1.0
+        progressWidth: Math.floor(progress * 240),       // Width for progress bar (240 max)
+        timeRemaining: formatTimeRemaining(timeRemaining),
+        isProducing: isProducing,
+        rateDisplay: config.rateDisplay,
       };
     }
     
@@ -180,12 +202,22 @@ class Default extends hz.Component<typeof Default> {
       const owned = this.upgrades[config.id] || 0;
       const cost = calculateUpgradeCost(config.baseCost, owned);
       const canAfford = this.cookies >= cost;
+      const isMaxed = config.id === "clicker" && owned >= 24;
+      const progress = this.productionProgress[config.id] || 0;
+      const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+      const isProducing = owned > 0;
       
       const upgradeObj = this.dataContext[config.id] as any;
       if (upgradeObj) {
         upgradeObj.owned = owned.toString();
-        upgradeObj.price = formatPrice(cost);
-        upgradeObj.canAfford = canAfford;
+        upgradeObj.price = isMaxed ? "MAXED OUT" : formatPrice(cost);
+        upgradeObj.canAfford = isMaxed ? false : canAfford;
+        upgradeObj.isMaxed = isMaxed;
+        // Production timer data
+        upgradeObj.progress = progress;
+        upgradeObj.progressWidth = Math.floor(progress * 240);
+        upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);
+        upgradeObj.isProducing = isProducing;
       }
     }
     
@@ -193,6 +225,57 @@ class Default extends hz.Component<typeof Default> {
     const leaderboard4 = this.dataContext.leaderboard4 as any;
     if (leaderboard4) {
       leaderboard4.score = formatNumber(this.cookies);
+    }
+  }
+  
+  private productionTick(): void {
+    const now = Date.now();
+    const deltaTime = now - this.lastTickTime;
+    this.lastTickTime = now;
+    
+    let dataChanged = false;
+    
+    // Update production progress for each upgrade type
+    for (const config of UPGRADE_CONFIGS) {
+      const owned = this.upgrades[config.id] || 0;
+      if (owned <= 0) continue;
+      
+      // Progress increment based on delta time
+      const progressIncrement = deltaTime / config.productionTimeMs;
+      this.productionProgress[config.id] = (this.productionProgress[config.id] || 0) + progressIncrement;
+      
+      // Check if production cycle completed
+      if (this.productionProgress[config.id] >= 1) {
+        // Award cookies (multiplied by owned count)
+        const cookiesEarned = config.cookiesPerCycle * owned;
+        
+        // Send production completion to server
+        this.sendNetworkBroadcastEvent(GameEvents.toServer, {
+          type: "production_complete",
+          upgradeId: config.id,
+          cookies: cookiesEarned,
+        });
+        
+        // Reset progress (keep overflow for smooth cycles)
+        this.productionProgress[config.id] = this.productionProgress[config.id] - 1;
+      }
+      
+      // Update UI data
+      const upgradeObj = this.dataContext[config.id] as any;
+      if (upgradeObj) {
+        const progress = this.productionProgress[config.id];
+        const timeRemaining = Math.ceil((1 - progress) * config.productionTimeMs);
+        upgradeObj.progress = progress;
+        upgradeObj.progressWidth = Math.floor(progress * 240);
+        upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);
+        upgradeObj.isProducing = true;
+        dataChanged = true;
+      }
+    }
+    
+    // Push updated data context to Noesis
+    if (dataChanged && this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
     }
   }
   

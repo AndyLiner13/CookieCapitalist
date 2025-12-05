@@ -21,7 +21,8 @@ export interface UpgradeConfig {
   image: string;
   name: string;
   baseCost: number;
-  cookiesPerSecond: number;
+  cookiesPerCycle: number;      // Cookies awarded when production completes
+  productionTimeMs: number;     // Time in ms for one production cycle
   rateDisplay: string;
 }
 
@@ -41,7 +42,7 @@ export type PageType = "home" | "shop" | "stats";
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
   [key: string]: SerializableState;
-  type: "cookie_clicked" | "buy_upgrade" | "request_state";
+  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete";
 };
 
 export type UIEventPayload = {
@@ -85,14 +86,15 @@ export const LocalUIEvents = {
 
 // #region ⚙️ Game Constants
 // All upgrade types in the game
+// Production model: Each owned upgrade produces cookiesPerCycle every productionTimeMs
 export const UPGRADE_CONFIGS: UpgradeConfig[] = [
-  { id: "clicker", image: "Images/ClickerImage.png", name: "+1 Cookie Clicker", baseCost: 15, cookiesPerSecond: 0.1, rateDisplay: "0.1/s" },
-  { id: "grandma", image: "Images/GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerSecond: 1, rateDisplay: "1/s" },
-  { id: "farm", image: "Images/FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerSecond: 8, rateDisplay: "8/s" },
-  { id: "factory", image: "Images/FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerSecond: 47, rateDisplay: "47/s" },
-  { id: "lab", image: "Images/LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerSecond: 260, rateDisplay: "260/s" },
-  { id: "fab", image: "Images/FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerSecond: 1400, rateDisplay: "1.4k/s" },
-  { id: "planet", image: "Images/PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerSecond: 7800, rateDisplay: "7.8k/s" },
+  { id: "clicker", image: "Images/ClickerImage.png", name: "Clicker", baseCost: 15, cookiesPerCycle: 1, productionTimeMs: 10000, rateDisplay: "+1" },
+  { id: "grandma", image: "Images/GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerCycle: 10, productionTimeMs: 10000, rateDisplay: "+10" },
+  { id: "farm", image: "Images/FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerCycle: 80, productionTimeMs: 10000, rateDisplay: "+80" },
+  { id: "factory", image: "Images/FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerCycle: 470, productionTimeMs: 10000, rateDisplay: "+470" },
+  { id: "lab", image: "Images/LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerCycle: 2600, productionTimeMs: 10000, rateDisplay: "+2.6K" },
+  { id: "fab", image: "Images/FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerCycle: 14000, productionTimeMs: 10000, rateDisplay: "+14K" },
+  { id: "planet", image: "Images/PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerCycle: 78000, productionTimeMs: 10000, rateDisplay: "+78K" },
 ];
 
 // Cost scaling factor per upgrade owned
@@ -114,12 +116,13 @@ export function calculateUpgradeCost(baseCost: number, owned: number): number {
   return Math.floor(baseCost * Math.pow(COST_MULTIPLIER, owned));
 }
 
-// Calculate total cookies per second from owned upgrades
+// Calculate total cookies per second from owned upgrades (for display purposes)
 export function calculateCPS(upgrades: { [upgradeId: string]: number }): number {
   let totalCPS = 0;
   for (const config of UPGRADE_CONFIGS) {
     const owned = upgrades[config.id] || 0;
-    totalCPS += config.cookiesPerSecond * owned;
+    // CPS = (cookiesPerCycle / productionTimeMs) * 1000 * owned
+    totalCPS += (config.cookiesPerCycle / config.productionTimeMs) * 1000 * owned;
   }
   return totalCPS;
 }
@@ -128,6 +131,12 @@ export function calculateCPS(upgrades: { [upgradeId: string]: number }): number 
 export function calculateCookiesPerClick(upgrades: { [upgradeId: string]: number }): number {
   const clickerCount = upgrades["clicker"] || 0;
   return BASE_COOKIES_PER_CLICK + clickerCount;
+}
+
+// Format time remaining in seconds
+export function formatTimeRemaining(ms: number): string {
+  const seconds = Math.ceil(ms / 1000);
+  return `${seconds}s`;
 }
 
 // Format large numbers for display

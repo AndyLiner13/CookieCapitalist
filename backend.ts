@@ -86,8 +86,8 @@ class Default extends Component<typeof Default> {
       (data: GameEventPayload) => this.handlePlayerEvent(data)
     );
     
-    // Start game tick (passive cookie production)
-    this.async.setInterval(() => this.gameTick(), TICK_INTERVAL_MS);
+    // Note: Production timers are now handled client-side (noesis_coreGame.ts)
+    // The client sends production_complete events when timers finish
     
     // Handle existing players (Desktop Editor preview)
     const players = this.world.getPlayers();
@@ -171,6 +171,10 @@ class Default extends Component<typeof Default> {
         this.handleBuyUpgrade(data.upgradeId as string);
         break;
         
+      case "production_complete":
+        this.handleProductionComplete(data.upgradeId as string, data.cookies as number);
+        break;
+        
       case "request_state":
         this.broadcastStateUpdate();
         break;
@@ -184,6 +188,19 @@ class Default extends Component<typeof Default> {
     this.gameState.totalCookiesEarned += this.gameState.cookiesPerClick;
     
     log.info(`Cookie clicked! Total: ${this.gameState.cookies}`);
+    this.throttledBroadcastStateUpdate();
+  }
+  
+  private handleProductionComplete(upgradeId: string, cookies: number): void {
+    const log = this.log.inactive("handleProductionComplete");
+    
+    if (!upgradeId || cookies <= 0) return;
+    
+    // Award cookies from production
+    this.gameState.cookies += cookies;
+    this.gameState.totalCookiesEarned += cookies;
+    
+    log.info(`Production complete: ${upgradeId} awarded ${cookies} cookies. Total: ${this.gameState.cookies}`);
     this.throttledBroadcastStateUpdate();
   }
   
