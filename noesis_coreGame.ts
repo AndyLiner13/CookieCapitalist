@@ -25,6 +25,8 @@ import {
   getTier,
   getNextTierThreshold,
   getTierSpeedMultiplier,
+  calculateCookiesPerCycle,
+  formatRateDisplay,
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
@@ -143,10 +145,13 @@ class Default extends hz.Component<typeof Default> {
       const tier = getTier(owned);
       const speedMultiplier = getTierSpeedMultiplier(tier);
       const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
-      const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
+      const timeRemainingMs = (1 - progress) * effectiveProductionTime;
       const isProducing = owned > 0;
       const nextTierThreshold = getNextTierThreshold(owned);
       const tierProgress = nextTierThreshold ? `${owned}/${nextTierThreshold}` : `${owned} MAX`;
+      
+      // Calculate actual cookies per cycle for rate display
+      const actualCookiesPerCycle = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
       
       upgradeData[config.id] = {
         name: config.name,
@@ -158,9 +163,9 @@ class Default extends hz.Component<typeof Default> {
         // Production timer data
         progress: progress,                              // 0.0 to 1.0
         progressWidth: Math.floor(progress * 240),       // Width for progress bar (240 max)
-        timeRemaining: formatTimeRemaining(timeRemaining),
+        timeRemaining: formatTimeRemaining(timeRemainingMs),
         isProducing: isProducing,
-        rateDisplay: config.rateDisplay,
+        rateDisplay: isProducing ? formatRateDisplay(actualCookiesPerCycle) : config.rateDisplay,
         // Tier data
         tier: tier,
         tierProgress: tierProgress,                      // e.g. "5/10" or "1000 MAX"
@@ -223,10 +228,13 @@ class Default extends hz.Component<typeof Default> {
       const tier = getTier(owned);
       const speedMultiplier = getTierSpeedMultiplier(tier);
       const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
-      const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
+      const timeRemainingMs = (1 - progress) * effectiveProductionTime;
       const isProducing = owned > 0;
       const nextTierThreshold = getNextTierThreshold(owned);
       const tierProgress = nextTierThreshold ? `${owned}/${nextTierThreshold}` : `${owned} MAX`;
+      
+      // Calculate actual cookies per cycle for rate display
+      const actualCookiesPerCycle = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
       
       const upgradeObj = this.dataContext[config.id] as any;
       if (upgradeObj) {
@@ -237,8 +245,9 @@ class Default extends hz.Component<typeof Default> {
         // Production timer data
         upgradeObj.progress = progress;
         upgradeObj.progressWidth = Math.floor(progress * 240);
-        upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);
+        upgradeObj.timeRemaining = formatTimeRemaining(timeRemainingMs);
         upgradeObj.isProducing = isProducing;
+        upgradeObj.rateDisplay = isProducing ? formatRateDisplay(actualCookiesPerCycle) : config.rateDisplay;
         // Tier data
         upgradeObj.tier = tier;
         upgradeObj.tierProgress = tierProgress;
@@ -276,8 +285,8 @@ class Default extends hz.Component<typeof Default> {
       
       // Check if production cycle completed
       if (this.productionProgress[config.id] >= 1) {
-        // Award cookies (multiplied by owned count)
-        const cookiesEarned = config.cookiesPerCycle * owned;
+        // Award cookies using scaled amount (8.7% increase per upgrade owned)
+        const cookiesEarned = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
         
         // Send production completion to server
         this.sendNetworkBroadcastEvent(GameEvents.toServer, {
@@ -294,10 +303,10 @@ class Default extends hz.Component<typeof Default> {
       const upgradeObj = this.dataContext[config.id] as any;
       if (upgradeObj) {
         const progress = this.productionProgress[config.id];
-        const timeRemaining = Math.ceil((1 - progress) * effectiveProductionTime);
+        const timeRemainingMs = (1 - progress) * effectiveProductionTime;
         upgradeObj.progress = progress;
         upgradeObj.progressWidth = Math.floor(progress * 240);
-        upgradeObj.timeRemaining = formatTimeRemaining(timeRemaining);
+        upgradeObj.timeRemaining = formatTimeRemaining(timeRemainingMs);
         upgradeObj.isProducing = true;
         dataChanged = true;
       }

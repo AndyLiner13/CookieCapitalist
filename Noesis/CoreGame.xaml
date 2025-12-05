@@ -35,6 +35,7 @@
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="BorderBrush" Value="Transparent"/>
       <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
@@ -54,7 +55,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- HOME PAGE - Cookie Button with Popups                                                       -->
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Grid x:Name="HomePage" Visibility="{Binding homeVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}">
+  <Grid x:Name="HomePage" Visibility="{Binding homeVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}" d:IsHidden="True">
     
     <!-- Clickable Cookie (centered) -->
     <Button x:Name="CookieButton"
@@ -284,15 +285,21 @@
     </Grid.RowDefinitions>
     
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
-      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,140">
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,140">
         
         <!-- Upgrade Card 1: Clicker (has max limit of 24) -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!-- Image: fills height with locked aspect ratio -->
+            <Image Grid.Column="0" Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <!-- Content: responsive width -->
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <!-- Progress fill (green when producing) -->
                   <Border Width="{Binding clicker.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
@@ -304,8 +311,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="ClickerBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="ClickerBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="ClickerBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -345,7 +356,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers>
@@ -358,24 +369,27 @@
                   </Border>
                 </Button>
                 <!-- Tier Progress / Timer display -->
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 2: Grandma -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding grandma.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -385,8 +399,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="GrandmaBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="GrandmaBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="GrandmaBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -426,7 +444,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding grandma.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -435,24 +453,27 @@
                     <TextBlock Text="{Binding grandma.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 3: Farm -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding farm.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -462,8 +483,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="FarmBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="FarmBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="FarmBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -503,7 +528,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding farm.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -512,24 +537,27 @@
                     <TextBlock Text="{Binding farm.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 4: Factory -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding factory.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -539,8 +567,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="FactoryBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="FactoryBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="FactoryBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -580,7 +612,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding factory.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -589,24 +621,27 @@
                     <TextBlock Text="{Binding factory.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 5: Lab -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding lab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -616,8 +651,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="LabBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="LabBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="LabBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -657,7 +696,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding lab.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -666,24 +705,27 @@
                     <TextBlock Text="{Binding lab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 6: Fab -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding fab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -693,8 +735,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="FabBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="FabBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="FabBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -734,7 +780,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding fab.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -743,24 +789,27 @@
                     <TextBlock Text="{Binding fab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
         <!-- Upgrade Card 7: Planet -->
-        <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="Images/PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
-            <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
-              <!-- Progress Bar / Name Bar -->
-              <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch" Margin="0,0,8,0"/>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
                   <Border Width="{Binding planet.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -770,8 +819,12 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
-                <Button x:Name="PlanetBuyButton" Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5">
+              <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="PlanetBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
                   <Button.RenderTransform>
                     <ScaleTransform x:Name="PlanetBuyScale" ScaleX="1" ScaleY="1"/>
                   </Button.RenderTransform>
@@ -811,7 +864,7 @@
                       </b:ControlStoryboardAction>
                     </b:EventTrigger>
                   </b:Interaction.Triggers>
-                  <Border Width="160" Height="47" CornerRadius="5">
+                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
                     <Border.Style>
                       <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
                         <Style.Triggers><DataTrigger Binding="{Binding planet.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
@@ -820,15 +873,15 @@
                     <TextBlock Text="{Binding planet.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                   </Border>
                 </Button>
-                <Border Width="75" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center">
                   <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#ffffff" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" HorizontalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
                   </StackPanel>
                 </Border>
-              </StackPanel>
+              </Grid>
             </StackPanel>
-          </StackPanel>
+          </Grid>
         </Border>
         
       </StackPanel>
@@ -838,7 +891,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- LEADERBOARD PAGE - Player Rankings                                                          -->
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Grid x:Name="LeaderboardPage" Visibility="{Binding statsVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}">
+  <Grid x:Name="LeaderboardPage" Visibility="{Binding statsVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}" d:IsHidden="True">
     <Grid.RowDefinitions>
       <RowDefinition Height="143"/>
       <RowDefinition Height="*"/>

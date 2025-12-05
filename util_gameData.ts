@@ -134,6 +134,28 @@ export function getNextTierThreshold(owned: number): number | null {
 export function getTierSpeedMultiplier(tier: number): number {
   return Math.pow(2, tier);
 }
+
+// Cookies per cycle scaling (8.7% increase per upgrade owned)
+export const COOKIES_PER_CYCLE_MULTIPLIER = 1.087;
+
+// Calculate actual cookies per cycle based on owned count (8.7% increase per upgrade)
+export function calculateCookiesPerCycle(baseCookiesPerCycle: number, owned: number): number {
+  if (owned <= 0) return 0;
+  // Each upgrade after the first adds 8.7% more cookies
+  // Total = base * owned * (1.087^(owned-1) + 1.087^(owned-2) + ... + 1) / owned
+  // Simplified: sum of geometric series
+  let total = 0;
+  for (let i = 0; i < owned; i++) {
+    total += baseCookiesPerCycle * Math.pow(COOKIES_PER_CYCLE_MULTIPLIER, i);
+  }
+  return Math.round(total);
+}
+
+// Format rate display for upgrade card (shows actual production amount)
+export function formatRateDisplay(cookiesPerCycle: number): string {
+  if (cookiesPerCycle <= 0) return "";
+  return `+${formatNumber(cookiesPerCycle)}`;
+}
 // #endregion
 
 // #region 🛠️ Utility Functions
@@ -147,8 +169,18 @@ export function calculateCPS(upgrades: { [upgradeId: string]: number }): number 
   let totalCPS = 0;
   for (const config of UPGRADE_CONFIGS) {
     const owned = upgrades[config.id] || 0;
-    // CPS = (cookiesPerCycle / productionTimeMs) * 1000 * owned
-    totalCPS += (config.cookiesPerCycle / config.productionTimeMs) * 1000 * owned;
+    if (owned <= 0) continue;
+    
+    // Get scaled cookies per cycle (8.7% increase per upgrade)
+    const scaledCookiesPerCycle = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
+    
+    // Get tier speed multiplier
+    const tier = getTier(owned);
+    const speedMultiplier = getTierSpeedMultiplier(tier);
+    const effectiveProductionTime = config.productionTimeMs / speedMultiplier;
+    
+    // CPS = scaledCookiesPerCycle / effectiveProductionTime * 1000
+    totalCPS += (scaledCookiesPerCycle / effectiveProductionTime) * 1000;
   }
   return totalCPS;
 }
@@ -159,10 +191,13 @@ export function calculateCookiesPerClick(upgrades: { [upgradeId: string]: number
   return BASE_COOKIES_PER_CLICK + clickerCount;
 }
 
-// Format time remaining in seconds
+// Format time remaining in seconds (shows decimal for under 10s)
 export function formatTimeRemaining(ms: number): string {
-  const seconds = Math.ceil(ms / 1000);
-  return `${seconds}s`;
+  const seconds = ms / 1000;
+  if (seconds < 10) {
+    return `${seconds.toFixed(1)}s`;
+  }
+  return `${Math.ceil(seconds)}s`;
 }
 
 // Format large numbers for display
@@ -186,10 +221,9 @@ export function formatCookieDisplay(cookies: number): string {
 
 // Format CPS for header display
 export function formatCPSDisplay(cps: number): string {
-  if (cps === 0) {
-    return "click to start!";
-  }
-  return `${formatNumber(cps)} per second`;
+  const roundedCps = Math.round(cps);
+  const word = roundedCps === 1 ? "cookie" : "cookies";
+  return `${formatNumber(roundedCps)} ${word} per second`;
 }
 
 // Format price for buy button
