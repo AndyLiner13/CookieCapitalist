@@ -31,7 +31,7 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
       Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
   
   <!-- Clickable Cookie (centered) -->
@@ -48,8 +48,10 @@
           Padding="0">
     <Button.Template>
       <ControlTemplate TargetType="Button">
-        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        <Border Background="Transparent">
+          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Border>
       </ControlTemplate>
     </Button.Template>
     <Button.RenderTransform>

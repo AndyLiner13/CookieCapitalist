@@ -16,7 +16,7 @@
   d:DesignWidth="393"
   d:DesignHeight="852">
 
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
   
   <!-- Ring of 24 Clicker fingers around Cookie -->
   <Canvas Width="336" Height="336" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">

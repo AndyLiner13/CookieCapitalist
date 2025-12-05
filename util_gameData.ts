@@ -75,13 +75,13 @@ export const LocalUIEvents = {
 // #region ⚙️ Game Constants
 // All upgrade types in the game
 export const UPGRADE_CONFIGS: UpgradeConfig[] = [
-  { id: "clicker", image: "ClickerImage.png", name: "+1 Cookie Clicker", baseCost: 15, cookiesPerSecond: 0.1, rateDisplay: "0.1/s" },
-  { id: "grandma", image: "GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerSecond: 1, rateDisplay: "1/s" },
-  { id: "farm", image: "FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerSecond: 8, rateDisplay: "8/s" },
-  { id: "factory", image: "FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerSecond: 47, rateDisplay: "47/s" },
-  { id: "lab", image: "LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerSecond: 260, rateDisplay: "260/s" },
-  { id: "fab", image: "FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerSecond: 1400, rateDisplay: "1.4k/s" },
-  { id: "planet", image: "PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerSecond: 7800, rateDisplay: "7.8k/s" },
+  { id: "clicker", image: "Images/ClickerImage.png", name: "+1 Cookie Clicker", baseCost: 15, cookiesPerSecond: 0.1, rateDisplay: "0.1/s" },
+  { id: "grandma", image: "Images/GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerSecond: 1, rateDisplay: "1/s" },
+  { id: "farm", image: "Images/FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerSecond: 8, rateDisplay: "8/s" },
+  { id: "factory", image: "Images/FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerSecond: 47, rateDisplay: "47/s" },
+  { id: "lab", image: "Images/LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerSecond: 260, rateDisplay: "260/s" },
+  { id: "fab", image: "Images/FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerSecond: 1400, rateDisplay: "1.4k/s" },
+  { id: "planet", image: "Images/PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerSecond: 7800, rateDisplay: "7.8k/s" },
 ];
 
 // Cost scaling factor per upgrade owned

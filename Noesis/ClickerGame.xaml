@@ -50,13 +50,13 @@
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True" Background="Transparent">
     
-    <Grid>
+    <Grid x:Name="RootContainer">
       <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
       <!-- Region: Initial State Trigger - Sets default navigation state on load                   -->
       <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
       <b:Interaction.Triggers>
         <b:EventTrigger>
-          <b:GoToStateAction StateName="HomeState"/>
+          <b:GoToStateAction StateName="HomeState" TargetObject="{Binding ElementName=RootContainer}"/>
         </b:EventTrigger>
       </b:Interaction.Triggers>
       
@@ -922,7 +922,7 @@
                 </b:ControlStoryboardAction>
               </b:EventTrigger>
               <b:EventTrigger EventName="Click">
-                <b:GoToStateAction StateName="ShopState"/>
+                <b:GoToStateAction StateName="ShopState" TargetObject="{Binding ElementName=RootContainer}"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
             <Image Source="Images/LeftTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
@@ -963,7 +963,7 @@
                 </b:ControlStoryboardAction>
               </b:EventTrigger>
               <b:EventTrigger EventName="Click">
-                <b:GoToStateAction StateName="HomeState"/>
+                <b:GoToStateAction StateName="HomeState" TargetObject="{Binding ElementName=RootContainer}"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
             <Image Source="Images/MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
@@ -1004,7 +1004,7 @@
                 </b:ControlStoryboardAction>
               </b:EventTrigger>
               <b:EventTrigger EventName="Click">
-                <b:GoToStateAction StateName="LeaderboardState"/>
+                <b:GoToStateAction StateName="LeaderboardState" TargetObject="{Binding ElementName=RootContainer}"/>
               </b:EventTrigger>
             </b:Interaction.Triggers>
             <Image Source="Images/RightTab.png" Width="93" Height="92" Stretch="UniformToFill"/>

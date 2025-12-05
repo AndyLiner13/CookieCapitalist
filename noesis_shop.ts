@@ -81,26 +81,33 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🎯 Main Logic
   private buildDataContext(): void {
-    const upgradesList = UPGRADE_CONFIGS.map((config) => {
+    // Build individual upgrade objects (not an array - Noesis works better with named properties)
+    const upgradeData: { [key: string]: any } = {};
+    
+    for (const config of UPGRADE_CONFIGS) {
       const owned = this.upgrades[config.id] || 0;
       const cost = calculateUpgradeCost(config.baseCost, owned);
       const canAfford = this.cookies >= cost;
       
-      return {
-        image: config.image,
+      upgradeData[config.id] = {
         name: config.name,
-        rate: config.rateDisplay,
         owned: owned.toString(),
         price: formatPrice(cost),
-        buyLabel: "BUY",
         canAfford: canAfford,
         buyCommand: () => this.purchaseUpgrade(config.id),
       };
-    });
+    }
     
     this.dataContext = {
       isVisible: this.isVisible,
-      upgrades: upgradesList,
+      // Individual upgrade objects by id
+      clicker: upgradeData["clicker"],
+      grandma: upgradeData["grandma"],
+      farm: upgradeData["farm"],
+      factory: upgradeData["factory"],
+      lab: upgradeData["lab"],
+      fab: upgradeData["fab"],
+      planet: upgradeData["planet"],
     };
   }
   

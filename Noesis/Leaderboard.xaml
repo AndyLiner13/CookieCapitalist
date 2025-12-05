@@ -22,7 +22,7 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
       Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
   
   <Grid.RowDefinitions>
@@ -32,62 +32,25 @@
   </Grid.RowDefinitions>
   
   <!-- Leaderboard Content Area -->
-  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Orientation="Vertical" Margin="16,8">
+  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="8,8,8,8">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
       
-      <!-- Stats Section -->
-      <TextBlock Text="YOUR STATS" FontFamily="Fonts/#Anton" FontSize="24" Foreground="#FFFFFF" 
-                 HorizontalAlignment="Center" Margin="0,0,0,16"/>
-      
-      <Border Background="#40000000" CornerRadius="12" Margin="0,0,0,16" Padding="16">
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          
-          <TextBlock Grid.Row="0" Grid.Column="0" Text="Cookies per Click:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA"/>
-          <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding cookiesPerClick}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF"/>
-          
-          <TextBlock Grid.Row="1" Grid.Column="0" Text="Cookies per Second:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
-          <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding currentCPS}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF" Margin="0,8,0,0"/>
-          
-          <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Upgrades:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
-          <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding totalUpgrades}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF" Margin="0,8,0,0"/>
-        </Grid>
-      </Border>
-      
-      <!-- Leaderboard Section -->
-      <TextBlock Text="LEADERBOARD" FontFamily="Fonts/#Anton" FontSize="24" Foreground="#FFFFFF" 
-                 HorizontalAlignment="Center" Margin="0,16,0,16"/>
-      
+      <!-- Leaderboard Entries using ItemsControl -->
       <ItemsControl ItemsSource="{Binding leaderboard}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Border Background="#40000000" CornerRadius="8" Margin="0,0,0,8" Padding="12,8">
+            <Border Width="377" Height="80" CornerRadius="8" Background="#252525" Padding="8" Margin="0,0,0,8">
               <Grid>
                 <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="40"/>
+                  <ColumnDefinition Width="171"/>
                   <ColumnDefinition Width="*"/>
                   <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
-                <!-- Rank -->
-                <TextBlock Grid.Column="0" Text="{Binding rank}" FontFamily="Fonts/#Anton" FontSize="20" 
-                           Foreground="#FFDD00" VerticalAlignment="Center"/>
-                
-                <!-- Username -->
-                <TextBlock Grid.Column="1" Text="{Binding username}" FontFamily="Fonts/#Roboto" FontSize="16" 
-                           Foreground="#FFFFFF" VerticalAlignment="Center"/>
-                
-                <!-- Score -->
-                <TextBlock Grid.Column="2" Text="{Binding score}" FontFamily="Fonts/#Anton" FontSize="16" 
-                           Foreground="#AAAAAA" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                  <Image Source="{Binding avatar}" Width="64" Height="64" Stretch="UniformToFill"/>
+                  <TextBlock Text="{Binding username}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Margin="26,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="{Binding score}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,8,0"/>
               </Grid>
             </Border>
           </DataTemplate>

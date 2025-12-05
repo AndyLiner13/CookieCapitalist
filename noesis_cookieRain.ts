@@ -4,13 +4,14 @@
 // #region 📋 README
 // Controller for the CookieRain Noesis overlay (back layer).
 // Listens for cookie click events and triggers falling cookie animations.
+// Visibility controlled by page navigation (only visible on home page).
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
 import * as hz from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
-import { LocalUIEvents } from "./util_gameData";
+import { PageType, LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
 const RAIN_COOKIE_COUNT = 10;
@@ -33,6 +34,9 @@ class Default extends hz.Component<typeof Default> {
   
   // Rain cookie state - round-robin index for next rain cookie slot
   private nextRainCookieIndex: number = 0;
+  
+  // Current page (only trigger rain on home page)
+  private currentPage: PageType = "home";
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -53,15 +57,35 @@ class Default extends hz.Component<typeof Default> {
       () => this.triggerRainCookie()
     );
 
+    // Listen for page change events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.changePage,
+      (data: { page: PageType }) => this.onPageChange(data.page)
+    );
+
     // Build and set initial data context
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
 
-    log.info("CookieRain gizmo initialized");
+    log.info("CookieRain gizmo initialized (visible on home page only)");
   }
   // #endregion
 
   // #region 🎯 Main Logic
+  private onPageChange(page: PageType): void {
+    const log = this.log.inactive("onPageChange");
+    
+    this.currentPage = page;
+    
+    if (!this.noesisGizmo) return;
+    
+    // Only visible on home page
+    const isVisible = page === "home";
+    this.noesisGizmo.setLocalEntityVisibility(isVisible);
+    
+    log.info(`CookieRain visibility: ${isVisible}`);
+  }
+
   private buildDataContext(): void {
     this.dataContext = {
       rainCookieScale: this.props.rainCookieScale,
@@ -78,6 +102,11 @@ class Default extends hz.Component<typeof Default> {
   // Trigger a rain cookie falling from a random horizontal position
   private triggerRainCookie(): void {
     const log = this.log.inactive("triggerRainCookie");
+
+    // Only trigger rain on home page
+    if (this.currentPage !== "home") {
+      return;
+    }
 
     // Use round-robin slot selection
     const rainIndex = this.nextRainCookieIndex;

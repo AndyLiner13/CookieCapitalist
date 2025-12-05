@@ -29,8 +29,10 @@
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            <Border Background="Transparent">
+              <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
           </ControlTemplate>
         </Setter.Value>
       </Setter>
@@ -38,7 +40,7 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
       Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
   
   <Grid.RowDefinitions>
@@ -48,96 +50,232 @@
   </Grid.RowDefinitions>
   
   <!-- Shop Content Area -->
-  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Orientation="Vertical" Margin="16,8">
+  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,16" ClipToBounds="False">
       
-      <!-- Shop Title -->
-      <TextBlock Text="UPGRADES" FontFamily="Fonts/#Anton" FontSize="24" Foreground="#FFFFFF" 
-                 HorizontalAlignment="Center" Margin="0,0,0,16"/>
-      
-      <!-- Upgrade Items List -->
-      <ItemsControl ItemsSource="{Binding upgrades}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Background="#40000000" CornerRadius="12" Margin="0,0,0,12" Padding="12">
-              <Grid>
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="64"/>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <!-- Upgrade Icon -->
-                <Image Grid.Column="0" Source="{Binding image}" Width="48" Height="48" 
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                
-                <!-- Upgrade Info -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
-                  <TextBlock Text="{Binding name}" FontFamily="Fonts/#Anton" FontSize="18" Foreground="#FFFFFF"/>
-                  <TextBlock Text="{Binding rate}" FontFamily="Fonts/#Roboto" FontSize="12" Foreground="#AAAAAA"/>
-                  <TextBlock FontFamily="Fonts/#Roboto" FontSize="12" Foreground="#FFDD00">
-                    <Run Text="Owned: "/><Run Text="{Binding owned}"/>
-                  </TextBlock>
-                </StackPanel>
-                
-                <!-- Buy Button -->
-                <Button Grid.Column="2" Style="{StaticResource InvisibleButtonStyle}" 
-                        Command="{Binding buyCommand}" VerticalAlignment="Center"
-                        RenderTransformOrigin="0.5,0.5">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="BuyBtnScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="BuyBtnScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="BuyBtnScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="BuyBtnScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="BuyBtnScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Background="{Binding canAfford, Converter={StaticResource BoolToVis}}" 
-                          CornerRadius="8" Padding="12,8">
-                    <Border.Style>
-                      <Style TargetType="Border">
-                        <Setter Property="Background" Value="#22AA22"/>
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding canAfford}" Value="False">
-                            <Setter Property="Background" Value="#666666"/>
-                          </DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                      <TextBlock Text="{Binding buyLabel}" FontFamily="Fonts/#Anton" FontSize="14" 
-                                 Foreground="#FFFFFF" HorizontalAlignment="Center"/>
-                      <TextBlock Text="{Binding price}" FontFamily="Fonts/#Roboto" FontSize="11" 
-                                 Foreground="#DDDDDD" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                  </Border>
-                </Button>
-              </Grid>
+      <!-- Upgrade Card 1: Clicker -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/ClickerImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding clicker.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding clicker.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding clicker.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding clicker.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 2: Grandma -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/GrandmaImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding grandma.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding grandma.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding grandma.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding grandma.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 3: Farm -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/FarmImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding farm.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding farm.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding farm.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding farm.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 4: Factory -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/FactoryImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding factory.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding factory.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding factory.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding factory.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 5: Lab -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/LabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding lab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding lab.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding lab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding lab.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 6: Fab -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/FabImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding fab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding fab.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding fab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding fab.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      
+      <!-- Upgrade Card 7: Planet -->
+      <Border Width="371" Height="119" CornerRadius="8" Background="#a6000000" Padding="16" Margin="0,0,0,8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Image Source="Images/PlanetImage.png" Width="87" Height="87" Stretch="UniformToFill"/>
+          <StackPanel Orientation="Vertical" Width="240" Margin="12,0,0,0">
+            <Border Width="240" Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <TextBlock Text="{Binding planet.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+              <Button Width="160" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5">
+                <Border Width="160" Height="47" CornerRadius="5">
+                  <Border.Style>
+                    <Style TargetType="Border">
+                      <Setter Property="Background" Value="#fa9750"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding planet.canAfford}" Value="False">
+                          <Setter Property="Background" Value="#515151"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock Text="{Binding planet.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </Button>
+              <Border Width="75" Height="39" CornerRadius="5" Background="#515151" Margin="5,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding planet.owned}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
       
     </StackPanel>
   </ScrollViewer>
