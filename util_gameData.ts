@@ -76,6 +76,9 @@ export const LocalUIEvents = {
   // Cookie clicked - UI sends to Backend, Backend forwards to server
   cookieClicked: new LocalEvent("local_cookie_clicked"),
   
+  // Batch complete - Production cycle completed, triggers cookie rain
+  batchComplete: new LocalEvent<{ cookies: number }>("local_batch_complete"),
+  
   // Buy upgrade - UI sends to Backend, Backend forwards to server
   buyUpgrade: new LocalEvent<{ upgradeId: string }>("local_buy_upgrade"),
   

@@ -295,6 +295,11 @@ class Default extends hz.Component<typeof Default> {
           cookies: cookiesEarned,
         });
         
+        // Notify background to rain cookies proportional to batch size
+        this.sendLocalBroadcastEvent(LocalUIEvents.batchComplete, {
+          cookies: cookiesEarned,
+        });
+        
         // Reset progress (keep overflow for smooth cycles)
         this.productionProgress[config.id] = this.productionProgress[config.id] - 1;
       }

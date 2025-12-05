@@ -3,7 +3,9 @@
 
 // #region 📋 README
 // Background overlay with blue gradient and falling cookie rain.
-// Listens for cookie click events and triggers falling cookie animations.
+// Listens for cookie click events (1 cookie) and batch completion events (queued cookies).
+// Rain is proportional: tapping triggers 1 cookie, batch completion triggers proportional rain.
+// Uses a queue system - if batch cookies exceed available rain slots, excess is queued.
 // Rain only visible on home page.
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
@@ -14,7 +16,9 @@ import { Logger } from "./util_logger";
 import { PageType, LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-const RAIN_COOKIE_COUNT = 10;
+const RAIN_COOKIE_COUNT = 1;
+const RAIN_STAGGER_INTERVAL_MS = 20; // Stagger between each cookie rain start
+const RAIN_COOKIE_DURATION_MS = 2000; // Must match XAML DoubleAnimation Duration (0:0:2)
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -34,6 +38,11 @@ class Default extends hz.Component<typeof Default> {
   // Rain cookie state
   private nextRainCookieIndex: number = 0;
   private currentPage: PageType = "home";
+  
+  // Queue system for cookie rain
+  private rainQueue: number = 0; // Number of cookies waiting to rain
+  private isProcessingQueue: boolean = false;
+  private rainCookieInUse: boolean[] = []; // Track which rain cookies are currently animating
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -45,11 +54,22 @@ class Default extends hz.Component<typeof Default> {
       log.error("Entity is not a NoesisGizmo!");
       return;
     }
+    
+    // Initialize rain cookie tracking
+    for (let i = 0; i < RAIN_COOKIE_COUNT; i++) {
+      this.rainCookieInUse[i] = false;
+    }
 
-    // Listen for cookie click events
+    // Listen for cookie click events (triggers 1 rain cookie)
     this.connectLocalBroadcastEvent(
       LocalUIEvents.cookieClicked,
-      () => this.triggerRainCookie()
+      () => this.queueRainCookies(1)
+    );
+    
+    // Listen for batch completion events (triggers proportional rain cookies)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.batchComplete,
+      (data: { cookies: number }) => this.queueRainCookies(data.cookies)
     );
 
     // Listen for page change events
@@ -68,6 +88,7 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🎯 Main Logic
   private onPageChange(page: PageType): void {
+    const log = this.log.inactive("onPageChange");
     this.currentPage = page;
     this.dataContext.rainVisible = page === "home";
     
@@ -77,9 +98,19 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private buildDataContext(): void {
+    const log = this.log.inactive("buildDataContext");
+    // Fall distance calculation:
+    // - Start offset: 150px (Canvas.Top="-150")
+    // - Viewport height: 852px (typical mobile)
+    // - Scaled cookie size: 128 * rainCookieScale
+    // Total = 150 + 852 + (128 * scale) + 50 buffer
+    const scaledCookieSize = 128 * this.props.rainCookieScale;
+    const fallDistance = 150 + 852 + scaledCookieSize + 50;
+    
     this.dataContext = {
       rainVisible: this.currentPage === "home",
       rainCookieScale: this.props.rainCookieScale,
+      rainFallDistance: fallDistance,
     };
     
     // Initialize rain cookie slots
@@ -90,18 +121,77 @@ class Default extends hz.Component<typeof Default> {
     }
   }
 
-  private triggerRainCookie(): void {
-    const log = this.log.inactive("triggerRainCookie");
+  private queueRainCookies(count: number): void {
+    const log = this.log.inactive("queueRainCookies");
 
     if (!this.props.enableRain || this.currentPage !== "home") {
       return;
     }
+    
+    // Add to queue
+    this.rainQueue += count;
+    log.info(`Queued ${count} cookies for rain. Total queue: ${this.rainQueue}`);
+    
+    // Start processing if not already
+    if (!this.isProcessingQueue) {
+      this.processRainQueue();
+    }
+  }
+  
+  private processRainQueue(): void {
+    const log = this.log.inactive("processRainQueue");
+    
+    if (this.rainQueue <= 0) {
+      this.isProcessingQueue = false;
+      return;
+    }
+    
+    this.isProcessingQueue = true;
+    
+    // Find an available rain cookie slot
+    const availableIndex = this.findAvailableRainCookie();
+    
+    if (availableIndex === -1) {
+      // All slots busy, wait and retry
+      this.async.setTimeout(() => this.processRainQueue(), RAIN_STAGGER_INTERVAL_MS);
+      return;
+    }
+    
+    // Trigger this cookie
+    this.triggerRainCookie(availableIndex);
+    this.rainQueue--;
+    
+    // Continue processing queue with stagger delay
+    if (this.rainQueue > 0) {
+      this.async.setTimeout(() => this.processRainQueue(), RAIN_STAGGER_INTERVAL_MS);
+    } else {
+      this.isProcessingQueue = false;
+    }
+  }
+  
+  private findAvailableRainCookie(): number {
+    const log = this.log.inactive("findAvailableRainCookie");
+    
+    // Round-robin starting from nextRainCookieIndex
+    for (let i = 0; i < RAIN_COOKIE_COUNT; i++) {
+      const index = (this.nextRainCookieIndex + i) % RAIN_COOKIE_COUNT;
+      if (!this.rainCookieInUse[index]) {
+        this.nextRainCookieIndex = (index + 1) % RAIN_COOKIE_COUNT;
+        return index;
+      }
+    }
+    return -1; // All slots in use
+  }
 
-    const rainIndex = this.nextRainCookieIndex;
-    this.nextRainCookieIndex = (rainIndex + 1) % RAIN_COOKIE_COUNT;
+  private triggerRainCookie(rainIndex: number): void {
+    const log = this.log.inactive("triggerRainCookie");
 
     const randomLeft = Math.floor(Math.random() * 350);
+    
+    // Mark as in use
+    this.rainCookieInUse[rainIndex] = true;
 
+    // Reset animation state first (required to re-trigger DataTrigger)
     this.dataContext[`RainCookie${rainIndex}Animate`] = false;
     this.dataContext[`RainCookie${rainIndex}Visible`] = true;
     this.dataContext[`RainCookie${rainIndex}Left`] = randomLeft;
@@ -109,19 +199,31 @@ class Default extends hz.Component<typeof Default> {
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
 
+      // Small delay to ensure XAML processes the false->true transition
       this.async.setTimeout(() => {
         this.dataContext[`RainCookie${rainIndex}Animate`] = true;
         if (this.noesisGizmo) {
           this.noesisGizmo.dataContext = this.dataContext;
         }
 
+        // When animation completes, immediately check for queued cookies
         this.async.setTimeout(() => {
-          this.dataContext[`RainCookie${rainIndex}Visible`] = false;
-          this.dataContext[`RainCookie${rainIndex}Animate`] = false;
-          if (this.noesisGizmo) {
-            this.noesisGizmo.dataContext = this.dataContext;
+          // Mark cookie available
+          this.rainCookieInUse[rainIndex] = false;
+          
+          // If there are queued cookies, immediately re-trigger this same cookie
+          if (this.rainQueue > 0) {
+            this.rainQueue--;
+            this.triggerRainCookie(rainIndex);
+          } else {
+            // No more queued - hide and reset
+            this.dataContext[`RainCookie${rainIndex}Animate`] = false;
+            this.dataContext[`RainCookie${rainIndex}Visible`] = false;
+            if (this.noesisGizmo) {
+              this.noesisGizmo.dataContext = this.dataContext;
+            }
           }
-        }, this.props.rainCookieDurationMs);
+        }, RAIN_COOKIE_DURATION_MS);
       }, 1);
     }
 
