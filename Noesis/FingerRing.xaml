@@ -2,6 +2,7 @@
   FingerRing - Rotating ring of clicking fingers (Screen Overlay)
   Display Mode: Screen Overlay, Render Order: 2 (behind cookie)
   Input Mode: No Interaction (visual only)
+  24 fingers with sequential clicking animation, counter-clockwise rotation
 -->
 
 <Page
@@ -17,63 +18,269 @@
 
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
   
-  <!-- Ring of Clicker Images around Cookie - uses ItemsControl with template -->
-  <ItemsControl x:Name="PointerRing" ItemsSource="{Binding fingerPositions}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-    <ItemsControl.ItemsPanel>
-      <ItemsPanelTemplate>
-        <!-- Smooth XAML-driven rotation animation -->
-        <Canvas Width="336" Height="336" RenderTransformOrigin="0.5,0.5">
-          <Canvas.RenderTransform>
-            <RotateTransform x:Name="PointerRingRotate" Angle="0"/>
-          </Canvas.RenderTransform>
-          <Canvas.Triggers>
-            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-              <BeginStoryboard>
-                <Storyboard RepeatBehavior="Forever">
-                  <DoubleAnimation Storyboard.TargetName="PointerRingRotate" Storyboard.TargetProperty="Angle" From="0" To="360" Duration="0:1:0"/>
-                </Storyboard>
-              </BeginStoryboard>
-            </EventTrigger>
-          </Canvas.Triggers>
-        </Canvas>
-      </ItemsPanelTemplate>
-    </ItemsControl.ItemsPanel>
-    <ItemsControl.ItemContainerStyle>
-      <Style TargetType="ContentPresenter">
-        <Setter Property="Canvas.Left" Value="{Binding left}"/>
-        <Setter Property="Canvas.Top" Value="{Binding top}"/>
-      </Style>
-    </ItemsControl.ItemContainerStyle>
-    <ItemsControl.ItemTemplate>
-      <DataTemplate>
-        <!-- Animated finger image: rotated toward center, clicking only when isClicking=true -->
-        <Image Source="Images/ClickerImage.png" Width="36" Height="36" RenderTransformOrigin="0.5,0.5">
-          <Image.RenderTransform>
-            <TransformGroup>
-              <TranslateTransform x:Name="FingerBob" Y="0"/>
-              <RotateTransform Angle="{Binding rotation}"/>
-            </TransformGroup>
-          </Image.RenderTransform>
-          <b:Interaction.Triggers>
-            <b:DataTrigger Binding="{Binding isClicking}" Value="True">
-              <b:ControlStoryboardAction>
-                <b:ControlStoryboardAction.Storyboard>
-                  <Storyboard>
-                    <!-- Single click: up then down -->
-                    <DoubleAnimation Storyboard.TargetName="FingerBob" Storyboard.TargetProperty="Y" From="0" To="-8" Duration="0:0:0.12" AutoReverse="True">
-                      <DoubleAnimation.EasingFunction>
-                        <QuadraticEase EasingMode="EaseOut"/>
-                      </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                  </Storyboard>
-                </b:ControlStoryboardAction.Storyboard>
-              </b:ControlStoryboardAction>
-            </b:DataTrigger>
-          </b:Interaction.Triggers>
-        </Image>
-      </DataTemplate>
-    </ItemsControl.ItemTemplate>
-  </ItemsControl>
+  <!-- Ring of 24 Clicker fingers around Cookie -->
+  <Canvas Width="336" Height="336" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+    <Canvas.RenderTransform>
+      <RotateTransform x:Name="RingRotation" Angle="0"/>
+    </Canvas.RenderTransform>
+    <Canvas.Triggers>
+      <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+        <BeginStoryboard>
+          <Storyboard RepeatBehavior="Forever">
+            <!-- Full rotation in 15 seconds, counter-clockwise -->
+            <DoubleAnimation Storyboard.TargetName="RingRotation" Storyboard.TargetProperty="Angle" From="0" To="360" Duration="0:0:15"/>
+            
+            <!-- Sequential finger clicking - one at a time, 0.625s each, 24 fingers = 15s total cycle -->
+            <!-- Each finger: 0.12s up, 0.12s down, then next finger starts -->
+            <!-- Clicking in reverse order (23 → 0) to match rotation direction -->
+            
+            <!-- Finger 23 clicks at 0.000s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger23Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:0.000" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:0.12" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:0.24" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 22 clicks at 0.625s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger22Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:0.625" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:0.745" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:0.865" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 21 clicks at 1.250s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger21Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:1.250" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:1.370" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:1.490" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 20 clicks at 1.875s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger20Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:1.875" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:1.995" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:2.115" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 19 clicks at 2.500s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger19Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:2.500" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:2.620" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:2.740" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 18 clicks at 3.125s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger18Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:3.125" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:3.245" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:3.365" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 17 clicks at 3.750s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger17Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:3.750" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:3.870" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:3.990" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 16 clicks at 4.375s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger16Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:4.375" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:4.495" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:4.615" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 15 clicks at 5.000s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger15Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:5.000" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:5.120" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:5.240" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 14 clicks at 5.625s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger14Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:5.625" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:5.745" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:5.865" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 13 clicks at 6.250s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger13Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:6.250" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:6.370" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:6.490" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 12 clicks at 6.875s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger12Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:6.875" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:6.995" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:7.115" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 11 clicks at 7.500s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger11Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:7.500" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:7.620" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:7.740" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 10 clicks at 8.125s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger10Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:8.125" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:8.245" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:8.365" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 9 clicks at 8.750s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger9Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:8.750" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:8.870" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:8.990" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 8 clicks at 9.375s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger8Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:9.375" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:9.495" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:9.615" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 7 clicks at 10.000s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger7Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:10.000" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:10.120" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:10.240" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 6 clicks at 10.625s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger6Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:10.625" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:10.745" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:10.865" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 5 clicks at 11.250s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger5Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:11.250" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:11.370" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:11.490" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 4 clicks at 11.875s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger4Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:11.875" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:11.995" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:12.115" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 3 clicks at 12.500s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger3Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:12.500" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:12.620" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:12.740" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 2 clicks at 13.125s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger2Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:13.125" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:13.245" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:13.365" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 1 clicks at 13.750s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger1Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:13.750" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:13.870" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:13.990" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Finger 0 clicks at 14.375s -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Finger0Bob" Storyboard.TargetProperty="Y">
+              <LinearDoubleKeyFrame KeyTime="0:0:14.375" Value="0"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:14.495" Value="-10" KeySpline="0,0,0.58,1"/>
+              <SplineDoubleKeyFrame KeyTime="0:0:14.615" Value="0" KeySpline="0.42,0,1,1"/>
+            </DoubleAnimationUsingKeyFrames>
+          </Storyboard>
+        </BeginStoryboard>
+      </EventTrigger>
+    </Canvas.Triggers>
+    
+    <!-- 24 fingers at 15° intervals (radius=150, center=150) -->
+    <!-- Finger 0: 0° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="300" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger0Bob" Y="0"/><RotateTransform Angle="0"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 1: 15° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="295" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger1Bob" Y="0"/><RotateTransform Angle="-15"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 2: 30° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="280" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger2Bob" Y="0"/><RotateTransform Angle="-30"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 3: 45° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="256" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger3Bob" Y="0"/><RotateTransform Angle="-45"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 4: 60° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="225" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger4Bob" Y="0"/><RotateTransform Angle="-60"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 5: 75° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="189" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger5Bob" Y="0"/><RotateTransform Angle="-75"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 6: 90° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="300" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger6Bob" Y="0"/><RotateTransform Angle="-90"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 7: 105° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="295" Canvas.Top="111" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger7Bob" Y="0"/><RotateTransform Angle="-105"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 8: 120° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="280" Canvas.Top="75" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger8Bob" Y="0"/><RotateTransform Angle="-120"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 9: 135° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="256" Canvas.Top="44" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger9Bob" Y="0"/><RotateTransform Angle="-135"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 10: 150° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="225" Canvas.Top="20" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger10Bob" Y="0"/><RotateTransform Angle="-150"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 11: 165° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="189" Canvas.Top="5" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger11Bob" Y="0"/><RotateTransform Angle="-165"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 12: 180° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="150" Canvas.Top="0" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger12Bob" Y="0"/><RotateTransform Angle="-180"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 13: 195° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="5" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger13Bob" Y="0"/><RotateTransform Angle="-195"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 14: 210° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="20" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger14Bob" Y="0"/><RotateTransform Angle="-210"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 15: 225° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="44" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger15Bob" Y="0"/><RotateTransform Angle="-225"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 16: 240° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="75" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger16Bob" Y="0"/><RotateTransform Angle="-240"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 17: 255° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="111" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger17Bob" Y="0"/><RotateTransform Angle="-255"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 18: 270° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="0" Canvas.Top="150" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger18Bob" Y="0"/><RotateTransform Angle="-270"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 19: 285° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="5" Canvas.Top="189" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger19Bob" Y="0"/><RotateTransform Angle="-285"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 20: 300° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="20" Canvas.Top="225" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger20Bob" Y="0"/><RotateTransform Angle="-300"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 21: 315° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="44" Canvas.Top="256" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger21Bob" Y="0"/><RotateTransform Angle="-315"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 22: 330° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="75" Canvas.Top="280" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger22Bob" Y="0"/><RotateTransform Angle="-330"/></TransformGroup></Image.RenderTransform>
+    </Image>
+    <!-- Finger 23: 345° -->
+    <Image Source="Images/ClickerImage.png" Width="36" Height="36" Canvas.Left="111" Canvas.Top="295" RenderTransformOrigin="0.5,0.5">
+      <Image.RenderTransform><TransformGroup><TranslateTransform x:Name="Finger23Bob" Y="0"/><RotateTransform Angle="-345"/></TransformGroup></Image.RenderTransform>
+    </Image>
+  </Canvas>
 
 </Grid>
 </Page>

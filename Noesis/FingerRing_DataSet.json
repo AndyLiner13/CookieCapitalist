@@ -1,6 +1,12 @@
 {
   "fingerPositions": [
-    { "left": 150, "top": 0, "rotation": 0, "isClicking": false },
-    { "left": 200, "top": 50, "rotation": -45, "isClicking": false }
+    { "left": 150, "top": 300, "rotation": 0 },
+    { "left": 256, "top": 256, "rotation": -45 },
+    { "left": 300, "top": 150, "rotation": -90 },
+    { "left": 256, "top": 44, "rotation": -135 },
+    { "left": 150, "top": 0, "rotation": -180 },
+    { "left": 44, "top": 44, "rotation": -225 },
+    { "left": 0, "top": 150, "rotation": -270 },
+    { "left": 44, "top": 256, "rotation": -315 }
   ]
 }
