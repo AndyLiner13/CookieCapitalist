@@ -16,9 +16,17 @@ import { Logger } from "./util_logger";
 import { PageType, LocalUIEvents } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-const RAIN_COOKIE_COUNT = 10;
-const RAIN_STAGGER_INTERVAL_MS = 20; // Stagger between each cookie rain start
+const RAIN_COOKIE_COUNT = 250;
+const RAIN_STAGGER_INTERVAL_MS = 15; // Stagger between each cookie rain start (smaller = denser rain)
 const RAIN_COOKIE_DURATION_MS = 3000; // Must match XAML DoubleAnimation Duration (0:0:3)
+const COOKIE_DISPLAY_WIDTH = 111; // 128 * 0.87 scale factor
+
+// Column-based distribution for guaranteed full coverage
+// Divide screen into columns, each cookie picks a column then adds random jitter
+const RAIN_COLUMNS = 12; // Number of columns to divide screen into (more = better horizontal coverage)
+const RAIN_VIEWPORT_WIDTH = 900; // Estimated max viewport width (generous)
+const RAIN_COLUMN_WIDTH = RAIN_VIEWPORT_WIDTH / RAIN_COLUMNS;
+const RAIN_MIN_LEFT = -COOKIE_DISPLAY_WIDTH * 0.5; // Allow cookies to start partially off-screen
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -175,7 +183,12 @@ class Default extends hz.Component<typeof Default> {
   private triggerRainCookie(rainIndex: number): void {
     const log = this.log.inactive("triggerRainCookie");
 
-    const randomLeft = Math.floor(Math.random() * 350);
+    // Column-based positioning with jitter for guaranteed full coverage
+    // Each cookie is assigned to a column based on its index, with random offset within column
+    const column = rainIndex % RAIN_COLUMNS;
+    const columnStart = RAIN_MIN_LEFT + (column * RAIN_COLUMN_WIDTH);
+    const jitter = Math.random() * RAIN_COLUMN_WIDTH; // Random position within column
+    const randomLeft = Math.floor(columnStart + jitter);
     
     // Mark as in use
     this.rainCookieInUse[rainIndex] = true;
