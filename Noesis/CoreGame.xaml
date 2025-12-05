@@ -20,6 +20,83 @@
   <ResourceDictionary>
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     
+    <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+    <!-- UPGRADE CARD STYLES & RESOURCES                                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Card Layout Constants -->
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardHeight">100</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardCornerRadius">8</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">30</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">47</sys:Double>
+    <CornerRadius x:Key="CardBorderRadius">8</CornerRadius>
+    <CornerRadius x:Key="BarCornerRadius">5</CornerRadius>
+    <CornerRadius x:Key="TierBadgeRadius">4</CornerRadius>
+    <Thickness x:Key="CardMargin">0,0,0,8</Thickness>
+    <Thickness x:Key="CardPadding">8</Thickness>
+    <Thickness x:Key="ImageMargin">0,0,8,0</Thickness>
+    <Thickness x:Key="TierBadgeMargin">0,0,0,2</Thickness>
+    <Thickness x:Key="TierBadgePadding">6,2</Thickness>
+    <Thickness x:Key="TimerMargin">5,0,0,0</Thickness>
+    <Thickness x:Key="TimerPadding">12,0</Thickness>
+    <Thickness x:Key="ProgressTextMargin">8,0,0,0</Thickness>
+    <Thickness x:Key="ButtonRowMargin">0,5,0,0</Thickness>
+    
+    <!-- Card Colors -->
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#a6000000"/>
+    <SolidColorBrush x:Key="BarBackgroundBrush" Color="#515151"/>
+    <SolidColorBrush x:Key="ProgressFillBrush" Color="#4CAF50"/>
+    <SolidColorBrush x:Key="BuyButtonAffordBrush" Color="#fa9750"/>
+    <SolidColorBrush x:Key="BuyButtonMaxedBrush" Color="#4CAF50"/>
+    <SolidColorBrush x:Key="BuyButtonDisabledBrush" Color="#515151"/>
+    <SolidColorBrush x:Key="TierBadgeBackgroundBrush" Color="#cc000000"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#ffffff"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#aaffffff"/>
+    
+    <!-- Card Typography -->
+    <FontFamily x:Key="CardFontFamily">Fonts/#Anton-Regular</FontFamily>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="NameFontSize">20</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="RateFontSize">16</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">14</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="PriceFontSize">20</sys:Double>
+    <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">18</sys:Double>
+    
+    <!-- Card Text Styles -->
+    <Style x:Key="CardNameTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+      <Setter Property="FontSize" Value="{StaticResource NameFontSize}"/>
+      <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+    </Style>
+    
+    <Style x:Key="CardRateTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+      <Setter Property="FontSize" Value="{StaticResource RateFontSize}"/>
+      <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <Style x:Key="CardTierTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+      <Setter Property="FontSize" Value="{StaticResource TierFontSize}"/>
+      <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+    </Style>
+    
+    <Style x:Key="CardPriceTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+      <Setter Property="FontSize" Value="{StaticResource PriceFontSize}"/>
+      <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <Style x:Key="CardTimerTextStyle" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+      <Setter Property="FontSize" Value="{StaticResource TimerFontSize}"/>
+      <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
     <!-- Popup text style -->
     <Style x:Key="PopupTextStyle" TargetType="TextBlock">
       <Setter Property="FontFamily" Value="Fonts/#Anton"/>
@@ -42,6 +119,168 @@
             <Border Background="Transparent">
               <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+    <!-- UPGRADE CARD TEMPLATE                                                                   -->
+    <!-- Usage: <ContentControl Style="{StaticResource UpgradeCardStyle}" Content="{Binding upgradeData}"/> -->
+    <!-- DataContext Properties Required:                                                        -->
+    <!--   - imageSource: string (e.g., "Images/ClickerImage.png")                              -->
+    <!--   - tierProgress: string (e.g., "5/24")                                                -->
+    <!--   - name: string (e.g., "Clicker")                                                     -->
+    <!--   - rateDisplay: string (e.g., "+1.2/s")                                               -->
+    <!--   - progressWidth: double (progress bar fill width)                                    -->
+    <!--   - isProducing: bool (show progress bar and timer)                                    -->
+    <!--   - buyCommand: ICommand                                                               -->
+    <!--   - price: string (e.g., "100")                                                        -->
+    <!--   - canAfford: bool                                                                    -->
+    <!--   - isMaxed: bool (optional, for max level indicator)                                  -->
+    <!--   - timeRemaining: string (e.g., "0:30")                                               -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+    <Style x:Key="UpgradeCardStyle" TargetType="ContentControl">
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ContentControl">
+            <Border Height="{StaticResource CardHeight}" 
+                    CornerRadius="{StaticResource CardBorderRadius}" 
+                    Background="{StaticResource CardBackgroundBrush}" 
+                    Padding="{StaticResource CardPadding}" 
+                    Margin="{StaticResource CardMargin}" 
+                    HorizontalAlignment="Stretch">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Image with tier progress overlay -->
+                <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                  <Image Source="{Binding imageSource}" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                  <Border Background="{StaticResource TierBadgeBackgroundBrush}" 
+                          CornerRadius="{StaticResource TierBadgeRadius}" 
+                          Padding="{StaticResource TierBadgePadding}" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Bottom" 
+                          Margin="{StaticResource TierBadgeMargin}">
+                    <TextBlock Text="{Binding tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                  </Border>
+                </Grid>
+                
+                <!-- Content: responsive width -->
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                  <!-- Progress Bar / Name Bar -->
+                  <Border Height="{StaticResource ProgressBarHeight}" 
+                          CornerRadius="{StaticResource BarCornerRadius}" 
+                          Background="{StaticResource BarBackgroundBrush}" 
+                          HorizontalAlignment="Stretch" 
+                          ClipToBounds="True">
+                    <Grid>
+                      <!-- Progress fill (green when producing) -->
+                      <Border Width="{Binding progressWidth}" 
+                              Height="{StaticResource ProgressBarHeight}" 
+                              CornerRadius="{StaticResource BarCornerRadius}" 
+                              Background="{StaticResource ProgressFillBrush}" 
+                              HorizontalAlignment="Left" 
+                              Visibility="{Binding isProducing, Converter={StaticResource BoolToVis}}"/>
+                      <!-- Name and rate text -->
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                        <TextBlock Text="{Binding name}" Style="{StaticResource CardNameTextStyle}"/>
+                        <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                        <TextBlock Text="{Binding rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                  
+                  <!-- Buy Button and Timer Row -->
+                  <Grid Margin="{StaticResource ButtonRowMargin}">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Buy Button -->
+                    <Button Grid.Column="0" 
+                            Height="{StaticResource BuyButtonHeight}" 
+                            Style="{StaticResource InvisibleButtonStyle}" 
+                            Command="{Binding buyCommand}" 
+                            RenderTransformOrigin="0.5,0.5" 
+                            HorizontalAlignment="Stretch">
+                      <Button.RenderTransform>
+                        <ScaleTransform x:Name="BuyButtonScale" ScaleX="1" ScaleY="1"/>
+                      </Button.RenderTransform>
+                      <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                          <b:ControlStoryboardAction>
+                            <b:ControlStoryboardAction.Storyboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                              </Storyboard>
+                            </b:ControlStoryboardAction.Storyboard>
+                          </b:ControlStoryboardAction>
+                        </b:EventTrigger>
+                        <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                          <b:ControlStoryboardAction>
+                            <b:ControlStoryboardAction.Storyboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
+                                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
+                                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                              </Storyboard>
+                            </b:ControlStoryboardAction.Storyboard>
+                          </b:ControlStoryboardAction>
+                        </b:EventTrigger>
+                        <b:EventTrigger EventName="MouseLeave">
+                          <b:ControlStoryboardAction>
+                            <b:ControlStoryboardAction.Storyboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
+                                <DoubleAnimation Storyboard.TargetName="BuyButtonScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
+                              </Storyboard>
+                            </b:ControlStoryboardAction.Storyboard>
+                          </b:ControlStoryboardAction>
+                        </b:EventTrigger>
+                      </b:Interaction.Triggers>
+                      <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                        <Border.Style>
+                          <Style TargetType="Border">
+                            <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding isMaxed}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/>
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding canAfford}" Value="False">
+                                <Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/>
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding price}" Style="{StaticResource CardPriceTextStyle}"/>
+                      </Border>
+                    </Button>
+                    
+                    <!-- Timer display -->
+                    <Border Grid.Column="1" 
+                            Height="{StaticResource BuyButtonHeight}" 
+                            CornerRadius="{StaticResource BarCornerRadius}" 
+                            Background="{StaticResource BarBackgroundBrush}" 
+                            Margin="{StaticResource TimerMargin}" 
+                            Padding="{StaticResource TimerPadding}" 
+                            VerticalAlignment="Center" 
+                            Visibility="{Binding isProducing, Converter={StaticResource BoolToVis}}">
+                      <TextBlock Text="{Binding timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                    </Border>
+                  </Grid>
+                </StackPanel>
+              </Grid>
             </Border>
           </ControlTemplate>
         </Setter.Value>
@@ -287,616 +526,26 @@
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
       <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,140">
         
-        <!-- Upgrade Card 1: Clicker (has max limit of 24) -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <!-- Image with tier progress overlay -->
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding clicker.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <!-- Content: responsive width -->
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <!-- Progress Bar / Name Bar -->
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <!-- Progress fill (green when producing) -->
-                  <Border Width="{Binding clicker.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <!-- Name and rate text -->
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding clicker.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding clicker.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="ClickerBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="ClickerBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers>
-                          <DataTrigger Binding="{Binding clicker.isMaxed}" Value="True"><Setter Property="Background" Value="#4CAF50"/></DataTrigger>
-                          <DataTrigger Binding="{Binding clicker.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger>
-                        </Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding clicker.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <!-- Timer display -->
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding clicker.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <!-- Upgrade Card 1: Clicker -->
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding clicker}"/>
         
         <!-- Upgrade Card 2: Grandma -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding grandma.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding grandma.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding grandma.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding grandma.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="GrandmaBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="GrandmaBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding grandma.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding grandma.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding grandma.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding grandma}"/>
         
         <!-- Upgrade Card 3: Farm -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding farm.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding farm.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding farm.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding farm.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="FarmBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="FarmBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding farm.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding farm.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding farm.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding farm}"/>
         
         <!-- Upgrade Card 4: Factory -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding factory.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding factory.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding factory.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding factory.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="FactoryBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="FactoryBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding factory.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding factory.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding factory.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding factory}"/>
         
         <!-- Upgrade Card 5: Lab -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding lab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding lab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding lab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding lab.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="LabBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="LabBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding lab.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding lab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding lab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding lab}"/>
         
         <!-- Upgrade Card 6: Fab -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding fab.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding fab.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding fab.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding fab.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="FabBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="FabBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding fab.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding fab.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding fab.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding fab}"/>
         
         <!-- Upgrade Card 7: Planet -->
-        <Border Height="100" CornerRadius="8" Background="#a6000000" Padding="8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0" Margin="0,0,8,0">
-              <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
-              <Border Background="#cc000000" CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <TextBlock Text="{Binding planet.tierProgress}" FontFamily="Fonts/#Anton-Regular" FontSize="14" Foreground="#ffffff"/>
-              </Border>
-            </Grid>
-            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-              <Border Height="30" CornerRadius="5" Background="#515151" HorizontalAlignment="Stretch" ClipToBounds="True">
-                <Grid>
-                  <Border Width="{Binding planet.progressWidth}" Height="30" CornerRadius="5" Background="#4CAF50" HorizontalAlignment="Left" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
-                  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding planet.name}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text=" " FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff"/>
-                    <TextBlock Text="{Binding planet.rateDisplay}" FontFamily="Fonts/#Anton-Regular" FontSize="16" Foreground="#aaffffff" VerticalAlignment="Center"/>
-                  </StackPanel>
-                </Grid>
-              </Border>
-              <Grid Margin="0,5,0,0">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" x:Name="PlanetBuyButton" Height="47" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
-                  <Button.RenderTransform>
-                    <ScaleTransform x:Name="PlanetBuyScale" ScaleX="1" ScaleY="1"/>
-                  </Button.RenderTransform>
-                  <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1">
-                              <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                    <b:EventTrigger EventName="MouseLeave">
-                      <b:ControlStoryboardAction>
-                        <b:ControlStoryboardAction.Storyboard>
-                          <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/>
-                          </Storyboard>
-                        </b:ControlStoryboardAction.Storyboard>
-                      </b:ControlStoryboardAction>
-                    </b:EventTrigger>
-                  </b:Interaction.Triggers>
-                  <Border Height="47" CornerRadius="5" HorizontalAlignment="Stretch">
-                    <Border.Style>
-                      <Style TargetType="Border"><Setter Property="Background" Value="#fa9750"/>
-                        <Style.Triggers><DataTrigger Binding="{Binding planet.canAfford}" Value="False"><Setter Property="Background" Value="#515151"/></DataTrigger></Style.Triggers>
-                      </Style>
-                    </Border.Style>
-                    <TextBlock Text="{Binding planet.price}" FontFamily="Fonts/#Anton-Regular" FontSize="20" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Border>
-                </Button>
-                <Border Grid.Column="1" Height="47" CornerRadius="5" Background="#515151" Margin="5,0,0,0" Padding="12,0" VerticalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
-                  <TextBlock Text="{Binding planet.timeRemaining}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-              </Grid>
-            </StackPanel>
-          </Grid>
-        </Border>
+        <ContentControl Style="{StaticResource UpgradeCardStyle}" DataContext="{Binding planet}"/>
         
       </StackPanel>
     </ScrollViewer>
