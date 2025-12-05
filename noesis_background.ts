@@ -18,15 +18,13 @@ import { PageType, LocalUIEvents } from "./util_gameData";
 // #region 🏷️ Type Definitions
 const RAIN_COOKIE_COUNT = 1;
 const RAIN_STAGGER_INTERVAL_MS = 20; // Stagger between each cookie rain start
-const RAIN_COOKIE_DURATION_MS = 2000; // Must match XAML DoubleAnimation Duration (0:0:2)
+const RAIN_COOKIE_DURATION_MS = 3000; // Must match XAML DoubleAnimation Duration (0:0:3)
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     enableRain: { type: hz.PropTypes.Boolean, default: true },
-    rainCookieDurationMs: { type: hz.PropTypes.Number, default: 2000 },
-    rainCookieScale: { type: hz.PropTypes.Number, default: 0.5 },
   };
   // #endregion
 
@@ -99,18 +97,8 @@ class Default extends hz.Component<typeof Default> {
 
   private buildDataContext(): void {
     const log = this.log.inactive("buildDataContext");
-    // Fall distance calculation:
-    // - Start offset: 150px (Canvas.Top="-150")
-    // - Viewport height: 852px (typical mobile)
-    // - Scaled cookie size: 128 * rainCookieScale
-    // Total = 150 + 852 + (128 * scale) + 50 buffer
-    const scaledCookieSize = 128 * this.props.rainCookieScale;
-    const fallDistance = 150 + 852 + scaledCookieSize + 50;
-    
     this.dataContext = {
       rainVisible: this.currentPage === "home",
-      rainCookieScale: this.props.rainCookieScale,
-      rainFallDistance: fallDistance,
     };
     
     // Initialize rain cookie slots
