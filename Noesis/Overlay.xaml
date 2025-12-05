@@ -1,9 +1,9 @@
 <!-- 
-  Overlay - Header and footer nav only (Screen Overlay)
+  Overlay - Header and Navigation combined (Screen Overlay)
   Display Mode: Screen Overlay, Render Order: 10 (top layer)
   Input Mode: Interactive, nonblocking
-  NOTE: Content area is hit-test invisible to allow clicks through to other overlays
-  Navigation buttons use Command binding to trigger TypeScript handlers
+  Contains: Cookie count/CPS header at top, navigation tabs at bottom
+  NOTE: Main Grid is hit-test invisible, only header/footer borders capture clicks
 -->
 
 <Page
@@ -13,7 +13,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
-  d:DataContext="ClickerGame_DataSet"
+  d:DataContext="Overlay_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852">
 
@@ -37,8 +37,8 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<!-- Main container - transparent and hit-test invisible except for header/footer -->
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" IsHitTestVisible="False">
+<!-- Main container - null background so clicks pass through empty areas -->
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
 
   <Grid.RowDefinitions>
     <RowDefinition Height="143"/>
@@ -47,9 +47,9 @@
   </Grid.RowDefinitions>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <!-- Region: Header - Cookie Count (Shared across all pages) - HIT TESTABLE                   -->
+  <!-- Region: Header - Cookie Count (Shared across all pages)                                  -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0" IsHitTestVisible="True">
+  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
       <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
       <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
@@ -57,14 +57,13 @@
   </Border>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <!-- Region: Middle Area - NOT HIT TESTABLE (clicks pass through to other overlays)           -->
+  <!-- Region: Middle Area - Empty (clicks pass through to CoreGame cookie)                     -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <!-- Empty - Cookie, FingerRing, CookieRain, Shop, Leaderboard are all separate overlays -->
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <!-- Region: Footer - Navigation Tabs - HIT TESTABLE                                          -->
+  <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16" Grid.Row="2" IsHitTestVisible="True">
+  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16" Grid.Row="2">
     <Grid HorizontalAlignment="Center">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
@@ -76,7 +75,7 @@
       
       <!-- Left Tab (Shop) -->
       <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"
-              Command="{Binding events.onShopClick}">
+              Command="{Binding onShopClick}">
         <Button.RenderTransform>
           <ScaleTransform x:Name="LeftTabScale" ScaleX="1" ScaleY="1"/>
         </Button.RenderTransform>
@@ -115,7 +114,7 @@
       
       <!-- Middle Tab (Home) -->
       <Button Grid.Column="2" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"
-              Command="{Binding events.onHomeClick}">
+              Command="{Binding onHomeClick}">
         <Button.RenderTransform>
           <ScaleTransform x:Name="MiddleTabScale" ScaleX="1" ScaleY="1"/>
         </Button.RenderTransform>
@@ -154,7 +153,7 @@
       
       <!-- Right Tab (Leaderboard) -->
       <Button Grid.Column="4" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"
-              Command="{Binding events.onStatsClick}">
+              Command="{Binding onStatsClick}">
         <Button.RenderTransform>
           <ScaleTransform x:Name="RightTabScale" ScaleX="1" ScaleY="1"/>
         </Button.RenderTransform>

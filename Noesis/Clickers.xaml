@@ -1,5 +1,5 @@
 <!-- 
-  FingerRing - Rotating ring of clicking fingers (Screen Overlay)
+  Clickers - Rotating ring of clicking fingers (Screen Overlay)
   Display Mode: Screen Overlay, Render Order: 2 (behind cookie)
   Input Mode: No Interaction (visual only)
   24 fingers with sequential clicking animation, counter-clockwise rotation
@@ -12,7 +12,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
-  d:DataContext="FingerRing_DataSet"
+  d:DataContext="Clickers_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852">
 
