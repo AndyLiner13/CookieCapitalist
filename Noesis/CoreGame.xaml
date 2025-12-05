@@ -382,7 +382,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding clicker.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding clicker.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding clicker.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -441,7 +443,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding grandma.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding grandma.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding grandma.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -500,7 +504,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding farm.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding farm.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding farm.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -559,7 +565,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding factory.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding factory.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding factory.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -618,7 +626,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding lab.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding lab.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding lab.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -677,7 +687,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding fab.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding fab.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding fab.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
@@ -736,7 +748,9 @@
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
               <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
                 <Grid>
-                  <Border Width="{Binding planet.progressWidth}" Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Left" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}"/>
+                  <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border.RenderTransform><ScaleTransform ScaleX="{Binding planet.progress}" ScaleY="1"/></Border.RenderTransform>
+                  </Border>
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
                     <TextBlock Text="{Binding planet.name}" Style="{StaticResource CardNameTextStyle}"/>
                     <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
