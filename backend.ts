@@ -26,6 +26,7 @@ import {
   TICK_INTERVAL_MS,
   calculateUpgradeCost,
   calculateCPS,
+  calculateCookiesPerClick,
   createDefaultGameState,
 } from "./util_gameData";
 
@@ -120,6 +121,7 @@ class Default extends Component<typeof Default> {
   
   private recalculateCPS(): void {
     this.cookiesPerSecond = calculateCPS(this.gameState.upgrades);
+    this.gameState.cookiesPerClick = calculateCookiesPerClick(this.gameState.upgrades);
   }
   
   // Handle player entering world

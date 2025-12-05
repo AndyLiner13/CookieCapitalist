@@ -124,6 +124,12 @@ export function calculateCPS(upgrades: { [upgradeId: string]: number }): number 
   return totalCPS;
 }
 
+// Calculate cookies per click based on clicker upgrades
+export function calculateCookiesPerClick(upgrades: { [upgradeId: string]: number }): number {
+  const clickerCount = upgrades["clicker"] || 0;
+  return BASE_COOKIES_PER_CLICK + clickerCount;
+}
+
 // Format large numbers for display
 export function formatNumber(num: number): string {
   if (num >= 1000000000000) {
