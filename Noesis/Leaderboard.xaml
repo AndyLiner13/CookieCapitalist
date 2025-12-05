@@ -1,0 +1,101 @@
+<!-- 
+  Leaderboard - Stats and leaderboard page (Screen Overlay)
+  Display Mode: Screen Overlay, Render Order: 5
+  Input Mode: Interactive, nonblocking
+  Visibility controlled by TypeScript based on current page
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="Leaderboard_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+<Page.Resources>
+  <ResourceDictionary>
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+  </ResourceDictionary>
+</Page.Resources>
+
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+      Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
+  
+  <Grid.RowDefinitions>
+    <RowDefinition Height="143"/>  <!-- Header spacer -->
+    <RowDefinition Height="*"/>     <!-- Content area -->
+    <RowDefinition Height="124"/>   <!-- Footer spacer -->
+  </Grid.RowDefinitions>
+  
+  <!-- Leaderboard Content Area -->
+  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Orientation="Vertical" Margin="16,8">
+      
+      <!-- Stats Section -->
+      <TextBlock Text="YOUR STATS" FontFamily="Fonts/#Anton" FontSize="24" Foreground="#FFFFFF" 
+                 HorizontalAlignment="Center" Margin="0,0,0,16"/>
+      
+      <Border Background="#40000000" CornerRadius="12" Margin="0,0,0,16" Padding="16">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Cookies per Click:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA"/>
+          <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding cookiesPerClick}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF"/>
+          
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Cookies per Second:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
+          <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding currentCPS}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF" Margin="0,8,0,0"/>
+          
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Upgrades:" FontFamily="Fonts/#Roboto" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
+          <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding totalUpgrades}" FontFamily="Fonts/#Anton" FontSize="14" Foreground="#FFFFFF" Margin="0,8,0,0"/>
+        </Grid>
+      </Border>
+      
+      <!-- Leaderboard Section -->
+      <TextBlock Text="LEADERBOARD" FontFamily="Fonts/#Anton" FontSize="24" Foreground="#FFFFFF" 
+                 HorizontalAlignment="Center" Margin="0,16,0,16"/>
+      
+      <ItemsControl ItemsSource="{Binding leaderboard}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Background="#40000000" CornerRadius="8" Margin="0,0,0,8" Padding="12,8">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="40"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Rank -->
+                <TextBlock Grid.Column="0" Text="{Binding rank}" FontFamily="Fonts/#Anton" FontSize="20" 
+                           Foreground="#FFDD00" VerticalAlignment="Center"/>
+                
+                <!-- Username -->
+                <TextBlock Grid.Column="1" Text="{Binding username}" FontFamily="Fonts/#Roboto" FontSize="16" 
+                           Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                
+                <!-- Score -->
+                <TextBlock Grid.Column="2" Text="{Binding score}" FontFamily="Fonts/#Anton" FontSize="16" 
+                           Foreground="#AAAAAA" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      
+    </StackPanel>
+  </ScrollViewer>
+
+</Grid>
+</Page>

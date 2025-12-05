@@ -43,13 +43,7 @@
   </ResourceDictionary>
 </Page.Resources>
 
-<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-  <Grid.Background>
-    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-      <GradientStop Color="#2773EA" Offset="0"/>
-      <GradientStop Color="#1E4DCE" Offset="1"/>
-    </LinearGradientBrush>
-  </Grid.Background>
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent">
 
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Main Container                                                                      -->
@@ -258,42 +252,6 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-          
-          <!-- Clickable Cookie (centered) -->
-          <!-- Fixed-size button so cookie scale animation cannot influence layout or finger ring positioning -->
-          <Button x:Name="CookieButton" Style="{StaticResource InvisibleButtonStyle}" Width="256" Height="256" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding onCookieClick}">
-            <Grid>
-              <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
-                <Image.RenderTransform>
-                  <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
-                </Image.RenderTransform>
-              </Image>
-            </Grid>
-            <b:Interaction.Triggers>
-              <!-- Shrink on press -->
-              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                <b:ControlStoryboardAction>
-                  <b:ControlStoryboardAction.Storyboard>
-                    <Storyboard>
-                      <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                      <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
-                    </Storyboard>
-                  </b:ControlStoryboardAction.Storyboard>
-                </b:ControlStoryboardAction>
-              </b:EventTrigger>
-              <!-- Bounce back on release -->
-              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                <b:ControlStoryboardAction>
-                  <b:ControlStoryboardAction.Storyboard>
-                    <Storyboard>
-                      <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation>
-                      <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation>
-                    </Storyboard>
-                  </b:ControlStoryboardAction.Storyboard>
-                </b:ControlStoryboardAction>
-              </b:EventTrigger>
-            </b:Interaction.Triggers>
-          </Button>
           
           <!-- Popup Text Elements (10 total) -->
           <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible}" Margin="{Binding Popup0Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">

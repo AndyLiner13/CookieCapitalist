@@ -1,0 +1,288 @@
+<!-- 
+  Overlay - Header and footer nav only (Screen Overlay)
+  Display Mode: Screen Overlay, Render Order: 10 (top layer)
+  Input Mode: Interactive, nonblocking
+  NOTE: Content area is hit-test invisible to allow clicks through to Cookie overlay
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="ClickerGame_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+<Page.Resources>
+  <ResourceDictionary>
+    <!-- Boolean to Visibility converter -->
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    
+    <!-- Invisible button style - no hover/click visual feedback -->
+    <Style x:Key="InvisibleButtonStyle" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="BorderBrush" Value="Transparent"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </ResourceDictionary>
+</Page.Resources>
+
+<!-- Main container - transparent and hit-test invisible except for header/footer -->
+<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" IsHitTestVisible="False">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- Region: Main Container                                                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
+  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True" Background="Transparent">
+    
+    <Grid>
+      <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+      <!-- Region: Initial State Trigger - Sets default navigation state on load                   -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+      <b:Interaction.Triggers>
+        <b:EventTrigger>
+          <b:GoToStateAction StateName="HomeState"/>
+        </b:EventTrigger>
+      </b:Interaction.Triggers>
+      
+      <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+      <!-- Region: Visual State Manager - Navigation States                                        -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+      <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup x:Name="NavigationStates">
+          <VisualStateGroup.Transitions>
+            <VisualTransition GeneratedDuration="0:0:0.3"/>
+          </VisualStateGroup.Transitions>
+          
+          <!-- Home State -->
+          <VisualState x:Name="HomeState">
+            <Storyboard>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HomePage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+          </VisualState>
+          
+          <!-- Shop State -->
+          <VisualState x:Name="ShopState">
+            <Storyboard>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HomePage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+          </VisualState>
+          
+          <!-- Leaderboard State -->
+          <VisualState x:Name="LeaderboardState">
+            <Storyboard>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HomePage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ShopPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+              </ObjectAnimationUsingKeyFrames>
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeaderboardPage" Storyboard.TargetProperty="(UIElement.Visibility)">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+              </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+          </VisualState>
+        </VisualStateGroup>
+      </VisualStateManager.VisualStateGroups>
+      
+      <Grid.RowDefinitions>
+        <RowDefinition Height="143"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="124"/>
+      </Grid.RowDefinitions>
+
+      <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+      <!-- Region: Header - Cookie Count (Shared across all pages) - HIT TESTABLE                   -->
+      <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+      <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0" IsHitTestVisible="True">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
+          <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+      <!-- Region: Page Content Area - NOT HIT TESTABLE (clicks pass through to Cookie overlay)     -->
+      <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+      <Grid Grid.Row="1" IsHitTestVisible="False">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+        <!-- Region: HOME PAGE - Empty (Cookie, FingerRing, CookieRain, Popups are separate overlays)-->
+        <!-- ═══════════════════════════════════════════════════════════════════════════════════════ -->
+        <Grid x:Name="HomePage">
+          <!-- Home page is now empty - all visual elements are in other overlays -->
+        </Grid>
+
+        <!-- Shop and Leaderboard pages are now separate overlays (Shop.xaml, Leaderboard.xaml) -->
+        <Grid x:Name="ShopPage" Visibility="Hidden"/>
+        <Grid x:Name="LeaderboardPage" Visibility="Hidden"/>
+
+      </Grid>
+
+      <!-- Footer - Navigation Tabs - HIT TESTABLE -->
+      <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16" Grid.Row="2" IsHitTestVisible="True">
+        <Grid HorizontalAlignment="Center">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          
+          <!-- Left Tab (Shop) -->
+          <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+              <ScaleTransform x:Name="LeftTabScale" ScaleX="1" ScaleY="1"/>
+            </Button.RenderTransform>
+            <b:Interaction.Triggers>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="LeftTabScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                      <DoubleAnimation Storyboard.TargetName="LeftTabScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="LeftTabScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="LeftTabScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="Click">
+                <b:GoToStateAction StateName="ShopState"/>
+              </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Image Source="Images/LeftTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+          </Button>
+          
+          <!-- Middle Tab (Home) -->
+          <Button Grid.Column="2" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+              <ScaleTransform x:Name="MiddleTabScale" ScaleX="1" ScaleY="1"/>
+            </Button.RenderTransform>
+            <b:Interaction.Triggers>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="MiddleTabScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                      <DoubleAnimation Storyboard.TargetName="MiddleTabScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="MiddleTabScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="MiddleTabScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="Click">
+                <b:GoToStateAction StateName="HomeState"/>
+              </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Image Source="Images/MiddleTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+          </Button>
+          
+          <!-- Right Tab (Leaderboard) -->
+          <Button Grid.Column="4" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+              <ScaleTransform x:Name="RightTabScale" ScaleX="1" ScaleY="1"/>
+            </Button.RenderTransform>
+            <b:Interaction.Triggers>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="RightTabScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                      <DoubleAnimation Storyboard.TargetName="RightTabScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="RightTabScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="RightTabScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="Click">
+                <b:GoToStateAction StateName="LeaderboardState"/>
+              </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Image Source="Images/RightTab.png" Width="93" Height="92" Stretch="UniformToFill"/>
+          </Button>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Grid>
+</Page>

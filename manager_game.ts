@@ -7,9 +7,10 @@
 // - Cookie production tick (passive income)
 // - Purchase validation and processing
 // - State synchronization with UI
+// - Assigning ownership of player controller to joining players
 // #endregion
 
-import { Component, Player, CodeBlockEvents, PropTypes } from "horizon/core";
+import { Component, Player, Entity, CodeBlockEvents, PropTypes } from "horizon/core";
 import { Logger } from "./util_logger";
 import {
   GameState,
@@ -31,7 +32,7 @@ import {
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
-    clickerUIGizmo: { type: PropTypes.Entity }, // NoesisUI gizmo with ClickerGame.xaml
+    playerController: { type: PropTypes.Entity },
   };
   // #endregion
 
@@ -134,8 +135,27 @@ class Default extends Component<typeof Default> {
     // For single player, just track the active player
     this.activePlayer = player;
     
+    // Assign ownership of player controller to this player
+    this.assignPlayerController(player);
+    
     // Send initial state after a short delay
     this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+  }
+  
+  // Assign ownership of existing player controller entity to player
+  private assignPlayerController(player: Player): void {
+    const log = this.log.active("assignPlayerController");
+    
+    const controller = this.props.playerController;
+    if (!controller) {
+      log.error("playerController prop is not set! Drag the controller_player entity into this slot in the Desktop Editor.");
+      return;
+    }
+    
+    // Assign ownership to the player - this triggers receiveOwnership on the client
+    controller.owner.set(player);
+    
+    log.info(`Assigned player controller ownership to ${player.name.get()}`);
   }
   
   // Handle player exiting world
