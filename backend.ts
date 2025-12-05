@@ -1,16 +1,19 @@
-// Desktop Editor Setup: Attach to Empty Object entity
+// Desktop Editor Setup: Attach to Empty Object entity. Use Default (server) execution mode.
 
 // #region 📋 README
-// Server-side game manager for Cookie Clicker.
-// Handles:
+// Backend - Server-side game manager for Cookie Clicker.
+// This script handles:
 // - Game state (cookies, upgrades, CPS)
 // - Cookie production tick (passive income)
 // - Purchase validation and processing
-// - State synchronization with UI
-// - Assigning ownership of player controller to joining players
+// - State synchronization with clients via network events
+// - Player controller assignment
+// 
+// IMPORTANT: This is SERVER-ONLY (Default execution mode).
+// UI scripts receive state via UIEvents.toClient network event directly.
 // #endregion
 
-import { Component, Player, Entity, CodeBlockEvents, PropTypes } from "horizon/core";
+import { Component, Player, CodeBlockEvents, PropTypes } from "horizon/core";
 import { Logger } from "./util_logger";
 import {
   GameState,
@@ -18,6 +21,7 @@ import {
   UIEventPayload,
   GameEvents,
   UIEvents,
+  LocalUIEvents,
   UPGRADE_CONFIGS,
   TICK_INTERVAL_MS,
   calculateUpgradeCost,
@@ -26,7 +30,6 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-// (Types are now in util_gameData.ts)
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -37,9 +40,9 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 📊 State
-  private log = new Logger("manager_game");
+  private log = new Logger("backend");
   
-  // Core game state
+  // Core game state (server authoritative)
   private gameState: GameState = createDefaultGameState();
   
   // Calculated values
@@ -48,10 +51,10 @@ class Default extends Component<typeof Default> {
   // Tick accumulator for fractional cookies
   private cookieAccumulator: number = 0;
   
-  // Throttle state broadcasts to avoid network flooding
+  // Throttle state broadcasts
   private pendingStateUpdate: boolean = false;
   private lastBroadcastTime: number = 0;
-  private static readonly BROADCAST_THROTTLE_MS = 100; // Max 10 updates per second
+  private static readonly BROADCAST_THROTTLE_MS = 100;
   
   // Active player reference
   private activePlayer: Player | null = null;
@@ -60,6 +63,8 @@ class Default extends Component<typeof Default> {
   // #region 🔄 Lifecycle Events
   start(): void {
     const log = this.log.active("start");
+    
+    // === SERVER-SIDE SETUP ===
     
     // Listen for player events
     this.connectCodeBlockEvent(
@@ -74,108 +79,86 @@ class Default extends Component<typeof Default> {
       this.onPlayerExit.bind(this)
     );
     
-    // Listen for game events from clients
+    // Listen for game events from clients (network → server)
     this.connectNetworkBroadcastEvent(
       GameEvents.toServer,
-      (data: GameEventPayload) => {
-        this.handlePlayerEvent(data);
-      }
+      (data: GameEventPayload) => this.handlePlayerEvent(data)
     );
     
-    // Start game tick
+    // Start game tick (passive cookie production)
     this.async.setInterval(() => this.gameTick(), TICK_INTERVAL_MS);
     
-    // Handle any players already in world (e.g., in Desktop Editor preview)
+    // Handle existing players (Desktop Editor preview)
     const players = this.world.getPlayers();
     if (players.length > 0) {
       this.activePlayer = players[0];
       log.info(`Found existing player: ${this.activePlayer.name.get()}`);
-      
-      // Send initial state after a short delay to let UI initialize
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
     }
     
-    log.info("Game manager initialized");
+    log.info("Backend initialized (Server)");
   }
   // #endregion
 
-  // #region 🎯 Main Logic
+  // #region 🎯 Server Logic
   // Main game tick - handles passive cookie production
   private gameTick(): void {
     if (this.cookiesPerSecond <= 0) return;
     
-    // Calculate cookies earned this tick
     const cookiesThisTick = this.cookiesPerSecond * (TICK_INTERVAL_MS / 1000);
     this.cookieAccumulator += cookiesThisTick;
     
-    // Only add whole cookies to prevent floating point issues
     if (this.cookieAccumulator >= 1) {
       const wholeCookies = Math.floor(this.cookieAccumulator);
       this.gameState.cookies += wholeCookies;
       this.gameState.totalCookiesEarned += wholeCookies;
       this.cookieAccumulator -= wholeCookies;
       
-      // Broadcast state update
       this.broadcastStateUpdate();
     }
   }
   
-  // Recalculate CPS from current upgrades
   private recalculateCPS(): void {
     this.cookiesPerSecond = calculateCPS(this.gameState.upgrades);
   }
-  // #endregion
-
-  // #region 🎬 Handlers
+  
   // Handle player entering world
   private onPlayerEnter(player: Player): void {
     const log = this.log.active("onPlayerEnter");
     log.info(`Player entered: ${player.name.get()}`);
     
-    // For single player, just track the active player
     this.activePlayer = player;
-    
-    // Assign ownership of player controller to this player
     this.assignPlayerController(player);
-    
-    // Send initial state after a short delay
     this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
   }
   
-  // Assign ownership of existing player controller entity to player
   private assignPlayerController(player: Player): void {
     const log = this.log.active("assignPlayerController");
     
     const controller = this.props.playerController;
     if (!controller) {
-      log.error("playerController prop is not set! Drag the controller_player entity into this slot in the Desktop Editor.");
+      log.error("playerController prop is not set!");
       return;
     }
     
-    // Assign ownership to the player - this triggers receiveOwnership on the client
     controller.owner.set(player);
-    
     log.info(`Assigned player controller ownership to ${player.name.get()}`);
   }
   
-  // Handle player exiting world
   private onPlayerExit(player: Player): void {
     const log = this.log.active("onPlayerExit");
     log.info(`Player exited: ${player.name.get()}`);
     
     if (this.activePlayer === player) {
       this.activePlayer = null;
-      // Could save state here for persistence
     }
   }
   
-  // Handle events from player UI
+  // Handle network events from clients
   private handlePlayerEvent(data: GameEventPayload): void {
     const log = this.log.active("handlePlayerEvent");
     
-    if (!data || !data.type) {
-      return;
-    }
+    if (!data || !data.type) return;
     
     switch (data.type) {
       case "cookie_clicked":
@@ -189,13 +172,9 @@ class Default extends Component<typeof Default> {
       case "request_state":
         this.broadcastStateUpdate();
         break;
-        
-      default:
-        log.warn(`Unknown event type`);
     }
   }
   
-  // Handle cookie click
   private handleCookieClick(): void {
     const log = this.log.inactive("handleCookieClick");
     
@@ -203,62 +182,43 @@ class Default extends Component<typeof Default> {
     this.gameState.totalCookiesEarned += this.gameState.cookiesPerClick;
     
     log.info(`Cookie clicked! Total: ${this.gameState.cookies}`);
-    
-    // Use throttled broadcast to avoid network flooding during rapid clicks
     this.throttledBroadcastStateUpdate();
   }
   
-  // Handle upgrade purchase
   private handleBuyUpgrade(upgradeId: string): void {
     const log = this.log.active("handleBuyUpgrade");
     
-    // Find upgrade config
     const config = UPGRADE_CONFIGS.find((c) => c.id === upgradeId);
     if (!config) {
       log.warn(`Unknown upgrade: ${upgradeId}`);
-      this.sendPurchaseResult(false, upgradeId, "Unknown upgrade");
       return;
     }
     
-    // Calculate cost
     const owned = this.gameState.upgrades[upgradeId] || 0;
     const cost = calculateUpgradeCost(config.baseCost, owned);
     
-    // Check if player can afford
     if (this.gameState.cookies < cost) {
-      log.info(`Cannot afford ${config.name}. Need ${cost}, have ${this.gameState.cookies}`);
-      this.sendPurchaseResult(false, upgradeId, "Not enough cookies!");
+      log.info(`Cannot afford ${config.name}`);
       return;
     }
     
-    // Process purchase
     this.gameState.cookies -= cost;
     this.gameState.upgrades[upgradeId] = owned + 1;
-    
-    // Recalculate CPS
     this.recalculateCPS();
     
     log.info(`Purchased ${config.name}. Now own ${owned + 1}. CPS: ${this.cookiesPerSecond}`);
-    
-    // Send results
-    this.sendPurchaseResult(true, upgradeId, `Purchased ${config.name}!`);
     this.broadcastStateUpdate();
   }
-  // #endregion
-
-  // #region 🛠️ Helper Methods
-  // Throttled broadcast - limits how often state updates are sent during rapid clicks
+  
   private throttledBroadcastStateUpdate(): void {
     const now = Date.now();
     const timeSinceLastBroadcast = now - this.lastBroadcastTime;
     
     if (timeSinceLastBroadcast >= Default.BROADCAST_THROTTLE_MS) {
-      // Enough time has passed, broadcast immediately
       this.broadcastStateUpdate();
       this.lastBroadcastTime = now;
       this.pendingStateUpdate = false;
     } else if (!this.pendingStateUpdate) {
-      // Schedule a delayed broadcast
       this.pendingStateUpdate = true;
       const delay = Default.BROADCAST_THROTTLE_MS - timeSinceLastBroadcast;
       this.async.setTimeout(() => {
@@ -269,10 +229,9 @@ class Default extends Component<typeof Default> {
         }
       }, delay);
     }
-    // If pendingStateUpdate is already true, a broadcast is already scheduled
   }
   
-  // Broadcast state to all players
+  // Broadcast state over network (server → all clients)
   private broadcastStateUpdate(): void {
     const log = this.log.inactive("broadcastStateUpdate");
     
@@ -286,18 +245,6 @@ class Default extends Component<typeof Default> {
     
     this.sendNetworkBroadcastEvent(UIEvents.toClient, stateData);
     log.info(`State broadcast: ${this.gameState.cookies} cookies`);
-  }
-  
-  // Send purchase result to all players
-  private sendPurchaseResult(success: boolean, upgradeId: string, message: string): void {
-    const resultData: UIEventPayload = {
-      type: "purchase_result",
-      success,
-      upgradeId,
-      message,
-    };
-    
-    this.sendNetworkBroadcastEvent(UIEvents.toClient, resultData);
   }
   // #endregion
 }

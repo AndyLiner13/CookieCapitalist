@@ -4,7 +4,7 @@
 // #region 📋 README
 // Core game controller - manages all three pages (Cookie, Shop, Leaderboard).
 // Handles page switching, cookie clicks, upgrade purchases, and data contexts.
-// Receives page change events from Overlay and state updates from manager_game.
+// Receives page change events from Overlay and state updates via NETWORK events from Backend.
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
@@ -13,10 +13,9 @@ import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
 import {
   PageType,
-  GameEventPayload,
-  UIEventPayload,
   GameEvents,
   UIEvents,
+  UIEventPayload,
   LocalUIEvents,
   UPGRADE_CONFIGS,
   calculateUpgradeCost,
@@ -69,10 +68,10 @@ class Default extends hz.Component<typeof Default> {
       this.upgrades[config.id] = 0;
     }
 
-    // Listen for state updates from game manager
+    // Listen for state updates via NETWORK event (from Backend)
     this.connectNetworkBroadcastEvent(
       UIEvents.toClient,
-      (data: UIEventPayload) => this.handleManagerEvent(data)
+      (data: UIEventPayload) => this.handleStateChanged(data)
     );
     
     // Listen for page change events from Overlay
@@ -196,12 +195,10 @@ class Default extends hz.Component<typeof Default> {
     }
   }
   
-  private handleManagerEvent(data: UIEventPayload): void {
-    const log = this.log.inactive("handleManagerEvent");
+  private handleStateChanged(data: UIEventPayload): void {
+    const log = this.log.inactive("handleStateChanged");
     
-    if (data.type !== "state_update") {
-      return;
-    }
+    if (data.type !== "state_update") return;
     
     // Update cached state
     this.cookies = (data.cookies as number) || 0;
@@ -232,10 +229,10 @@ class Default extends hz.Component<typeof Default> {
     // Show +# popup
     this.showPopup(`+${this.cookiesPerClick}`);
 
-    // Broadcast click to other overlays (CookieRain, FingerRing)
+    // Broadcast click via LOCAL event (for rain/visual effects)
     this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
-
-    // Send click to game manager (server)
+    
+    // Send to server via NETWORK event
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "cookie_clicked",
     });
@@ -245,6 +242,7 @@ class Default extends hz.Component<typeof Default> {
     const log = this.log.active("purchaseUpgrade");
     log.info(`Purchasing upgrade: ${upgradeId}`);
     
+    // Send to server via NETWORK event
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "buy_upgrade",
       upgradeId: upgradeId,

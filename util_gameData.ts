@@ -51,23 +51,34 @@ export type UIEventPayload = {
 // #endregion
 
 // #region 🔌 Network Events
-// Events sent from UI (client) to Game Manager (server)
+// Events sent from Backend (client) to Backend (server)
 export const GameEvents = {
   toServer: new NetworkEvent<GameEventPayload>("game_to_server"),
 };
 
-// Events sent from Game Manager (server) to UI (client)
+// Events sent from Backend (server) to Backend (client)
 export const UIEvents = {
   toClient: new NetworkEvent<UIEventPayload>("game_to_client"),
 };
 
-// Local events (client-side only, for communication between local scripts)
+// Local events (client-side only - used by ALL UI scripts)
+// Backend is the only script that bridges network ↔ local
 export const LocalUIEvents = {
-  // Fired when player clicks in focused interaction mode - triggers cookie click
+  // State changed - Backend redistributes server state to UI scripts
+  stateChanged: new LocalEvent<{
+    cookies: number;
+    cps: number;
+    cookiesPerClick: number;
+    upgrades: { [key: string]: number };
+  }>("local_state_changed"),
+  
+  // Cookie clicked - UI sends to Backend, Backend forwards to server
   cookieClicked: new LocalEvent("local_cookie_clicked"),
-  // Fired when navigating pages - shows/hides cookie collider
-  setCookieVisible: new LocalEvent<{ visible: boolean }>("local_set_cookie_visible"),
-  // Fired when navigating pages - change page in CoreGame
+  
+  // Buy upgrade - UI sends to Backend, Backend forwards to server
+  buyUpgrade: new LocalEvent<{ upgradeId: string }>("local_buy_upgrade"),
+  
+  // Page navigation (purely local, no server involvement)
   changePage: new LocalEvent<{ page: PageType }>("local_change_page"),
 };
 // #endregion

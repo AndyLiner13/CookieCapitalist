@@ -5,7 +5,7 @@
 // Overlay controller - combines Header and Navigation.
 // Displays cookie count/CPS at top, navigation tabs at bottom.
 // Broadcasts page change events to CoreGame and other overlays.
-// Receives state updates from manager_game for header display.
+// Receives state updates via NETWORK events from Backend.
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
@@ -14,8 +14,8 @@ import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
 import {
   PageType,
-  UIEventPayload,
   UIEvents,
+  UIEventPayload,
   LocalUIEvents,
   formatCookieDisplay,
   formatCPSDisplay,
@@ -52,10 +52,10 @@ class Default extends Component<typeof Default> {
       return;
     }
 
-    // Listen for state updates from game manager
+    // Listen for state updates via NETWORK event (from Backend)
     this.connectNetworkBroadcastEvent(
       UIEvents.toClient,
-      (data: UIEventPayload) => this.handleManagerEvent(data)
+      (data: UIEventPayload) => this.handleStateChanged(data)
     );
 
     // Build and set initial data context (commands are set once here)
@@ -98,14 +98,11 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 🎬 Handlers
-  private handleManagerEvent(data: UIEventPayload): void {
-    if (!data || data.type !== "state_update") {
-      return;
-    }
-
+  private handleStateChanged(data: UIEventPayload): void {
+    if (data.type !== "state_update") return;
+    
     this.cookies = (data.cookies as number) || 0;
     this.cookiesPerSecond = (data.cps as number) || 0;
-
     this.updateUI();
   }
   // #endregion

@@ -20,6 +20,7 @@ const RAIN_COOKIE_COUNT = 10;
 class Default extends hz.Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
+    enableRain: { type: hz.PropTypes.Boolean, default: true },
     rainCookieDurationMs: { type: hz.PropTypes.Number, default: 2000 },
     rainCookieScale: { type: hz.PropTypes.Number, default: 0.5 },
   };
@@ -92,7 +93,7 @@ class Default extends hz.Component<typeof Default> {
   private triggerRainCookie(): void {
     const log = this.log.inactive("triggerRainCookie");
 
-    if (this.currentPage !== "home") {
+    if (!this.props.enableRain || this.currentPage !== "home") {
       return;
     }
 
