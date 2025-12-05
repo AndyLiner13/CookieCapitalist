@@ -144,9 +144,9 @@ export function formatNumber(num: number): string {
   return Math.floor(num).toLocaleString();
 }
 
-// Format cookie count for header display
+// Format cookie count for header display (shows full number)
 export function formatCookieDisplay(cookies: number): string {
-  return `${formatNumber(cookies)} Cookies!`;
+  return `${Math.floor(cookies).toLocaleString()} Cookies!`;
 }
 
 // Format CPS for header display

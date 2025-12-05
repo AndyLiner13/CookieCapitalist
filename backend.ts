@@ -197,6 +197,13 @@ class Default extends Component<typeof Default> {
     }
     
     const owned = this.gameState.upgrades[upgradeId] || 0;
+    
+    // Clicker has a max limit of 24 (matches the visual finger ring)
+    if (upgradeId === "clicker" && owned >= 24) {
+      log.info(`Clicker at max limit (24)`);
+      return;
+    }
+    
     const cost = calculateUpgradeCost(config.baseCost, owned);
     
     if (this.gameState.cookies < cost) {

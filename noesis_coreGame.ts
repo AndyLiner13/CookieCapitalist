@@ -24,7 +24,8 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-const POPUP_COUNT = 10;
+// 40 popups to handle max click rate (600ms animation / 16ms per frame ≈ 38 max visible)
+const POPUP_COUNT = 40;
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -256,11 +257,13 @@ class Default extends hz.Component<typeof Default> {
     const popupIndex = this.nextPopupIndex;
     this.nextPopupIndex = (popupIndex + 1) % POPUP_COUNT;
     
-    // Random position within circular cookie area (cookie is 256x256, radius ~110 for good spread)
+    // Random position within circular cookie area (cookie is 256x256, radius 128)
+    // Use sqrt for uniform distribution across the circular area
+    // Margin offsets are doubled since centered elements need 2x offset to move the same distance
     const angle = Math.random() * 2 * Math.PI;
-    const radius = Math.random() * 110;
-    const offsetX = Math.floor(Math.cos(angle) * radius);
-    const offsetY = Math.floor(Math.sin(angle) * radius);
+    const radius = Math.sqrt(Math.random()) * 128;
+    const offsetX = Math.floor(Math.cos(angle) * radius * 2);
+    const offsetY = Math.floor(Math.sin(angle) * radius * 2);
     
     // Reset and set new values
     this.dataContext[`Popup${popupIndex}Animate`] = false;
