@@ -1,9 +1,9 @@
 <!-- 
-  Milk - Animated milk wave (Spatial)
+  Milk Waves - Combined dual-layer wave animation
   Display Mode: Spatial, Render Order: 6
   Input Mode: No Interaction
   
-  Continuous wave animation moving left-right and up-down.
+  Two wave layers with synchronized horizontal and vertical animation.
 -->
 
 <Page
@@ -12,7 +12,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
-  d:DataContext="Milk_DataSet"
+  d:DataContext="MilkWave_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852">
 
@@ -22,60 +22,64 @@
 
   <Grid Background="Transparent">
     
-    <!-- Bottom wave layer - pure white -->
+    <!-- Top wave layer - pure white (Wave2 from Milk2.xaml) -->
+    <Grid x:Name="Wave2"
+          VerticalAlignment="Bottom" 
+          HorizontalAlignment="Stretch"
+          Height="420"
+          Margin="-100,0,-100,-150">
+      <Grid.RenderTransform>
+        <TranslateTransform x:Name="WaveTransform2" X="0" Y="0"/>
+      </Grid.RenderTransform>
+      
+      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1133,0,-1151,-608">
+        <Path.Data>
+          <PathGeometry>
+            <PathFigure StartPoint="0,40">
+              <!-- Smooth sine wave pattern -->
+              <BezierSegment Point1="175,30" Point2="325,30" Point3="500,40"/>
+              <BezierSegment Point1="675,50" Point2="825,50" Point3="1000,40"/>
+              <BezierSegment Point1="1175,30" Point2="1325,30" Point3="1500,40"/>
+              <BezierSegment Point1="1675,50" Point2="1825,50" Point3="2000,40"/>
+              <BezierSegment Point1="2175,30" Point2="2325,30" Point3="2500,40"/>
+              <BezierSegment Point1="2675,50" Point2="2825,50" Point3="3000,40"/>
+              <BezierSegment Point1="3175,30" Point2="3325,30" Point3="3500,40"/>
+              <!-- Complete the shape -->
+              <LineSegment Point="3500,500"/>
+              <LineSegment Point="0,500"/>
+            </PathFigure>
+          </PathGeometry>
+        </Path.Data>
+      </Path>
+    </Grid>
+    
+    <!-- Bottom wave layer - pure white (Wave1 from Milk.xaml) -->
     <Grid x:Name="Wave1"
           VerticalAlignment="Bottom" 
           HorizontalAlignment="Stretch"
-          Height="400"
+          Height="380"
           Margin="-100,0,-100,-150">
       <Grid.RenderTransform>
         <TranslateTransform x:Name="WaveTransform1" X="0" Y="0"/>
       </Grid.RenderTransform>
       
-      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False">
+      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1133,0,-1151,-608">
+        <Path.Effect>
+          <DropShadowEffect Color="Black" BlurRadius="87" ShadowDepth="-5" Opacity="0.4"/>
+        </Path.Effect>
         <Path.Data>
           <PathGeometry>
-            <PathFigure StartPoint="0,30">
-              <!-- Wider sine waves -->
-              <BezierSegment Point1="125,15" Point2="250,15" Point3="375,30"/>
-              <BezierSegment Point1="500,45" Point2="625,45" Point3="750,30"/>
-              <BezierSegment Point1="875,15" Point2="1000,15" Point3="1000,30"/>
+            <PathFigure StartPoint="0,40">
+              <!-- Smooth sine wave pattern -->
+              <BezierSegment Point1="175,30" Point2="325,30" Point3="500,40"/>
+              <BezierSegment Point1="675,50" Point2="825,50" Point3="1000,40"/>
+              <BezierSegment Point1="1175,30" Point2="1325,30" Point3="1500,40"/>
+              <BezierSegment Point1="1675,50" Point2="1825,50" Point3="2000,40"/>
+              <BezierSegment Point1="2175,30" Point2="2325,30" Point3="2500,40"/>
+              <BezierSegment Point1="2675,50" Point2="2825,50" Point3="3000,40"/>
+              <BezierSegment Point1="3175,30" Point2="3325,30" Point3="3500,40"/>
               <!-- Complete the shape -->
-              <LineSegment Point="1000,500"/>
-              <LineSegment Point="0,500"/>
-            </PathFigure>
-          </PathGeometry>
-        </Path.Data>
-        <Path.OpacityMask>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#B5FFFFFF" Offset="0"/>
-            <GradientStop Color="White" Offset="0.15"/>
-            <GradientStop Color="White" Offset="1"/>
-          </LinearGradientBrush>
-        </Path.OpacityMask>
-      </Path>
-    </Grid>
-    
-    <!-- Top wave layer - yellowish white, fewer waves -->
-    <Grid x:Name="Wave2"
-          VerticalAlignment="Bottom" 
-          HorizontalAlignment="Stretch"
-          Height="400"
-          Margin="-100,0,-100,-180">
-      <Grid.RenderTransform>
-        <TranslateTransform x:Name="WaveTransform2" X="0" Y="0"/>
-      </Grid.RenderTransform>
-      
-      <Path Fill="#FFF8F0" Stretch="Fill" IsHitTestVisible="False">
-        <Path.Data>
-          <PathGeometry>
-            <PathFigure StartPoint="0,25">
-              <!-- Fewer, wider waves -->
-              <BezierSegment Point1="125,12" Point2="250,12" Point3="375,25"/>
-              <BezierSegment Point1="500,38" Point2="625,38" Point3="750,25"/>
-              <BezierSegment Point1="875,12" Point2="1000,12" Point3="1000,25"/>
-              <!-- Complete the shape -->
-              <LineSegment Point="1000,500"/>
+              <LineSegment Point="3500,500"/>
               <LineSegment Point="0,500"/>
             </PathFigure>
           </PathGeometry>
@@ -83,78 +87,37 @@
       </Path>
     </Grid>
     
-    <!-- Third wave layer - lighter yellowish, even lower -->
-    <Grid x:Name="Wave3"
-          VerticalAlignment="Bottom" 
-          HorizontalAlignment="Stretch"
-          Height="400"
-          Margin="-100,0,-100,-230">
-      <Grid.RenderTransform>
-        <TranslateTransform x:Name="WaveTransform3" X="0" Y="0"/>
-      </Grid.RenderTransform>
-      
-      <Path Stretch="Fill" IsHitTestVisible="False" Fill="#FFFFF8E9">
-        <Path.Data>
-          <PathGeometry>
-            <PathFigure StartPoint="0,20">
-              <!-- Wide waves, different phase -->
-              <BezierSegment Point1="166,10" Point2="333,10" Point3="500,20"/>
-              <BezierSegment Point1="667,30" Point2="834,30" Point3="1000,20"/>
-              <!-- Complete the shape -->
-              <LineSegment Point="1000,500"/>
-              <LineSegment Point="0,500"/>
-            </PathFigure>
-          </PathGeometry>
-        </Path.Data>
-      </Path>
-    </Grid>
-    
-    <!-- Continuous wave animation -->
+    <!-- Continuous wave animations -->
     <Grid.Triggers>
       <EventTrigger RoutedEvent="Grid.Loaded">
         <BeginStoryboard>
           <Storyboard RepeatBehavior="Forever">
-            <!-- Bottom wave horizontal movement -->
+            <!-- Wave 1 horizontal movement (starts right, moves left) -->
             <DoubleAnimation Storyboard.TargetName="WaveTransform1"
                              Storyboard.TargetProperty="X"
-                             From="-50" To="50" Duration="0:0:4"
+                             From="800" To="-800" Duration="0:0:12"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
-            <!-- Bottom wave vertical movement (more subtle) -->
+            <!-- Wave 1 vertical movement -->
             <DoubleAnimation Storyboard.TargetName="WaveTransform1"
                              Storyboard.TargetProperty="Y"
-                             From="-8" To="8" Duration="0:0:3"
+                             From="-55" To="5" Duration="0:0:7"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
             
-            <!-- Top wave horizontal movement (different timing) -->
+            <!-- Wave 2 horizontal movement (starts left, moves right) -->
             <DoubleAnimation Storyboard.TargetName="WaveTransform2"
                              Storyboard.TargetProperty="X"
-                             From="40" To="-40" Duration="0:0:5"
+                             From="-800" To="800" Duration="0:0:15"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
-            <!-- Top wave vertical movement (more subtle) -->
+            <!-- Wave 2 vertical movement -->
             <DoubleAnimation Storyboard.TargetName="WaveTransform2"
                              Storyboard.TargetProperty="Y"
-                             From="-5" To="5" Duration="0:0:3.6"
-                             AutoReverse="True"
-                             RepeatBehavior="Forever"
-                             EasingFunction="{StaticResource SineEase}"/>
-            
-            <!-- Third wave horizontal movement -->
-            <DoubleAnimation Storyboard.TargetName="WaveTransform3"
-                             Storyboard.TargetProperty="X"
-                             From="-30" To="30" Duration="0:0:6"
-                             AutoReverse="True"
-                             RepeatBehavior="Forever"
-                             EasingFunction="{StaticResource SineEase}"/>
-            <!-- Third wave vertical movement -->
-            <DoubleAnimation Storyboard.TargetName="WaveTransform3"
-                             Storyboard.TargetProperty="Y"
-                             From="-3" To="3" Duration="0:0:4.4"
+                             From="-55" To="5" Duration="0:0:12"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
