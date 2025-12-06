@@ -132,7 +132,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- HOME PAGE - Cookie Button with Popups                                                       -->
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Grid x:Name="HomePage" Visibility="{Binding homeVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}" d:IsHidden="True">
+  <Grid x:Name="HomePage" Visibility="{Binding homeVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}">
     
     <!-- Clickable Cookie (centered) -->
     <Button x:Name="CookieButton"
@@ -184,7 +184,33 @@
         </b:EventTrigger>
       </b:Interaction.Triggers>
       <Grid>
-        <Image Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill"/>
+        <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
+          <Image.RenderTransform>
+            <TranslateTransform x:Name="CookieDunkTranslate" Y="0"/>
+          </Image.RenderTransform>
+          <Image.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+              <BeginStoryboard>
+                <Storyboard RepeatBehavior="Forever">
+                  <!-- Smooth continuous dunk motion - down and back up with ease-in-out -->
+                  <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieDunkTranslate" Storyboard.TargetProperty="Y">
+                    <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="280">
+                      <EasingDoubleKeyFrame.EasingFunction>
+                        <SineEase EasingMode="EaseInOut"/>
+                      </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                    <EasingDoubleKeyFrame KeyTime="0:0:1.6" Value="0">
+                      <EasingDoubleKeyFrame.EasingFunction>
+                        <SineEase EasingMode="EaseInOut"/>
+                      </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                  </DoubleAnimationUsingKeyFrames>
+                </Storyboard>
+              </BeginStoryboard>
+            </EventTrigger>
+          </Image.Triggers>
+        </Image>
       </Grid>
     </Button>
     
@@ -354,7 +380,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- SHOP PAGE - Upgrade Cards                                                                   -->
   <!-- ═══════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Grid x:Name="ShopPage" Visibility="{Binding shopVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}">
+  <Grid x:Name="ShopPage" Visibility="{Binding shopVisible, Converter={StaticResource BoolToVis}}" Background="{x:Null}" d:IsHidden="True">
     <Grid.RowDefinitions>
       <RowDefinition Height="143"/>
       <RowDefinition Height="*"/>
