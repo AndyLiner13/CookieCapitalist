@@ -1,0 +1,27 @@
+{
+    "Player Variables": {
+    "CookieCapitalist:Cookies:": "Number",
+    "CookieCapitalist:TotalCookies": "Number",
+    "CookieCapitalist:Upgrades": "Object"
+    },
+    "Leaderboard Variables": {
+        "CurrentCookies": {
+            "System name": "CurrentCookies",
+            "External name": "Current Cookies",
+            "Sort Order": "Descending",
+            "Reset frequency": "Never",
+            "Reset persistent variable (optional)": "N/A",
+            "Set as default": false,
+            "Make visible outside world": true
+        },
+        "TotalCookies": {
+            "System name": "TotalCookies",
+            "External name": "Total Cookies",
+            "Sort Order": "Descending",
+            "Reset frequency": "Never",
+            "Reset persistent variable (optional)": "N/A",
+            "Set as default": true,
+            "Make visible outside world": true
+        }
+    }
+}
