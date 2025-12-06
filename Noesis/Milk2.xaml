@@ -68,7 +68,7 @@
             <!-- Wave 2 vertical movement -->
             <DoubleAnimation Storyboard.TargetName="WaveTransform2"
                              Storyboard.TargetProperty="Y"
-                             From="-55" To="5" Duration="0:0:12"
+                             From="-40" To="0" Duration="0:0:12"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
