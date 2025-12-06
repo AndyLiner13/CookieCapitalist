@@ -118,7 +118,7 @@ class Default extends hz.Component<typeof Default> {
     if (data.type !== "state_update") return;
 
     this.cookiesPerClick = (data.cookiesPerClick as number) || 1;
-    log.info(`cookiesPerClick updated: ${this.cookiesPerClick}`);
+    log.info(`cookiesPerClick updated from backend: ${this.cookiesPerClick}`);
   }
 
   private onPageChange(page: PageType): void {

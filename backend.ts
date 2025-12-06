@@ -13,7 +13,7 @@
 // UI scripts receive state via UIEvents.toClient network event directly.
 // #endregion
 
-import { Component, Player, CodeBlockEvents, PropTypes } from "horizon/core";
+import { Component, Player, CodeBlockEvents, PropTypes, LEADEBOARD_SCORE_MAX_VALUE } from "horizon/core";
 import { Logger } from "./util_logger";
 import {
   GameState,
@@ -31,10 +31,16 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
-// Leaderboard configuration - must match the leaderboard name created in Systems > Leaderboards
-// IMPORTANT: This leaderboard tracks TOTAL cookies earned, never resets, and doesn't decrease when buying items
-const LEADERBOARD_NAME = "TotalCookies";
-const LEADERBOARD_UPDATE_THROTTLE_MS = 1000; // Update every 1 second max to avoid spam
+// Leaderboard configuration - must match the leaderboard names created in Systems > Leaderboards
+const LEADERBOARD_TOTAL_COOKIES = "TotalCookies";    // Lifetime total - never decreases
+const LEADERBOARD_CURRENT_COOKIES = "CurrentCookies"; // Current balance - can decrease when buying
+const LEADERBOARD_UPDATE_THROTTLE_MS = 5000; // Update every 5 seconds max
+
+// Clamp score to valid leaderboard range (leaderboards only support 32-bit signed integers)
+// Max value is ~2.1 billion (2^31 - 1)
+function clampLeaderboardScore(score: number): number {
+  return Math.min(Math.max(Math.floor(score), -LEADEBOARD_SCORE_MAX_VALUE), LEADEBOARD_SCORE_MAX_VALUE);
+}
 
 // PPV (Persistent Player Variable) keys - format: "VariableGroupName:VariableName"
 // These must match the variable group and variable names created in Systems > Variable Groups
@@ -48,6 +54,7 @@ class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     playerController: { type: PropTypes.Entity },
+    resetStats: { type: PropTypes.Boolean, default: false }, // When enabled, resets all player stats to 0 on join
   };
   // #endregion
 
@@ -70,14 +77,15 @@ class Default extends Component<typeof Default> {
   
   // Leaderboard throttle
   private lastLeaderboardUpdate: number = 0;
-  private lastLeaderboardScore: number = 0;
+  private lastTotalCookiesScore: number = 0;
+  private lastCurrentCookiesScore: number = 0;
   
   // Active player reference
   private activePlayer: Player | null = null;
   
   // Auto-save interval ID
   private autoSaveTimerId: number | null = null;
-  private static readonly AUTO_SAVE_INTERVAL_MS = 10000; // Save every 10 seconds (reduced for testing)
+  private static readonly AUTO_SAVE_INTERVAL_MS = 30000; // Save every 30 seconds
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -113,6 +121,7 @@ class Default extends Component<typeof Default> {
     if (players.length > 0) {
       const existingPlayer = players[0];
       log.info(`Found existing player: ${existingPlayer.name.get()}`);
+      
       // Treat as if they just entered - load PPVs and assign controller
       this.onPlayerEnter(existingPlayer);
     }
@@ -146,14 +155,20 @@ class Default extends Component<typeof Default> {
   
   // Handle player entering world
   private onPlayerEnter(player: Player): void {
-    const log = this.log.inactive("onPlayerEnter");
+    const log = this.log.active("onPlayerEnter");
     log.info(`Player entered: ${player.name.get()}`);
     
     this.activePlayer = player;
     this.assignPlayerController(player);
     
-    // Load saved state from PPVs
-    this.loadPlayerState(player);
+    // Check if stats should be reset
+    if (this.props.resetStats) {
+      log.info(`[RESET STATS] Resetting all stats for ${player.name.get()}`);
+      this.resetPlayerStats(player);
+    } else {
+      // Load saved state from PPVs
+      this.loadPlayerState(player);
+    }
     
     // Start auto-save timer
     this.startAutoSave();
@@ -170,6 +185,44 @@ class Default extends Component<typeof Default> {
     
     controller.owner.set(player);
     log.info(`Assigned player controller ownership to ${player.name.get()}`);
+  }
+  
+  // Reset all player stats to 0 and save to PPVs
+  private resetPlayerStats(player: Player): void {
+    const log = this.log.active("resetPlayerStats");
+    
+    // Reset game state to defaults
+    this.gameState = createDefaultGameState();
+    this.recalculateCPS();
+    
+    // Save the reset state to PPVs
+    this.savePlayerState(player);
+    
+    // Reset leaderboard scores to 0
+    try {
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_TOTAL_COOKIES,
+        player,
+        0,
+        true
+      );
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_CURRENT_COOKIES,
+        player,
+        0,
+        true
+      );
+      this.lastTotalCookiesScore = 0;
+      this.lastCurrentCookiesScore = 0;
+      log.info(`[RESET STATS] Leaderboards reset to 0`);
+    } catch (error) {
+      log.error(`[RESET STATS] Failed to reset leaderboards: ${error}`);
+    }
+    
+    // Broadcast the reset state to client
+    this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+    
+    log.info(`[RESET STATS] All stats reset for ${player.name.get()}`);
   }
   
   private onPlayerExit(player: Player): void {
@@ -189,7 +242,7 @@ class Default extends Component<typeof Default> {
   
   // Handle save request from UI (e.g., when opening leaderboard)
   private handleSaveRequest(): void {
-    const log = this.log.active("handleSaveRequest");
+    const log = this.log.inactive("handleSaveRequest");
     
     if (!this.activePlayer) {
       log.warn("No active player - cannot save");
@@ -329,7 +382,7 @@ class Default extends Component<typeof Default> {
   // #region 💾 PPV (Persistent Player Variables)
   // Load player's saved state from PPVs
   private loadPlayerState(player: Player): void {
-    const log = this.log.active("loadPlayerState");
+    const log = this.log.inactive("loadPlayerState");
     
     try {
       // Load cookies (Number type - returns 0 if not set)
@@ -366,6 +419,18 @@ class Default extends Component<typeof Default> {
       // Broadcast state to client after loading
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
       
+      // Force a leaderboard update after load (bypass throttle)
+      this.async.setTimeout(() => {
+        const timeoutLog = this.log.active("leaderboardTimeout");
+        timeoutLog.info("[LEADERBOARD] === FORCE UPDATE TIMEOUT FIRED ===");
+        if (this.activePlayer) {
+          timeoutLog.info("[LEADERBOARD] Active player exists, calling forceLeaderboardUpdate");
+          this.forceLeaderboardUpdate();
+        } else {
+          timeoutLog.warn("[LEADERBOARD] No active player in timeout!");
+        }
+      }, 1000);
+      
       // Do an immediate save after 5 seconds to capture any early changes
       this.async.setTimeout(() => {
         if (this.activePlayer) {
@@ -385,7 +450,7 @@ class Default extends Component<typeof Default> {
   
   // Save player's current state to PPVs
   private savePlayerState(player: Player): void {
-    const log = this.log.active("savePlayerState");
+    const log = this.log.inactive("savePlayerState");
     
     try {
       const cookiesToSave = Math.floor(this.gameState.cookies);
@@ -426,7 +491,7 @@ class Default extends Component<typeof Default> {
   
   // Start auto-save timer
   private startAutoSave(): void {
-    const log = this.log.active("startAutoSave");
+    const log = this.log.inactive("startAutoSave");
     
     // Clear any existing timer
     this.stopAutoSave();
@@ -434,7 +499,6 @@ class Default extends Component<typeof Default> {
     // Start new timer
     this.autoSaveTimerId = this.async.setInterval(() => {
       if (this.activePlayer) {
-        log.info("[AUTO-SAVE] Timer triggered");
         this.savePlayerState(this.activePlayer);
       }
     }, Default.AUTO_SAVE_INTERVAL_MS);
@@ -454,45 +518,107 @@ class Default extends Component<typeof Default> {
   // Update leaderboard score for the active player (throttled)
   // Tracks totalCookiesEarned - never decreases when purchasing items
   private updateLeaderboard(): void {
-    const log = this.log.active("updateLeaderboard");
+    const log = this.log.inactive("updateLeaderboard");
     
     if (!this.activePlayer) {
-      log.warn("No active player - skipping leaderboard update");
+      log.warn("[LEADERBOARD] No active player - skipping");
       return;
     }
     
     const now = Date.now();
     const timeSinceLastUpdate = now - this.lastLeaderboardUpdate;
-    const totalCookies = Math.floor(this.gameState.totalCookiesEarned);
     
-    // Only update if enough time has passed AND score has changed
+    // Clamp scores to valid leaderboard range (max ~2.1 billion)
+    const totalCookies = clampLeaderboardScore(this.gameState.totalCookiesEarned);
+    const currentCookies = clampLeaderboardScore(this.gameState.cookies);
+    
+    log.info(`[LEADERBOARD] Check: total=${totalCookies}, current=${currentCookies}, timeSince=${timeSinceLastUpdate}ms`);
+    
+    // Only update if enough time has passed
     if (timeSinceLastUpdate < LEADERBOARD_UPDATE_THROTTLE_MS) {
+      log.info("[LEADERBOARD] Throttled - too soon");
       return;
     }
     
-    if (totalCookies <= this.lastLeaderboardScore) {
+    // Check if either score has changed
+    const totalChanged = totalCookies > this.lastTotalCookiesScore;
+    const currentChanged = currentCookies !== this.lastCurrentCookiesScore;
+    
+    if (!totalChanged && !currentChanged) {
+      log.info("[LEADERBOARD] Skipped - no score changes");
       return;
     }
-    
-    log.info(`[LEADERBOARD] Updating "${LEADERBOARD_NAME}" with score: ${totalCookies}`);
     
     try {
-      // Update the TotalCookies leaderboard
-      // - Tracks lifetime cookies earned (never resets)
-      // - Purchases don't reduce this number (only affects current cookies balance)
-      // - override=false means it only updates if the new score is higher
-      this.world.leaderboards.setScoreForPlayer(
-        LEADERBOARD_NAME,
-        this.activePlayer,
-        totalCookies,
-        false // Don't override if player somehow has a higher existing score
-      );
+      // Update TotalCookies leaderboard (lifetime, never decreases)
+      if (totalChanged) {
+        this.world.leaderboards.setScoreForPlayer(
+          LEADERBOARD_TOTAL_COOKIES,
+          this.activePlayer,
+          totalCookies,
+          false // Don't override if player has higher existing score
+        );
+        this.lastTotalCookiesScore = totalCookies;
+        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_TOTAL_COOKIES}: ${totalCookies}`);
+      }
+      
+      // Update CurrentCookies leaderboard (current balance, can decrease)
+      if (currentChanged) {
+        this.world.leaderboards.setScoreForPlayer(
+          LEADERBOARD_CURRENT_COOKIES,
+          this.activePlayer,
+          currentCookies,
+          true // Always override - current balance can go up or down
+        );
+        this.lastCurrentCookiesScore = currentCookies;
+        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_CURRENT_COOKIES}: ${currentCookies}`);
+      }
       
       this.lastLeaderboardUpdate = now;
-      this.lastLeaderboardScore = totalCookies;
-      log.info(`[LEADERBOARD] Success! ${this.activePlayer.name.get()} now has ${totalCookies} on "${LEADERBOARD_NAME}"`);
+      log.info(`[LEADERBOARD] Success! ${this.activePlayer.name.get()}`);
     } catch (error) {
-      log.error(`[LEADERBOARD] Failed to update "${LEADERBOARD_NAME}": ${error}`);
+      log.error(`[LEADERBOARD] Failed: ${error}`);
+    }
+  }
+  
+  // Force leaderboard update (bypasses throttle) - used for initial load
+  private forceLeaderboardUpdate(): void {
+    const log = this.log.inactive("forceLeaderboardUpdate");
+    
+    if (!this.activePlayer) {
+      log.warn("[LEADERBOARD] No active player - cannot force update");
+      return;
+    }
+    
+    // Clamp scores to valid leaderboard range (max ~2.1 billion)
+    const totalCookies = clampLeaderboardScore(this.gameState.totalCookiesEarned);
+    const currentCookies = clampLeaderboardScore(this.gameState.cookies);
+    
+    log.info(`[LEADERBOARD] FORCE updating both leaderboards: total=${totalCookies}, current=${currentCookies}`);
+    
+    try {
+      // Force update TotalCookies
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_TOTAL_COOKIES,
+        this.activePlayer,
+        totalCookies,
+        true
+      );
+      this.lastTotalCookiesScore = totalCookies;
+      
+      // Force update CurrentCookies
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_CURRENT_COOKIES,
+        this.activePlayer,
+        currentCookies,
+        true
+      );
+      this.lastCurrentCookiesScore = currentCookies;
+      
+      this.lastLeaderboardUpdate = Date.now();
+      log.info(`[LEADERBOARD] FORCE Success! total=${totalCookies}, current=${currentCookies}`);
+    } catch (error) {
+      log.error(`[LEADERBOARD] FORCE Failed: ${error}`);
     }
   }
   // #endregion
