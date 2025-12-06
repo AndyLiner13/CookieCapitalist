@@ -1,9 +1,9 @@
 <!-- 
-  Milk Wave 1 - Front wave layer
-  Display Mode: Spatial, Render Order: 7
+  Milk Foreground - Back wave layer
+  Display Mode: Spatial, Render Order: 6
   Input Mode: No Interaction
   
-  Front wave layer with drop shadow effect.
+  Back wave layer without shadow.
 -->
 
 <Page
@@ -12,7 +12,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   mc:Ignorable="d"
-  d:DataContext="MilkWave1_DataSet"
+  d:DataContext="MilkForeground_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852">
 
@@ -22,14 +22,14 @@
 
   <Grid Background="Transparent">
     
-    <!-- Front wave layer - pure white with shadow -->
-    <Grid x:Name="Wave1"
+    <!-- Back wave layer - pure white -->
+    <Grid x:Name="Wave2"
           VerticalAlignment="Bottom" 
           HorizontalAlignment="Stretch"
-          Height="380"
+          Height="420"
           Margin="-100,0,-100,-150">
       <Grid.RenderTransform>
-        <TranslateTransform x:Name="WaveTransform1" X="0" Y="0"/>
+        <TranslateTransform x:Name="WaveTransform2" X="0" Y="0"/>
       </Grid.RenderTransform>
       
       <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1133,0,-1151,-608">
@@ -58,17 +58,17 @@
       <EventTrigger RoutedEvent="Grid.Loaded">
         <BeginStoryboard>
           <Storyboard RepeatBehavior="Forever">
-            <!-- Wave 1 horizontal movement (starts right, moves left) -->
-            <DoubleAnimation Storyboard.TargetName="WaveTransform1"
+            <!-- Wave 2 horizontal movement (starts left, moves right) -->
+            <DoubleAnimation Storyboard.TargetName="WaveTransform2"
                              Storyboard.TargetProperty="X"
-                             From="800" To="-800" Duration="0:0:12"
+                             From="-800" To="800" Duration="0:0:15"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
-            <!-- Wave 1 vertical movement -->
-            <DoubleAnimation Storyboard.TargetName="WaveTransform1"
+            <!-- Wave 2 vertical movement -->
+            <DoubleAnimation Storyboard.TargetName="WaveTransform2"
                              Storyboard.TargetProperty="Y"
-                             From="-40" To="0" Duration="0:0:7"
+                             From="-40" To="0" Duration="0:0:12"
                              AutoReverse="True"
                              RepeatBehavior="Forever"
                              EasingFunction="{StaticResource SineEase}"/>
