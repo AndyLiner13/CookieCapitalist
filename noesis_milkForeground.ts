@@ -1,8 +1,8 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with MilkForeground.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Spatial, Render Order = 6, Input Mode = No Interaction
+// Desktop Editor Setup: Attach to NoesisUI entity with MilkBackground.xaml. Use Shared execution mode.
+// NoesisUI Settings: Display Mode = Spatial, Render Order = 7, Input Mode = No Interaction
 
 // #region 📋 README
-// Milk Foreground (back wave layer) controller.
+// Milk Background (front wave layer) controller.
 // Hides when player navigates to shop or leaderboard pages.
 // Listens to LocalUIEvents.changePage broadcast from Overlay controller.
 // Must use Shared execution mode for proper Noesis integration.
@@ -22,7 +22,7 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 📊 State
-  private log = new Logger("noesis_milkForeground");
+  private log = new Logger("noesis_milkBackground");
   private noesisGizmo: NoesisGizmo | null = null;
   // #endregion
 
@@ -42,7 +42,7 @@ class Default extends Component<typeof Default> {
       (data) => this.handlePageChange(data.page)
     );
 
-    log.info("Milk Foreground initialized");
+    log.info("Milk Background initialized");
   }
   // #endregion
 
