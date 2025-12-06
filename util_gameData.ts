@@ -84,6 +84,9 @@ export const LocalUIEvents = {
   
   // Page navigation (purely local, no server involvement)
   changePage: new LocalEvent<{ page: PageType }>("local_change_page"),
+  
+  // Swipe down gesture detected (mobile only)
+  swipeDown: new LocalEvent("local_swipe_down"),
 };
 // #endregion
 

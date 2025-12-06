@@ -64,6 +64,9 @@ class Default extends hz.Component<typeof Default> {
   // Popup system state
   private nextPopupIndex: number = 0;
   
+  // Dunk animation state
+  private isDunking: boolean = false;
+  
   // Player info for leaderboard
   private playerName: string = "You";
   // #endregion
@@ -105,6 +108,12 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       LocalUIEvents.changePage,
       (data: { page: PageType }) => this.onPageChange(data.page)
+    );
+    
+    // Listen for swipe down gesture (from controller_player on mobile)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.swipeDown,
+      () => this.onSwipeDown()
     );
 
     // Build and set initial data context
@@ -207,6 +216,7 @@ class Default extends hz.Component<typeof Default> {
       
       // Cookie page (command set once)
       onCookieClick: () => this.onCookieClick(),
+      dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
       
@@ -381,6 +391,53 @@ class Default extends hz.Component<typeof Default> {
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "cookie_clicked",
     });
+  }
+  
+  private triggerDunkAnimation(): void {
+    const log = this.log.active("triggerDunkAnimation");
+    
+    if (this.isDunking) {
+      log.info("Already dunking, ignoring");
+      return;
+    }
+    
+    this.isDunking = true;
+    
+    // Trigger animation by toggling dunkAnimate
+    this.dataContext.dunkAnimate = false;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    // Small delay then set to true to trigger animation
+    this.async.setTimeout(() => {
+      this.dataContext.dunkAnimate = true;
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+      
+      // Reset after animation completes (1.6 seconds)
+      this.async.setTimeout(() => {
+        this.dataContext.dunkAnimate = false;
+        this.isDunking = false;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+      }, 1700);
+    }, 50);
+  }
+  
+  private onSwipeDown(): void {
+    const log = this.log.active("onSwipeDown");
+    
+    // Only trigger dunk when on home page
+    if (this.currentPage !== "home") {
+      log.info("Not on home page, ignoring swipe");
+      return;
+    }
+    
+    log.info("Swipe down received - triggering dunk!");
+    this.triggerDunkAnimation();
   }
   
   private purchaseUpgrade(upgradeId: string): void {

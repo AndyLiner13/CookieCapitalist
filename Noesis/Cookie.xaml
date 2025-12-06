@@ -1,0 +1,280 @@
+<!-- 
+  Cookie - Main cookie button and popups (Spatial)
+  Display Mode: Spatial, Render Order: 5
+  Input Mode: No Interaction (clicks handled via raycast + collider and LocalUIEvents.cookieClicked)
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="Cookie_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+  <Page.Resources>
+    <ResourceDictionary>
+      <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+      
+      <!-- Popup text style -->
+      <Style x:Key="PopupTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Fonts/#Anton"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+      </Style>
+    </ResourceDictionary>
+  </Page.Resources>
+
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
+    
+    <!-- Clickable Cookie (centered) -->
+    <Button x:Name="CookieButton"
+            Command="{Binding onCookieClick}"
+            Width="256"
+            Height="256"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            RenderTransformOrigin="0.5,0.5"
+            Background="Transparent"
+            BorderThickness="0"
+            BorderBrush="Transparent"
+            Padding="0">
+      <Button.Template>
+        <ControlTemplate TargetType="Button">
+          <Border Background="Transparent">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+          </Border>
+        </ControlTemplate>
+      </Button.Template>
+      <Button.RenderTransform>
+        <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
+      </Button.RenderTransform>
+      <b:Interaction.Triggers>
+        <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+          <b:ControlStoryboardAction>
+            <b:ControlStoryboardAction.Storyboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+              </Storyboard>
+            </b:ControlStoryboardAction.Storyboard>
+          </b:ControlStoryboardAction>
+        </b:EventTrigger>
+        <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+          <b:ControlStoryboardAction>
+            <b:ControlStoryboardAction.Storyboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+              </Storyboard>
+            </b:ControlStoryboardAction.Storyboard>
+          </b:ControlStoryboardAction>
+        </b:EventTrigger>
+      </b:Interaction.Triggers>
+      <Grid>
+        <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
+          <Image.RenderTransform>
+            <TranslateTransform x:Name="CookieDunkTranslate" Y="0"/>
+          </Image.RenderTransform>
+          <b:Interaction.Triggers>
+            <!-- Dunk animation triggered by data binding -->
+            <b:DataTrigger Binding="{Binding dunkAnimate}" Value="True">
+              <b:ControlStoryboardAction>
+                <b:ControlStoryboardAction.Storyboard>
+                  <Storyboard>
+                    <!-- Smooth dunk motion - down and back up with ease-in-out -->
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieDunkTranslate" Storyboard.TargetProperty="Y">
+                      <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                      <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="280">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                          <SineEase EasingMode="EaseInOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                      </EasingDoubleKeyFrame>
+                      <EasingDoubleKeyFrame KeyTime="0:0:1.6" Value="0">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                          <SineEase EasingMode="EaseInOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                      </EasingDoubleKeyFrame>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </b:ControlStoryboardAction.Storyboard>
+              </b:ControlStoryboardAction>
+            </b:DataTrigger>
+          </b:Interaction.Triggers>
+        </Image>
+      </Grid>
+    </Button>
+    
+    <!-- Popup Text Elements (40 total - handles max click rate of 600ms animation / 16ms per frame) -->
+    <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup0Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup0Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup0Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup0Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup0" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup1" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup1Text}" Visibility="{Binding Popup1Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup1Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup1Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup1Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup1Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup1" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup2" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup2Text}" Visibility="{Binding Popup2Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup2Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup2Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup2Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup2Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup2" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup3" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup3Text}" Visibility="{Binding Popup3Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup3Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup3Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup3Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup3Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup3" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup4" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup4Text}" Visibility="{Binding Popup4Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup4Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup4Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup4Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup4Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup4" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup5" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup5Text}" Visibility="{Binding Popup5Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup5Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup5Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup5Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup5Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup5" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup6" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup6Text}" Visibility="{Binding Popup6Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup6Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup6Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup6Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup6Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup6" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup7" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup7Text}" Visibility="{Binding Popup7Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup7Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup7Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup7Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup7Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup7" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup8" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup8Text}" Visibility="{Binding Popup8Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup8Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup8Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup8Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup8Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup8" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup9" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup9Text}" Visibility="{Binding Popup9Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup9Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup9Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup9Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup9Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup9" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup10" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup10Text}" Visibility="{Binding Popup10Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup10Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup10Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup10Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup10Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup10" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup11" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup11Text}" Visibility="{Binding Popup11Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup11Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup11Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup11Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup11Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup11" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup12" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup12Text}" Visibility="{Binding Popup12Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup12Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup12Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup12Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup12Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup12" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup13" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup13Text}" Visibility="{Binding Popup13Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup13Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup13Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup13Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup13Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup13" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup14" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup14Text}" Visibility="{Binding Popup14Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup14Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup14Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup14Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup14Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup14" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup15" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup15Text}" Visibility="{Binding Popup15Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup15Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup15Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup15Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup15Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup15" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup16" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup16Text}" Visibility="{Binding Popup16Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup16Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup16Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup16Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup16Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup16" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup17" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup17Text}" Visibility="{Binding Popup17Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup17Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup17Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup17Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup17Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup17" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup18" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup18Text}" Visibility="{Binding Popup18Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup18Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup18Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup18Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup18Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup18" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup19" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup19Text}" Visibility="{Binding Popup19Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup19Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup19Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup19Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup19Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup19" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup20" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup20Text}" Visibility="{Binding Popup20Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup20Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup20Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup20Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup20Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup20" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup21" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup21Text}" Visibility="{Binding Popup21Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup21Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup21Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup21Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup21Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup21" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup22" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup22Text}" Visibility="{Binding Popup22Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup22Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup22Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup22Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup22Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup22" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup23" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup23Text}" Visibility="{Binding Popup23Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup23Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup23Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup23Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup23Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup23" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup24" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup24Text}" Visibility="{Binding Popup24Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup24Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup24Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup24Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup24Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup24" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup25" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup25Text}" Visibility="{Binding Popup25Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup25Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup25Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup25Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup25Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup25" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup26" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup26Text}" Visibility="{Binding Popup26Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup26Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup26Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup26Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup26Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup26" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup27" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup27Text}" Visibility="{Binding Popup27Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup27Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup27Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup27Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup27Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup27" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup28" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup28Text}" Visibility="{Binding Popup28Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup28Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup28Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup28Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup28Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup28" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup29" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup29Text}" Visibility="{Binding Popup29Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup29Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup29Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup29Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup29Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup29" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup30" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup30Text}" Visibility="{Binding Popup30Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup30Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup30Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup30Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup30Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup30" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup31" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup31Text}" Visibility="{Binding Popup31Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup31Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup31Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup31Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup31Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup31" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup32" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup32Text}" Visibility="{Binding Popup32Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup32Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup32Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup32Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup32Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup32" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup33" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup33Text}" Visibility="{Binding Popup33Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup33Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup33Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup33Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup33Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup33" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup34" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup34Text}" Visibility="{Binding Popup34Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup34Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup34Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup34Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup34Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup34" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup35" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup35Text}" Visibility="{Binding Popup35Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup35Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup35Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup35Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup35Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup35" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup36" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup36Text}" Visibility="{Binding Popup36Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup36Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup36Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup36Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup36Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup36" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup37" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup37Text}" Visibility="{Binding Popup37Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup37Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup37Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup37Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup37Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup37" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup38" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup38Text}" Visibility="{Binding Popup38Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup38Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup38Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup38Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup38Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup38" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+    <TextBlock x:Name="Popup39" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup39Text}" Visibility="{Binding Popup39Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup39Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
+      <TextBlock.RenderTransform><TransformGroup><TranslateTransform x:Name="Popup39Translate" Y="0"/><ScaleTransform ScaleX="1" ScaleY="1"/></TransformGroup></TextBlock.RenderTransform>
+      <b:Interaction.Triggers><b:DataTrigger Binding="{Binding Popup39Animate}" Value="True"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="Popup39Translate" Storyboard.TargetProperty="Y" From="0" To="-60" Duration="0:0:0.6"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="Popup39" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.6"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:DataTrigger></b:Interaction.Triggers>
+    </TextBlock>
+  </Grid>
+</Page>

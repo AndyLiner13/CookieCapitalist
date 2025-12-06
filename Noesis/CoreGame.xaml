@@ -188,28 +188,31 @@
           <Image.RenderTransform>
             <TranslateTransform x:Name="CookieDunkTranslate" Y="0"/>
           </Image.RenderTransform>
-          <Image.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-              <BeginStoryboard>
-                <Storyboard RepeatBehavior="Forever">
-                  <!-- Smooth continuous dunk motion - down and back up with ease-in-out -->
-                  <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieDunkTranslate" Storyboard.TargetProperty="Y">
-                    <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                    <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="280">
-                      <EasingDoubleKeyFrame.EasingFunction>
-                        <SineEase EasingMode="EaseInOut"/>
-                      </EasingDoubleKeyFrame.EasingFunction>
-                    </EasingDoubleKeyFrame>
-                    <EasingDoubleKeyFrame KeyTime="0:0:1.6" Value="0">
-                      <EasingDoubleKeyFrame.EasingFunction>
-                        <SineEase EasingMode="EaseInOut"/>
-                      </EasingDoubleKeyFrame.EasingFunction>
-                    </EasingDoubleKeyFrame>
-                  </DoubleAnimationUsingKeyFrames>
-                </Storyboard>
-              </BeginStoryboard>
-            </EventTrigger>
-          </Image.Triggers>
+          <b:Interaction.Triggers>
+            <!-- Dunk animation triggered by data binding -->
+            <b:DataTrigger Binding="{Binding dunkAnimate}" Value="True">
+              <b:ControlStoryboardAction>
+                <b:ControlStoryboardAction.Storyboard>
+                  <Storyboard>
+                    <!-- Smooth dunk motion - down and back up with ease-in-out -->
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieDunkTranslate" Storyboard.TargetProperty="Y">
+                      <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                      <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="280">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                          <SineEase EasingMode="EaseInOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                      </EasingDoubleKeyFrame>
+                      <EasingDoubleKeyFrame KeyTime="0:0:1.6" Value="0">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                          <SineEase EasingMode="EaseInOut"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                      </EasingDoubleKeyFrame>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </b:ControlStoryboardAction.Storyboard>
+              </b:ControlStoryboardAction>
+            </b:DataTrigger>
+          </b:Interaction.Triggers>
         </Image>
       </Grid>
     </Button>

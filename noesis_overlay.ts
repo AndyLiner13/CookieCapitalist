@@ -62,6 +62,11 @@ class Default extends Component<typeof Default> {
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
 
+    // Broadcast initial page so all gizmos set correct visibility
+    this.async.setTimeout(() => {
+      this.sendLocalBroadcastEvent(LocalUIEvents.changePage, { page: this.currentPage });
+    }, 100);
+
     log.info("Overlay initialized (Header + Navigation)");
   }
   // #endregion

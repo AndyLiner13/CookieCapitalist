@@ -1,0 +1,558 @@
+<!-- 
+  Shop - Upgrade cards screen (Screen Overlay)
+  Display Mode: Screen Overlay, Render Order: 5
+  Input Mode: Interactive, nonblocking
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="Shop_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+  <Page.Resources>
+    <ResourceDictionary>
+      <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+      
+      <!-- Card Layout Constants -->
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardHeight">100</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardCornerRadius">8</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">30</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">47</sys:Double>
+      <CornerRadius x:Key="CardBorderRadius">8</CornerRadius>
+      <CornerRadius x:Key="BarCornerRadius">5</CornerRadius>
+      <CornerRadius x:Key="TierBadgeRadius">4</CornerRadius>
+      <Thickness x:Key="CardMargin">0,0,0,8</Thickness>
+      <Thickness x:Key="CardPadding">8</Thickness>
+      <Thickness x:Key="ImageMargin">0,0,8,0</Thickness>
+      <Thickness x:Key="TierBadgeMargin">0,0,0,2</Thickness>
+      <Thickness x:Key="TierBadgePadding">6,2</Thickness>
+      <Thickness x:Key="TimerMargin">5,0,0,0</Thickness>
+      <Thickness x:Key="TimerPadding">12,0</Thickness>
+      <Thickness x:Key="ProgressTextMargin">8,0,0,0</Thickness>
+      <Thickness x:Key="ButtonRowMargin">0,5,0,0</Thickness>
+      
+      <!-- Card Colors -->
+      <SolidColorBrush x:Key="CardBackgroundBrush" Color="#a6000000"/>
+      <SolidColorBrush x:Key="BarBackgroundBrush" Color="#515151"/>
+      <SolidColorBrush x:Key="ProgressFillBrush" Color="#4CAF50"/>
+      <SolidColorBrush x:Key="BuyButtonAffordBrush" Color="#fa9750"/>
+      <SolidColorBrush x:Key="BuyButtonMaxedBrush" Color="#4CAF50"/>
+      <SolidColorBrush x:Key="BuyButtonDisabledBrush" Color="#515151"/>
+      <SolidColorBrush x:Key="TierBadgeBackgroundBrush" Color="#cc000000"/>
+      <SolidColorBrush x:Key="PrimaryTextBrush" Color="#ffffff"/>
+      <SolidColorBrush x:Key="SecondaryTextBrush" Color="#aaffffff"/>
+      
+      <!-- Card Typography -->
+      <FontFamily x:Key="CardFontFamily">Fonts/#Anton-Regular</FontFamily>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="NameFontSize">20</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="RateFontSize">16</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">14</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="PriceFontSize">20</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">18</sys:Double>
+      
+      <!-- Card Text Styles -->
+      <Style x:Key="CardNameTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource NameFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+      </Style>
+      
+      <Style x:Key="CardRateTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource RateFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+      </Style>
+      
+      <Style x:Key="CardTierTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource TierFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+      </Style>
+      
+      <Style x:Key="CardPriceTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource PriceFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+      </Style>
+      
+      <Style x:Key="CardTimerTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource CardFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource TimerFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+      </Style>
+      
+      <!-- Invisible button style -->
+      <Style x:Key="InvisibleButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="Button">
+              <Border Background="Transparent">
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </Page.Resources>
+
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
+    <Grid Background="{x:Null}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="143"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,140">
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 1: Clicker                                                             -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding clicker.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding clicker.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding clicker.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding clicker.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="ClickerBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding clicker.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding clicker.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding clicker.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding clicker.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 2: Grandma                                                             -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding grandma.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding grandma.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding grandma.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding grandma.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="GrandmaBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding grandma.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding grandma.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding grandma.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding grandma.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 3: Farm                                                                -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding farm.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding farm.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding farm.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding farm.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="FarmBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding farm.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding farm.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding farm.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding farm.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 4: Factory                                                             -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding factory.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding factory.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding factory.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding factory.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="FactoryBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding factory.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding factory.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding factory.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding factory.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 5: Lab                                                                 -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding lab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding lab.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding lab.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding lab.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="LabBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding lab.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding lab.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding lab.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding lab.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 6: Fab                                                                 -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding fab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding fab.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding fab.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding fab.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="FabBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding fab.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding fab.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding fab.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding fab.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 7: Planet                                                              -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding planet.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding planet.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding planet.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding planet.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="PlanetBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding planet.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding planet.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding planet.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding planet.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</Page>
