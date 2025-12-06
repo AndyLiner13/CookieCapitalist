@@ -73,7 +73,10 @@ export const LocalUIEvents = {
     upgrades: { [key: string]: number };
   }>("local_state_changed"),
   
-  // Cookie clicked - UI sends to Backend, Backend forwards to server
+  // Cookie pressed down - triggers press animation
+  cookiePressed: new LocalEvent("local_cookie_pressed"),
+  
+  // Cookie clicked (released) - UI sends to Backend, Backend forwards to server
   cookieClicked: new LocalEvent("local_cookie_clicked"),
   
   // Batch complete - Production cycle completed, triggers cookie rain

@@ -29,6 +29,7 @@ class Default extends hz.Component<typeof Default> {
   private gestures: Gestures | null = null;
   private raycastGizmo: hz.RaycastGizmo | null = null;
   private cookieCollider: hz.Entity | null = null;
+  private isCookiePressed: boolean = false;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -150,26 +151,70 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Cookie collider target: ${this.cookieCollider.name.get()}`);
 
     // Use connectLocalBroadcastEvent for Focused Interaction tap events
-    // Only listen to InputEnded to avoid double-triggering on single taps
+    // InputStarted = press down, InputEnded = release
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputStarted,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const innerLog = this.log.inactive("onFocusedInteractionInputStarted");
+        this.handleInteractionStart(data.interactionInfo, innerLog);
+      }
+    );
+    
     this.connectLocalBroadcastEvent(
       hz.PlayerControls.onFocusedInteractionInputEnded,
       (data: { interactionInfo: hz.InteractionInfo[] }) => {
         const innerLog = this.log.inactive("onFocusedInteractionInputEnded");
-        this.handleInteraction(data.interactionInfo, innerLog);
+        this.handleInteractionEnd(data.interactionInfo, innerLog);
       }
     );
     
     log.info("Raycast cookie click handler connected");
   }
 
-  private handleInteraction(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
+  private handleInteractionStart(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
     if (!this.raycastGizmo || !this.cookieCollider) {
-      log.warn("Raycast or collider not set");
       return;
     }
 
     const interactions = interactionInfo || [];
-    log.info(`Processing ${interactions.length} interactions`);
+    
+    for (const interaction of interactions) {
+      if (interaction.interactionIndex !== 0) continue;
+
+      const hit = this.raycastGizmo.raycast(
+        interaction.worldRayOrigin,
+        interaction.worldRayDirection
+      ) as hz.RaycastHit | null;
+
+      if (hit && hit.targetType === hz.RaycastTargetType.Entity && hit.target === this.cookieCollider) {
+        log.info("Cookie pressed down");
+        this.isCookiePressed = true;
+        this.sendLocalBroadcastEvent(LocalUIEvents.cookiePressed, {});
+      }
+    }
+  }
+
+  private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
+    // If cookie was pressed, release it regardless of where the finger ended
+    // This handles the case where user swipes away (e.g., dunk gesture)
+    if (this.isCookiePressed) {
+      const interactions = interactionInfo || [];
+      for (const interaction of interactions) {
+        if (interaction.interactionIndex !== 0) continue;
+        
+        log.info("Cookie released (was pressed)");
+        this.isCookiePressed = false;
+        this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
+        return;
+      }
+    }
+    
+    // If cookie wasn't already pressed, check if this is a quick tap on the cookie
+    if (!this.raycastGizmo || !this.cookieCollider) {
+      return;
+    }
+
+    const interactions = interactionInfo || [];
     
     for (const interaction of interactions) {
       // Only respond to primary tap (index 0)

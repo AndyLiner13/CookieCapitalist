@@ -72,7 +72,13 @@ class Default extends hz.Component<typeof Default> {
       () => this.onSwipeDown()
     );
 
-    // Listen for cookie click events from any source (Noesis button, raycast + collider)
+    // Listen for cookie press events (finger down on cookie)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.cookiePressed,
+      () => this.onCookiePressedEvent()
+    );
+
+    // Listen for cookie click events (finger released on cookie)
     this.connectLocalBroadcastEvent(
       LocalUIEvents.cookieClicked,
       () => this.onCookieClickedEvent()
@@ -89,7 +95,8 @@ class Default extends hz.Component<typeof Default> {
     // Note: onCookieClick is NOT exposed here - clicks are only detected via
     // raycast gizmo + cookie collider in controller_player.ts
     this.dataContext = {
-      clickAnimate: false,
+      clickDown: false,
+      clickUp: false,
       dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
@@ -127,12 +134,20 @@ class Default extends hz.Component<typeof Default> {
   // #endregion
 
   // #region 🎬 Handlers
-  private onCookieClickedEvent(): void {
-    const log = this.log.active("onCookieClickedEvent");
-    log.info("Cookie click event received");
+  private onCookiePressedEvent(): void {
+    const log = this.log.inactive("onCookiePressedEvent");
+    log.info("Cookie pressed down");
 
-    // Trigger click animation
-    this.triggerClickAnimation();
+    // Trigger press down animation
+    this.triggerClickDown();
+  }
+
+  private onCookieClickedEvent(): void {
+    const log = this.log.inactive("onCookieClickedEvent");
+    log.info("Cookie released");
+
+    // Trigger release animation
+    this.triggerClickUp();
 
     // Show +# popup
     this.showPopup(`+${this.cookiesPerClick}`);
@@ -143,15 +158,32 @@ class Default extends hz.Component<typeof Default> {
     });
   }
 
-  private triggerClickAnimation(): void {
-    // Reset and trigger the click animation
-    this.dataContext.clickAnimate = false;
+  private triggerClickDown(): void {
+    // Reset and trigger the click down animation
+    this.dataContext.clickDown = false;
+    this.dataContext.clickUp = false;
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
 
     this.async.setTimeout(() => {
-      this.dataContext.clickAnimate = true;
+      this.dataContext.clickDown = true;
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 1);
+  }
+
+  private triggerClickUp(): void {
+    // Reset and trigger the click up animation
+    this.dataContext.clickDown = false;
+    this.dataContext.clickUp = false;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+
+    this.async.setTimeout(() => {
+      this.dataContext.clickUp = true;
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;
       }

@@ -48,25 +48,28 @@
         <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
       </Border.RenderTransform>
       <b:Interaction.Triggers>
-        <!-- Click animation triggered by data binding -->
-        <b:DataTrigger Binding="{Binding clickAnimate}" Value="True">
+        <!-- Click DOWN animation - scale down when pressed -->
+        <b:DataTrigger Binding="{Binding clickDown}" Value="True">
           <b:ControlStoryboardAction>
             <b:ControlStoryboardAction.Storyboard>
               <Storyboard>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX">
-                  <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
-                  <EasingDoubleKeyFrame KeyTime="0:0:0.05" Value="0.9"/>
-                  <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
-                    <EasingDoubleKeyFrame.EasingFunction><QuadraticEase EasingMode="EaseOut"/></EasingDoubleKeyFrame.EasingFunction>
-                  </EasingDoubleKeyFrame>
-                </DoubleAnimationUsingKeyFrames>
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY">
-                  <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
-                  <EasingDoubleKeyFrame KeyTime="0:0:0.05" Value="0.9"/>
-                  <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
-                    <EasingDoubleKeyFrame.EasingFunction><QuadraticEase EasingMode="EaseOut"/></EasingDoubleKeyFrame.EasingFunction>
-                  </EasingDoubleKeyFrame>
-                </DoubleAnimationUsingKeyFrames>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+              </Storyboard>
+            </b:ControlStoryboardAction.Storyboard>
+          </b:ControlStoryboardAction>
+        </b:DataTrigger>
+        <!-- Click UP animation - scale back up when released -->
+        <b:DataTrigger Binding="{Binding clickUp}" Value="True">
+          <b:ControlStoryboardAction>
+            <b:ControlStoryboardAction.Storyboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
+                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
+                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
               </Storyboard>
             </b:ControlStoryboardAction.Storyboard>
           </b:ControlStoryboardAction>
