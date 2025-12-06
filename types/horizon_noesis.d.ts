@@ -89,6 +89,47 @@ export declare class NoesisGizmo extends Entity {
      * @see {@link setVisibilityForPlayers} for network-synchronized visibility control
      */
     setLocalEntityVisibility(visible: boolean): void;
+    /**
+     * Changes the currently displayed XAML page to a new page from the loaded asset.
+     *
+     * @param xamlFile - A resource reference to the XAML file to load (use NoesisAsset.getResource())
+     * @param dataContext - Optional data context to set for the new page. If not provided, the existing data context is preserved.
+     *
+     * @returns True if the page change was initiated, false if validation failed
+     *
+     * @remarks
+     * This method allows you to dynamically switch between different XAML pages within a Noesis UI entity.
+     * The XAML file must exist in the Noesis asset that was loaded for this entity.
+     *
+     * **DataContext behavior**:
+     * - If `dataContext` is provided, it replaces the existing data context on the new page
+     * - If `dataContext` is not provided (null/undefined), the existing data context is preserved
+     *
+     *
+     * @example
+     * ```
+     * // Get the Noesis UI entity and its asset
+     * const noesisUI = world.getEntityByName("MyNoesisUI") as NoesisGizmo;
+     * const asset = noesisUI.getAsset();
+     *
+     * if (asset != null) {
+     *   // Get a reference to the XAML page
+     *   const settingsPage = asset.getResource("SettingsPage.xaml");
+     *
+     *   if (settingsPage != null) {
+     *     // Change to the page, preserving the existing data context
+     *     if (noesisUI.changePage(settingsPage)) {
+     *       console.log("Page change initiated successfully");
+     *     }
+     *
+     *     // Or change with a new data context
+     *     const newContext = { title: "Settings", version: "1.0" };
+     *     noesisUI.changePage(settingsPage, newContext);
+     *   }
+     * }
+     * ```
+     */
+    changePage(xamlFile: NoesisAssetResource, dataContext?: IUiViewModelObject): boolean;
 }
 
 }
