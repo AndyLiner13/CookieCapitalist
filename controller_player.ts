@@ -65,55 +65,10 @@ class Default extends hz.Component<typeof Default> {
 
     // Set up raycast-based cookie tapping (mobile/web)
     this.setupRaycastCookieClick();
-    
-    // Debug: Log ALL tap events regardless of raycast setup
-    this.setupTapDebugLogging();
   }
   // #endregion
   
   // #region 🎬 Handlers
-  private setupTapDebugLogging(): void {
-    const log = this.log.active("setupTapDebugLogging");
-    
-    // Log when input STARTS - use connectLocalBroadcastEvent for Focused Interaction
-    this.connectLocalBroadcastEvent(
-      hz.PlayerControls.onFocusedInteractionInputStarted,
-      (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const tapLog = this.log.active("TAP_STARTED");
-        tapLog.info(`TAP STARTED! Count: ${data.interactionInfo?.length || 0}`);
-        if (data.interactionInfo) {
-          for (const info of data.interactionInfo) {
-            tapLog.info(`  Index: ${info.interactionIndex}, Origin: ${info.worldRayOrigin.toString()}`);
-          }
-        }
-      }
-    );
-    
-    // Log when input ENDS
-    this.connectLocalBroadcastEvent(
-      hz.PlayerControls.onFocusedInteractionInputEnded,
-      (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const tapLog = this.log.active("TAP_ENDED");
-        tapLog.info(`TAP ENDED! Count: ${data.interactionInfo?.length || 0}`);
-        if (data.interactionInfo) {
-          for (const info of data.interactionInfo) {
-            tapLog.info(`  Index: ${info.interactionIndex}, Origin: ${info.worldRayOrigin.toString()}`);
-          }
-        }
-      }
-    );
-    
-    // Log when input MOVES (drag)
-    this.connectLocalBroadcastEvent(
-      hz.PlayerControls.onFocusedInteractionInputMoved,
-      (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const tapLog = this.log.inactive("TAP_MOVED");
-        tapLog.info(`TAP MOVED! Count: ${data.interactionInfo?.length || 0}`);
-      }
-    );
-    
-    log.info("Tap debug logging enabled for all interaction events");
-  }
   private positionCameraAtCookie(): void {
     const log = this.log.active("positionCameraAtCookie");
 
@@ -195,20 +150,11 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Cookie collider target: ${this.cookieCollider.name.get()}`);
 
     // Use connectLocalBroadcastEvent for Focused Interaction tap events
-    this.connectLocalBroadcastEvent(
-      hz.PlayerControls.onFocusedInteractionInputStarted,
-      (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const innerLog = this.log.active("onFocusedInteractionInputStarted");
-        innerLog.info(`INPUT STARTED - ${data.interactionInfo?.length || 0} interactions`);
-        this.handleInteraction(data.interactionInfo, innerLog);
-      }
-    );
-
+    // Only listen to InputEnded to avoid double-triggering on single taps
     this.connectLocalBroadcastEvent(
       hz.PlayerControls.onFocusedInteractionInputEnded,
       (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const innerLog = this.log.active("onFocusedInteractionInputEnded");
-        innerLog.info(`INPUT ENDED - ${data.interactionInfo?.length || 0} interactions`);
+        const innerLog = this.log.inactive("onFocusedInteractionInputEnded");
         this.handleInteraction(data.interactionInfo, innerLog);
       }
     );
