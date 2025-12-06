@@ -17,6 +17,7 @@ import {
   PageType,
   UIEvents,
   UIEventPayload,
+  GameEvents,
   LocalUIEvents,
   formatCookieDisplay,
   formatCPSDisplay,
@@ -121,6 +122,12 @@ class Default extends Component<typeof Default> {
 
     // Broadcast page change to CoreGame and other overlays (Clickers, Background)
     this.sendLocalBroadcastEvent(LocalUIEvents.changePage, { page });
+    
+    // Request save when navigating to stats (leaderboard) - ensures latest data is saved
+    if (page === "stats") {
+      log.info("Requesting PPV save before viewing leaderboard");
+      this.sendNetworkBroadcastEvent(GameEvents.toServer, { type: "request_save" });
+    }
 
     // Toggle leaderboard gizmo position when changing pages
     if (this.leaderboardGizmo) {

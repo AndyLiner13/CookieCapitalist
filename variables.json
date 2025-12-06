@@ -1,6 +1,6 @@
 {
     "Player Variables": {
-    "CookieCapitalist:Cookies:": "Number",
+    "CookieCapitalist:Cookies": "Number",
     "CookieCapitalist:TotalCookies": "Number",
     "CookieCapitalist:Upgrades": "Object"
     },

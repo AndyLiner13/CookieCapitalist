@@ -35,6 +35,13 @@ import {
 // IMPORTANT: This leaderboard tracks TOTAL cookies earned, never resets, and doesn't decrease when buying items
 const LEADERBOARD_NAME = "TotalCookies";
 const LEADERBOARD_UPDATE_THROTTLE_MS = 1000; // Update every 1 second max to avoid spam
+
+// PPV (Persistent Player Variable) keys - format: "VariableGroupName:VariableName"
+// These must match the variable group and variable names created in Systems > Variable Groups
+const PPV_GROUP = "CookieCapitalist";
+const PPV_COOKIES = `${PPV_GROUP}:Cookies`;
+const PPV_TOTAL_COOKIES = `${PPV_GROUP}:TotalCookies`;
+const PPV_UPGRADES = `${PPV_GROUP}:Upgrades`;
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -67,6 +74,10 @@ class Default extends Component<typeof Default> {
   
   // Active player reference
   private activePlayer: Player | null = null;
+  
+  // Auto-save interval ID
+  private autoSaveTimerId: number | null = null;
+  private static readonly AUTO_SAVE_INTERVAL_MS = 10000; // Save every 10 seconds (reduced for testing)
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -100,9 +111,10 @@ class Default extends Component<typeof Default> {
     // Handle existing players (Desktop Editor preview)
     const players = this.world.getPlayers();
     if (players.length > 0) {
-      this.activePlayer = players[0];
-      log.info(`Found existing player: ${this.activePlayer.name.get()}`);
-      this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+      const existingPlayer = players[0];
+      log.info(`Found existing player: ${existingPlayer.name.get()}`);
+      // Treat as if they just entered - load PPVs and assign controller
+      this.onPlayerEnter(existingPlayer);
     }
     
     log.info("Backend initialized (Server)");
@@ -134,16 +146,21 @@ class Default extends Component<typeof Default> {
   
   // Handle player entering world
   private onPlayerEnter(player: Player): void {
-    const log = this.log.active("onPlayerEnter");
+    const log = this.log.inactive("onPlayerEnter");
     log.info(`Player entered: ${player.name.get()}`);
     
     this.activePlayer = player;
     this.assignPlayerController(player);
-    this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+    
+    // Load saved state from PPVs
+    this.loadPlayerState(player);
+    
+    // Start auto-save timer
+    this.startAutoSave();
   }
   
   private assignPlayerController(player: Player): void {
-    const log = this.log.active("assignPlayerController");
+    const log = this.log.inactive("assignPlayerController");
     
     const controller = this.props.playerController;
     if (!controller) {
@@ -156,17 +173,36 @@ class Default extends Component<typeof Default> {
   }
   
   private onPlayerExit(player: Player): void {
-    const log = this.log.active("onPlayerExit");
+    const log = this.log.inactive("onPlayerExit");
     log.info(`Player exited: ${player.name.get()}`);
+    
+    // Save state before player leaves
+    this.savePlayerState(player);
+    
+    // Stop auto-save timer
+    this.stopAutoSave();
     
     if (this.activePlayer === player) {
       this.activePlayer = null;
     }
   }
   
+  // Handle save request from UI (e.g., when opening leaderboard)
+  private handleSaveRequest(): void {
+    const log = this.log.active("handleSaveRequest");
+    
+    if (!this.activePlayer) {
+      log.warn("No active player - cannot save");
+      return;
+    }
+    
+    log.info("[SAVE REQUEST] Triggered by UI - saving PPV now");
+    this.savePlayerState(this.activePlayer);
+  }
+  
   // Handle network events from clients
   private handlePlayerEvent(data: GameEventPayload): void {
-    const log = this.log.active("handlePlayerEvent");
+    const log = this.log.inactive("handlePlayerEvent");
     
     if (!data || !data.type) return;
     
@@ -185,6 +221,10 @@ class Default extends Component<typeof Default> {
         
       case "request_state":
         this.broadcastStateUpdate();
+        break;
+        
+      case "request_save":
+        this.handleSaveRequest();
         break;
     }
   }
@@ -214,7 +254,7 @@ class Default extends Component<typeof Default> {
   }
   
   private handleBuyUpgrade(upgradeId: string): void {
-    const log = this.log.active("handleBuyUpgrade");
+    const log = this.log.inactive("handleBuyUpgrade");
     
     const config = UPGRADE_CONFIGS.find((c) => c.id === upgradeId);
     if (!config) {
@@ -286,12 +326,138 @@ class Default extends Component<typeof Default> {
     this.updateLeaderboard();
   }
   
+  // #region 💾 PPV (Persistent Player Variables)
+  // Load player's saved state from PPVs
+  private loadPlayerState(player: Player): void {
+    const log = this.log.active("loadPlayerState");
+    
+    try {
+      // Load cookies (Number type - returns 0 if not set)
+      const cookies = this.world.persistentStorage.getPlayerVariable(player, PPV_COOKIES);
+      log.info(`[PPV READ] ${PPV_COOKIES} = ${cookies} (type: ${typeof cookies})`);
+      
+      // Load total cookies earned (Number type - returns 0 if not set)
+      const totalCookies = this.world.persistentStorage.getPlayerVariable(player, PPV_TOTAL_COOKIES);
+      log.info(`[PPV READ] ${PPV_TOTAL_COOKIES} = ${totalCookies} (type: ${typeof totalCookies})`);
+      
+      // Load upgrades (Object type - returns 0 if not set, null for uninitialized objects)
+      const upgradesRaw = this.world.persistentStorage.getPlayerVariable<{ [key: string]: number }>(player, PPV_UPGRADES);
+      log.info(`[PPV READ] ${PPV_UPGRADES} = ${JSON.stringify(upgradesRaw)} (type: ${typeof upgradesRaw})`);
+      
+      // Apply loaded values to game state
+      this.gameState.cookies = typeof cookies === "number" ? cookies : 0;
+      this.gameState.totalCookiesEarned = typeof totalCookies === "number" ? totalCookies : 0;
+      
+      // Handle upgrades - could be 0 (default), null, or an object
+      if (upgradesRaw && typeof upgradesRaw === "object" && upgradesRaw !== null) {
+        // Merge loaded upgrades with defaults (in case new upgrade types were added)
+        const defaultState = createDefaultGameState();
+        this.gameState.upgrades = { ...defaultState.upgrades, ...upgradesRaw };
+      } else {
+        // No saved upgrades - use defaults
+        this.gameState.upgrades = createDefaultGameState().upgrades;
+      }
+      
+      // Recalculate CPS based on loaded upgrades
+      this.recalculateCPS();
+      
+      log.info(`Loaded PPV state for ${player.name.get()}: ${this.gameState.cookies} cookies, ${this.gameState.totalCookiesEarned} total, ${Object.values(this.gameState.upgrades).reduce((a, b) => a + b, 0)} upgrades`);
+      
+      // Broadcast state to client after loading
+      this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+      
+      // Do an immediate save after 5 seconds to capture any early changes
+      this.async.setTimeout(() => {
+        if (this.activePlayer) {
+          log.info("[PPV] Initial save after load");
+          this.savePlayerState(this.activePlayer);
+        }
+      }, 5000);
+      
+    } catch (error) {
+      log.error(`Failed to load PPV state for ${player.name.get()}: ${error}`);
+      // Use default state on error
+      this.gameState = createDefaultGameState();
+      this.recalculateCPS();
+      this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+    }
+  }
+  
+  // Save player's current state to PPVs
+  private savePlayerState(player: Player): void {
+    const log = this.log.active("savePlayerState");
+    
+    try {
+      const cookiesToSave = Math.floor(this.gameState.cookies);
+      const totalToSave = Math.floor(this.gameState.totalCookiesEarned);
+      const upgradesToSave = this.gameState.upgrades;
+      
+      log.info(`[PPV WRITE] ${PPV_COOKIES} = ${cookiesToSave}`);
+      log.info(`[PPV WRITE] ${PPV_TOTAL_COOKIES} = ${totalToSave}`);
+      log.info(`[PPV WRITE] ${PPV_UPGRADES} = ${JSON.stringify(upgradesToSave)}`);
+      
+      // Save cookies (Number type)
+      this.world.persistentStorage.setPlayerVariable(
+        player,
+        PPV_COOKIES,
+        cookiesToSave
+      );
+      
+      // Save total cookies earned (Number type)
+      this.world.persistentStorage.setPlayerVariable(
+        player,
+        PPV_TOTAL_COOKIES,
+        totalToSave
+      );
+      
+      // Save upgrades (Object type)
+      this.world.persistentStorage.setPlayerVariable(
+        player,
+        PPV_UPGRADES,
+        upgradesToSave
+      );
+      
+      log.info(`[PPV WRITE COMPLETE] Saved state for ${player.name.get()}`);
+      
+    } catch (error) {
+      log.error(`Failed to save PPV state for ${player.name.get()}: ${error}`);
+    }
+  }
+  
+  // Start auto-save timer
+  private startAutoSave(): void {
+    const log = this.log.active("startAutoSave");
+    
+    // Clear any existing timer
+    this.stopAutoSave();
+    
+    // Start new timer
+    this.autoSaveTimerId = this.async.setInterval(() => {
+      if (this.activePlayer) {
+        log.info("[AUTO-SAVE] Timer triggered");
+        this.savePlayerState(this.activePlayer);
+      }
+    }, Default.AUTO_SAVE_INTERVAL_MS);
+    
+    log.info(`[AUTO-SAVE] Started (every ${Default.AUTO_SAVE_INTERVAL_MS / 1000}s)`);
+  }
+  
+  // Stop auto-save timer
+  private stopAutoSave(): void {
+    if (this.autoSaveTimerId !== null) {
+      this.async.clearInterval(this.autoSaveTimerId);
+      this.autoSaveTimerId = null;
+    }
+  }
+  // #endregion
+  
   // Update leaderboard score for the active player (throttled)
   // Tracks totalCookiesEarned - never decreases when purchasing items
   private updateLeaderboard(): void {
-    const log = this.log.inactive("updateLeaderboard");
+    const log = this.log.active("updateLeaderboard");
     
     if (!this.activePlayer) {
+      log.warn("No active player - skipping leaderboard update");
       return;
     }
     
@@ -308,6 +474,8 @@ class Default extends Component<typeof Default> {
       return;
     }
     
+    log.info(`[LEADERBOARD] Updating "${LEADERBOARD_NAME}" with score: ${totalCookies}`);
+    
     try {
       // Update the TotalCookies leaderboard
       // - Tracks lifetime cookies earned (never resets)
@@ -322,9 +490,9 @@ class Default extends Component<typeof Default> {
       
       this.lastLeaderboardUpdate = now;
       this.lastLeaderboardScore = totalCookies;
-      log.info(`Leaderboard "${LEADERBOARD_NAME}" updated: ${totalCookies} total cookies earned by ${this.activePlayer.name.get()}`);
+      log.info(`[LEADERBOARD] Success! ${this.activePlayer.name.get()} now has ${totalCookies} on "${LEADERBOARD_NAME}"`);
     } catch (error) {
-      log.warn(`Failed to update leaderboard "${LEADERBOARD_NAME}": ${error}`);
+      log.error(`[LEADERBOARD] Failed to update "${LEADERBOARD_NAME}": ${error}`);
     }
   }
   // #endregion

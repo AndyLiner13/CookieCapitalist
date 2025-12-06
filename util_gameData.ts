@@ -42,7 +42,7 @@ export type PageType = "home" | "shop" | "stats";
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
   [key: string]: SerializableState;
-  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete";
+  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save";
 };
 
 export type UIEventPayload = {
