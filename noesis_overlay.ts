@@ -9,8 +9,9 @@
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
-import { Component } from "horizon/core";
+import { Component, PropTypes, Entity, Vec3, Quaternion } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
+import LocalCamera from "horizon/camera";
 import { Logger } from "./util_logger";
 import {
   PageType,
@@ -22,17 +23,24 @@ import {
 } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
+// Hidden position for leaderboard (world origin, out of view)
+const LEADERBOARD_HIDDEN_POS = new Vec3(0, -100, 0);
+// Distance in front of camera when visible
+const LEADERBOARD_DISTANCE_FROM_CAMERA = 1.23; // 2 meters in front of camera
 // #endregion
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
-  static propsDefinition = {};
+  static propsDefinition = {
+    leaderboardGizmo: { type: PropTypes.Entity },
+  };
   // #endregion
 
   // #region 📊 State
   private log = new Logger("noesis_overlay");
   private noesisGizmo: NoesisGizmo | null = null;
   private dataContext: IUiViewModelObject = {};
+  private leaderboardGizmo: Entity | null = null;
   
   // Current page
   private currentPage: PageType = "home";
@@ -50,6 +58,20 @@ class Default extends Component<typeof Default> {
     if (!this.noesisGizmo) {
       log.error("Entity is not a NoesisGizmo!");
       return;
+    }
+
+    // Cache leaderboard gizmo (optional) and hide it on start
+    this.leaderboardGizmo = this.props.leaderboardGizmo || null;
+    log.info(`Leaderboard prop value: ${this.leaderboardGizmo ? "SET" : "NULL"}`);
+    if (this.leaderboardGizmo) {
+      const gizmoName = this.leaderboardGizmo.name.get();
+      log.info(`Leaderboard gizmo found: ${gizmoName} - will position dynamically based on camera`);
+      
+      // Move leaderboard to hidden position on start
+      this.leaderboardGizmo.position.set(LEADERBOARD_HIDDEN_POS);
+      log.info(`Leaderboard gizmo moved to hidden position: ${LEADERBOARD_HIDDEN_POS.toString()}`);
+    } else {
+      log.warn("leaderboardGizmo prop is NOT SET on overlay entity - cannot control leaderboard visibility");
     }
 
     // Listen for state updates via NETWORK event (from Backend)
@@ -99,6 +121,29 @@ class Default extends Component<typeof Default> {
 
     // Broadcast page change to CoreGame and other overlays (Clickers, Background)
     this.sendLocalBroadcastEvent(LocalUIEvents.changePage, { page });
+
+    // Toggle leaderboard gizmo position when changing pages
+    if (this.leaderboardGizmo) {
+      if (page === "stats") {
+        // Get current camera position and forward direction
+        const cameraPos = LocalCamera.position.get();
+        const cameraForward = LocalCamera.forward.get();
+        
+        // Position leaderboard in front of camera
+        const leaderboardPos = cameraPos.add(cameraForward.mul(LEADERBOARD_DISTANCE_FROM_CAMERA));
+        
+        // Rotate to face the same direction as camera (not back at it)
+        const leaderboardRot = Quaternion.lookRotation(cameraForward, Vec3.up);
+        
+        this.leaderboardGizmo.position.set(leaderboardPos);
+        this.leaderboardGizmo.rotation.set(leaderboardRot);
+        log.info(`Leaderboard moved to visible position: ${leaderboardPos.toString()} (${LEADERBOARD_DISTANCE_FROM_CAMERA}m in front of camera)`);
+      } else {
+        // Move leaderboard to hidden position (world origin, underground)
+        this.leaderboardGizmo.position.set(LEADERBOARD_HIDDEN_POS);
+        log.info(`Leaderboard moved to hidden position: ${LEADERBOARD_HIDDEN_POS.toString()}`);
+      }
+    }
   }
   // #endregion
 

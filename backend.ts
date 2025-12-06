@@ -32,8 +32,9 @@ import {
 
 // #region 🏷️ Type Definitions
 // Leaderboard configuration - must match the leaderboard name created in Systems > Leaderboards
+// IMPORTANT: This leaderboard tracks TOTAL cookies earned, never resets, and doesn't decrease when buying items
 const LEADERBOARD_NAME = "TotalCookies";
-const LEADERBOARD_UPDATE_THROTTLE_MS = 2000; // Don't spam leaderboard updates
+const LEADERBOARD_UPDATE_THROTTLE_MS = 1000; // Update every 1 second max to avoid spam
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -73,7 +74,7 @@ class Default extends Component<typeof Default> {
     const log = this.log.active("start");
     
     // === SERVER-SIDE SETUP ===
-    
+
     // Listen for player events
     this.connectCodeBlockEvent(
       this.entity,
@@ -191,10 +192,11 @@ class Default extends Component<typeof Default> {
   private handleCookieClick(): void {
     const log = this.log.inactive("handleCookieClick");
     
-    this.gameState.cookies += this.gameState.cookiesPerClick;
-    this.gameState.totalCookiesEarned += this.gameState.cookiesPerClick;
+    const earnedAmount = this.gameState.cookiesPerClick;
+    this.gameState.cookies += earnedAmount;
+    this.gameState.totalCookiesEarned += earnedAmount; // Leaderboard stat - never decreases
     
-    log.info(`Cookie clicked! Total: ${this.gameState.cookies}`);
+    log.info(`Cookie clicked! Earned: ${earnedAmount}, Total: ${this.gameState.cookies}, Lifetime: ${this.gameState.totalCookiesEarned}`);
     this.throttledBroadcastStateUpdate();
   }
   
@@ -205,9 +207,9 @@ class Default extends Component<typeof Default> {
     
     // Award cookies from production
     this.gameState.cookies += cookies;
-    this.gameState.totalCookiesEarned += cookies;
+    this.gameState.totalCookiesEarned += cookies; // Leaderboard stat - never decreases
     
-    log.info(`Production complete: ${upgradeId} awarded ${cookies} cookies. Total: ${this.gameState.cookies}`);
+    log.info(`Production complete: ${upgradeId} awarded ${cookies} cookies. Total: ${this.gameState.cookies}, Lifetime: ${this.gameState.totalCookiesEarned}`);
     this.throttledBroadcastStateUpdate();
   }
   
@@ -235,11 +237,12 @@ class Default extends Component<typeof Default> {
       return;
     }
     
+    // Deduct cost from current balance (does NOT affect totalCookiesEarned/leaderboard)
     this.gameState.cookies -= cost;
     this.gameState.upgrades[upgradeId] = owned + 1;
     this.recalculateCPS();
     
-    log.info(`Purchased ${config.name}. Now own ${owned + 1}. CPS: ${this.cookiesPerSecond}`);
+    log.info(`Purchased ${config.name}. Cost: ${cost}, Now own: ${owned + 1}, Balance: ${this.gameState.cookies}, CPS: ${this.cookiesPerSecond}`);
     this.broadcastStateUpdate();
   }
   
@@ -284,6 +287,7 @@ class Default extends Component<typeof Default> {
   }
   
   // Update leaderboard score for the active player (throttled)
+  // Tracks totalCookiesEarned - never decreases when purchasing items
   private updateLeaderboard(): void {
     const log = this.log.inactive("updateLeaderboard");
     
@@ -293,7 +297,7 @@ class Default extends Component<typeof Default> {
     
     const now = Date.now();
     const timeSinceLastUpdate = now - this.lastLeaderboardUpdate;
-    const totalCookies = this.gameState.totalCookiesEarned;
+    const totalCookies = Math.floor(this.gameState.totalCookiesEarned);
     
     // Only update if enough time has passed AND score has changed
     if (timeSinceLastUpdate < LEADERBOARD_UPDATE_THROTTLE_MS) {
@@ -305,19 +309,22 @@ class Default extends Component<typeof Default> {
     }
     
     try {
-      // Update the leaderboard - override=false means it only updates if higher
+      // Update the TotalCookies leaderboard
+      // - Tracks lifetime cookies earned (never resets)
+      // - Purchases don't reduce this number (only affects current cookies balance)
+      // - override=false means it only updates if the new score is higher
       this.world.leaderboards.setScoreForPlayer(
         LEADERBOARD_NAME,
         this.activePlayer,
         totalCookies,
-        false // Don't override lower scores - leaderboard tracks highest
+        false // Don't override if player somehow has a higher existing score
       );
       
       this.lastLeaderboardUpdate = now;
       this.lastLeaderboardScore = totalCookies;
-      log.info(`Leaderboard updated: ${totalCookies} total cookies for ${this.activePlayer.name.get()}`);
+      log.info(`Leaderboard "${LEADERBOARD_NAME}" updated: ${totalCookies} total cookies earned by ${this.activePlayer.name.get()}`);
     } catch (error) {
-      log.warn(`Failed to update leaderboard: ${error}`);
+      log.warn(`Failed to update leaderboard "${LEADERBOARD_NAME}": ${error}`);
     }
   }
   // #endregion

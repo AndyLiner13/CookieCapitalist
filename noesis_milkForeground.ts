@@ -3,7 +3,7 @@
 
 // #region 📋 README
 // Milk Background (front wave layer) controller.
-// Hides when player navigates to shop or leaderboard pages.
+// Hides when player navigates to shop or stats pages.
 // Listens to LocalUIEvents.changePage broadcast from Overlay controller.
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
