@@ -86,8 +86,10 @@ class Default extends hz.Component<typeof Default> {
   private buildDataContext(): void {
     const log = this.log.inactive("buildDataContext");
 
+    // Note: onCookieClick is NOT exposed here - clicks are only detected via
+    // raycast gizmo + cookie collider in controller_player.ts
     this.dataContext = {
-      onCookieClick: () => this.onCookieClick(),
+      clickAnimate: false,
       dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
@@ -125,17 +127,12 @@ class Default extends hz.Component<typeof Default> {
   // #endregion
 
   // #region 🎬 Handlers
-  private onCookieClick(): void {
-    const log = this.log.active("onCookieClick");
-    log.info("Cookie button clicked (Noesis)");
-
-    // Broadcast cookie click - handled by onCookieClickedEvent
-    this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
-  }
-
   private onCookieClickedEvent(): void {
     const log = this.log.active("onCookieClickedEvent");
     log.info("Cookie click event received");
+
+    // Trigger click animation
+    this.triggerClickAnimation();
 
     // Show +# popup
     this.showPopup(`+${this.cookiesPerClick}`);
@@ -144,6 +141,21 @@ class Default extends hz.Component<typeof Default> {
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "cookie_clicked",
     });
+  }
+
+  private triggerClickAnimation(): void {
+    // Reset and trigger the click animation
+    this.dataContext.clickAnimate = false;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+
+    this.async.setTimeout(() => {
+      this.dataContext.clickAnimate = true;
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 1);
   }
 
   private onSwipeDown(): void {

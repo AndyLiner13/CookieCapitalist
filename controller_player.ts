@@ -65,10 +65,55 @@ class Default extends hz.Component<typeof Default> {
 
     // Set up raycast-based cookie tapping (mobile/web)
     this.setupRaycastCookieClick();
+    
+    // Debug: Log ALL tap events regardless of raycast setup
+    this.setupTapDebugLogging();
   }
   // #endregion
   
   // #region 🎬 Handlers
+  private setupTapDebugLogging(): void {
+    const log = this.log.active("setupTapDebugLogging");
+    
+    // Log when input STARTS - use connectLocalBroadcastEvent for Focused Interaction
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputStarted,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const tapLog = this.log.active("TAP_STARTED");
+        tapLog.info(`TAP STARTED! Count: ${data.interactionInfo?.length || 0}`);
+        if (data.interactionInfo) {
+          for (const info of data.interactionInfo) {
+            tapLog.info(`  Index: ${info.interactionIndex}, Origin: ${info.worldRayOrigin.toString()}`);
+          }
+        }
+      }
+    );
+    
+    // Log when input ENDS
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputEnded,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const tapLog = this.log.active("TAP_ENDED");
+        tapLog.info(`TAP ENDED! Count: ${data.interactionInfo?.length || 0}`);
+        if (data.interactionInfo) {
+          for (const info of data.interactionInfo) {
+            tapLog.info(`  Index: ${info.interactionIndex}, Origin: ${info.worldRayOrigin.toString()}`);
+          }
+        }
+      }
+    );
+    
+    // Log when input MOVES (drag)
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputMoved,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const tapLog = this.log.inactive("TAP_MOVED");
+        tapLog.info(`TAP MOVED! Count: ${data.interactionInfo?.length || 0}`);
+      }
+    );
+    
+    log.info("Tap debug logging enabled for all interaction events");
+  }
   private positionCameraAtCookie(): void {
     const log = this.log.active("positionCameraAtCookie");
 
@@ -127,53 +172,98 @@ class Default extends hz.Component<typeof Default> {
   private setupRaycastCookieClick(): void {
     const log = this.log.active("setupRaycastCookieClick");
 
-    if (!this.props.raycastGizmo || !this.props.cookieCollider) {
-      log.info("Raycast gizmo or cookie collider not set; skipping cookie tap handling");
+    if (!this.props.raycastGizmo) {
+      log.warn("raycastGizmo prop not set - cookie tap handling disabled");
+      return;
+    }
+    
+    if (!this.props.cookieCollider) {
+      log.warn("cookieCollider prop not set - cookie tap handling disabled");
       return;
     }
 
     const raycast = this.props.raycastGizmo.as(hz.RaycastGizmo);
     if (!raycast) {
-      log.warn("raycastGizmo prop is not a RaycastGizmo");
+      log.warn("raycastGizmo prop is not a RaycastGizmo entity");
       return;
     }
 
     this.raycastGizmo = raycast;
     this.cookieCollider = this.props.cookieCollider;
+    
+    log.info(`Raycast gizmo ready: ${this.raycastGizmo.toString()}`);
+    log.info(`Cookie collider target: ${this.cookieCollider.name.get()}`);
 
-    this.connectLocalEvent(
-      this.world.getLocalPlayer(),
-      hz.PlayerControls.onFocusedInteractionInputEnded,
-      ({ interactionInfo }: { interactionInfo: hz.InteractionInfo[] }) => {
-        const innerLog = this.log.inactive("onFocusedInteractionInputEnded");
-
-        if (!this.raycastGizmo || !this.cookieCollider) {
-          return;
-        }
-
-        const interactions = interactionInfo || [];
-        for (const interaction of interactions) {
-          // Only respond to primary tap (index 0)
-          if (interaction.interactionIndex !== 0) {
-            continue;
-          }
-
-          const hit = this.raycastGizmo.raycast(
-            interaction.worldRayOrigin,
-            interaction.worldRayDirection
-          ) as hz.RaycastHit | null;
-
-          if (!hit || hit.targetType !== hz.RaycastTargetType.Entity || !hit.target) {
-            continue;
-          }
-
-          if (hit.target === this.cookieCollider) {
-            innerLog.info("Cookie collider tapped via raycast");
-            this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
-          }
-        }
+    // Use connectLocalBroadcastEvent for Focused Interaction tap events
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputStarted,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const innerLog = this.log.active("onFocusedInteractionInputStarted");
+        innerLog.info(`INPUT STARTED - ${data.interactionInfo?.length || 0} interactions`);
+        this.handleInteraction(data.interactionInfo, innerLog);
       }
     );
+
+    this.connectLocalBroadcastEvent(
+      hz.PlayerControls.onFocusedInteractionInputEnded,
+      (data: { interactionInfo: hz.InteractionInfo[] }) => {
+        const innerLog = this.log.active("onFocusedInteractionInputEnded");
+        innerLog.info(`INPUT ENDED - ${data.interactionInfo?.length || 0} interactions`);
+        this.handleInteraction(data.interactionInfo, innerLog);
+      }
+    );
+    
+    log.info("Raycast cookie click handler connected");
+  }
+
+  private handleInteraction(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
+    if (!this.raycastGizmo || !this.cookieCollider) {
+      log.warn("Raycast or collider not set");
+      return;
+    }
+
+    const interactions = interactionInfo || [];
+    log.info(`Processing ${interactions.length} interactions`);
+    
+    for (const interaction of interactions) {
+      // Only respond to primary tap (index 0)
+      if (interaction.interactionIndex !== 0) {
+        continue;
+      }
+
+      log.info(`Tap at origin: ${interaction.worldRayOrigin.toString()}, dir: ${interaction.worldRayDirection.toString()}`);
+
+      const hit = this.raycastGizmo.raycast(
+        interaction.worldRayOrigin,
+        interaction.worldRayDirection
+      ) as hz.RaycastHit | null;
+
+      if (!hit) {
+        log.info("Raycast returned null - no hit");
+        continue;
+      }
+      
+      log.info(`Hit targetType: ${hit.targetType}, hitPoint: ${hit.hitPoint.toString()}`);
+
+      if (hit.targetType !== hz.RaycastTargetType.Entity) {
+        log.info(`Hit was not an Entity (type: ${hit.targetType})`);
+        continue;
+      }
+      
+      if (!hit.target) {
+        log.info("Hit target is null");
+        continue;
+      }
+      
+      log.info(`Hit entity: ${hit.target.name.get()}`);
+
+      if (hit.target === this.cookieCollider) {
+        log.info("Cookie collider tapped via raycast - sending cookieClicked event!");
+        this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
+      } else {
+        log.info(`Hit entity doesn't match cookieCollider`);
+      }
+    }
   }
   // #endregion
 }

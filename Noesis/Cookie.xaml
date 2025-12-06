@@ -1,7 +1,10 @@
 <!-- 
-  Cookie - Main cookie button and popups (Spatial)
+  Cookie - Main cookie display and popups (Spatial)
   Display Mode: Spatial, Render Order: 5
-  Input Mode: No Interaction (clicks handled via raycast + collider and LocalUIEvents.cookieClicked)
+  Input Mode: No Interaction (IMPORTANT - all clicks come from controller_player.ts via LocalUIEvents.cookieClicked)
+  
+  This XAML is purely visual - it has NO click detection.
+  Clicks are detected by raycast + collider in controller_player.ts, which sends LocalUIEvents.cookieClicked.
 -->
 
 <Page
@@ -32,54 +35,42 @@
 
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     
-    <!-- Clickable Cookie (centered) -->
-    <Button x:Name="CookieButton"
-            Command="{Binding onCookieClick}"
+    <!-- Cookie image (non-interactive - clicks handled via raycast + collider in controller_player.ts) -->
+    <Border x:Name="CookieContainer"
             Width="256"
             Height="256"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             RenderTransformOrigin="0.5,0.5"
             Background="Transparent"
-            BorderThickness="0"
-            BorderBrush="Transparent"
-            Padding="0">
-      <Button.Template>
-        <ControlTemplate TargetType="Button">
-          <Border Background="Transparent">
-            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-          </Border>
-        </ControlTemplate>
-      </Button.Template>
-      <Button.RenderTransform>
+            IsHitTestVisible="False">
+      <Border.RenderTransform>
         <ScaleTransform x:Name="CookieScale" ScaleX="1" ScaleY="1"/>
-      </Button.RenderTransform>
+      </Border.RenderTransform>
       <b:Interaction.Triggers>
-        <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+        <!-- Click animation triggered by data binding -->
+        <b:DataTrigger Binding="{Binding clickAnimate}" Value="True">
           <b:ControlStoryboardAction>
             <b:ControlStoryboardAction.Storyboard>
               <Storyboard>
-                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/>
-                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/>
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX">
+                  <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                  <EasingDoubleKeyFrame KeyTime="0:0:0.05" Value="0.9"/>
+                  <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
+                    <EasingDoubleKeyFrame.EasingFunction><QuadraticEase EasingMode="EaseOut"/></EasingDoubleKeyFrame.EasingFunction>
+                  </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY">
+                  <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                  <EasingDoubleKeyFrame KeyTime="0:0:0.05" Value="0.9"/>
+                  <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="1">
+                    <EasingDoubleKeyFrame.EasingFunction><QuadraticEase EasingMode="EaseOut"/></EasingDoubleKeyFrame.EasingFunction>
+                  </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
               </Storyboard>
             </b:ControlStoryboardAction.Storyboard>
           </b:ControlStoryboardAction>
-        </b:EventTrigger>
-        <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-          <b:ControlStoryboardAction>
-            <b:ControlStoryboardAction.Storyboard>
-              <Storyboard>
-                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.15">
-                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                </DoubleAnimation>
-                <DoubleAnimation Storyboard.TargetName="CookieScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.15">
-                  <DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
-                </DoubleAnimation>
-              </Storyboard>
-            </b:ControlStoryboardAction.Storyboard>
-          </b:ControlStoryboardAction>
-        </b:EventTrigger>
+        </b:DataTrigger>
       </b:Interaction.Triggers>
       <Grid>
         <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
@@ -113,7 +104,7 @@
           </b:Interaction.Triggers>
         </Image>
       </Grid>
-    </Button>
+    </Border>
     
     <!-- Popup Text Elements (40 total - handles max click rate of 600ms animation / 16ms per frame) -->
     <TextBlock x:Name="Popup0" Style="{StaticResource PopupTextStyle}" Text="{Binding Popup0Text}" Visibility="{Binding Popup0Visible, Converter={StaticResource BoolToVis}}" Margin="{Binding Popup0Margin}" FontSize="{Binding PopupFontSize}" Foreground="{Binding PopupColor}">
