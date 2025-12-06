@@ -1,0 +1,81 @@
+<!-- 
+  Milk Wave 1 - Front wave layer
+  Display Mode: Spatial, Render Order: 7
+  Input Mode: No Interaction
+  
+  Front wave layer with drop shadow effect.
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="MilkWave1_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+  <Page.Resources>
+    <SineEase x:Key="SineEase" EasingMode="EaseInOut"/>
+  </Page.Resources>
+
+  <Grid Background="Transparent">
+    
+    <!-- Front wave layer - pure white with shadow -->
+    <Grid x:Name="Wave1"
+          VerticalAlignment="Bottom" 
+          HorizontalAlignment="Stretch"
+          Height="380"
+          Margin="-100,0,-100,-150">
+      <Grid.RenderTransform>
+        <TranslateTransform x:Name="WaveTransform1" X="0" Y="0"/>
+      </Grid.RenderTransform>
+      
+      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1133,0,-1151,-608">
+        <Path.Data>
+          <PathGeometry>
+            <PathFigure StartPoint="0,40">
+              <!-- Smooth sine wave pattern -->
+              <BezierSegment Point1="175,30" Point2="325,30" Point3="500,40"/>
+              <BezierSegment Point1="675,50" Point2="825,50" Point3="1000,40"/>
+              <BezierSegment Point1="1175,30" Point2="1325,30" Point3="1500,40"/>
+              <BezierSegment Point1="1675,50" Point2="1825,50" Point3="2000,40"/>
+              <BezierSegment Point1="2175,30" Point2="2325,30" Point3="2500,40"/>
+              <BezierSegment Point1="2675,50" Point2="2825,50" Point3="3000,40"/>
+              <BezierSegment Point1="3175,30" Point2="3325,30" Point3="3500,40"/>
+              <!-- Complete the shape -->
+              <LineSegment Point="3500,500"/>
+              <LineSegment Point="0,500"/>
+            </PathFigure>
+          </PathGeometry>
+        </Path.Data>
+      </Path>
+    </Grid>
+    
+    <!-- Wave animation -->
+    <Grid.Triggers>
+      <EventTrigger RoutedEvent="Grid.Loaded">
+        <BeginStoryboard>
+          <Storyboard RepeatBehavior="Forever">
+            <!-- Wave 1 horizontal movement (starts right, moves left) -->
+            <DoubleAnimation Storyboard.TargetName="WaveTransform1"
+                             Storyboard.TargetProperty="X"
+                             From="800" To="-800" Duration="0:0:12"
+                             AutoReverse="True"
+                             RepeatBehavior="Forever"
+                             EasingFunction="{StaticResource SineEase}"/>
+            <!-- Wave 1 vertical movement -->
+            <DoubleAnimation Storyboard.TargetName="WaveTransform1"
+                             Storyboard.TargetProperty="Y"
+                             From="-55" To="5" Duration="0:0:7"
+                             AutoReverse="True"
+                             RepeatBehavior="Forever"
+                             EasingFunction="{StaticResource SineEase}"/>
+          </Storyboard>
+        </BeginStoryboard>
+      </EventTrigger>
+    </Grid.Triggers>
+    
+  </Grid>
+</Page>
