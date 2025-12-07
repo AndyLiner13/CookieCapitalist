@@ -26,14 +26,14 @@ const CLICK_RATE_WINDOW_MS = 5000; // 5 second window to count clicks
 
 // Click thresholds to upgrade multiplier (clicks needed in 5 second window)
 const CLICKS_TO_4X = 20;  // 2x -> 4x: 10 clicks in 5 seconds
-const CLICKS_TO_8X = 30;  // 4x -> 8x: 15 clicks in 5 seconds  
-const CLICKS_TO_16X = 40; // 8x -> 16x: 20 clicks in 5 seconds
+const CLICKS_TO_8X = 35;  // 4x -> 8x: 15 clicks in 5 seconds  
+const CLICKS_TO_16X = 50; // 8x -> 16x: 20 clicks in 5 seconds
 
 // Timeout durations per multiplier tier (ms)
-const TIMEOUT_2X = 15000;  // 15 seconds
+const TIMEOUT_2X = 16000;  // 15 seconds
 const TIMEOUT_4X = 12000;  // 12 seconds
-const TIMEOUT_8X = 9000;   // 9 seconds
-const TIMEOUT_16X = 6000;  // 6 seconds
+const TIMEOUT_8X = 8000;   // 9 seconds
+const TIMEOUT_16X = 5500;  // 5.5 seconds
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -41,7 +41,10 @@ class Default extends hz.Component<typeof Default> {
   static propsDefinition = {
     popupFontSize: { type: hz.PropTypes.Number, default: 48 },
     popupColor: { type: hz.PropTypes.String, default: "#FFFFFF" },
-    glowSize: { type: hz.PropTypes.Number, default: 420 },
+    glow1Size: { type: hz.PropTypes.Number, default: 280 }, // Ring 1 (2x) - innermost
+    glow2Size: { type: hz.PropTypes.Number, default: 360 }, // Ring 2 (4x)
+    glow3Size: { type: hz.PropTypes.Number, default: 440 }, // Ring 3 (8x)
+    glow4Size: { type: hz.PropTypes.Number, default: 520 }, // Ring 4 (16x) - outermost
     glowSpinSpeed: { type: hz.PropTypes.Number, default: 0.5 }, // degrees per frame
   };
   // #endregion
@@ -59,8 +62,11 @@ class Default extends hz.Component<typeof Default> {
   private currentMultiplier: number = 1;
   private multiplierEndTime: number = 0;
   
-  // Glow rotation state
-  private glowRotation: number = 0;
+  // Glow rotation state (4 rings with alternating directions)
+  private glow1Rotation: number = 0; // 2x - counter-clockwise
+  private glow2Rotation: number = 0; // 4x - clockwise
+  private glow3Rotation: number = 0; // 8x - counter-clockwise
+  private glow4Scale: number = 1; // 16x - pulsing scale (no rotation)
   private glowSpinTimerId: number | null = null;
   
   // Click rate tracking for multiplier upgrades
@@ -129,10 +135,19 @@ class Default extends hz.Component<typeof Default> {
       dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
-      GlowOpacity: 0,
-      GlowScale: 1,
-      GlowSize: this.props.glowSize,
-      GlowRotation: 0,
+      // 4 glow rings - sizes configurable via props
+      Glow1Opacity: 0,
+      Glow1Size: this.props.glow1Size,
+      Glow1Rotation: 0,
+      Glow2Opacity: 0,
+      Glow2Size: this.props.glow2Size,
+      Glow2Rotation: 0,
+      Glow3Opacity: 0,
+      Glow3Size: this.props.glow3Size,
+      Glow3Rotation: 0,
+      Glow4Opacity: 0,
+      Glow4Size: this.props.glow4Size,
+      Glow4Scale: 1,
     };
 
     for (let i = 0; i < POPUP_COUNT; i++) {
@@ -507,45 +522,37 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Showing popup ${popupIndex}: ${text}`);
   }
   
-  // Updates the golden glow opacity behind the cookie based on multiplier
-  // Opacity: 2x=70%, 4x=80%, 8x=90%, 16x=100%
-  // Scale: starts at 1.3 (16x base size) and increases 10% per tier down from there
-  // So 2x=1.0, 4x=1.1, 8x=1.2, 16x=1.3
+  // Updates the golden glow rings opacity based on multiplier
+  // Each ring becomes visible at its corresponding multiplier tier
+  // Ring 1 (2x), Ring 2 (4x), Ring 3 (8x), Ring 4 (16x)
   private updateGlowOpacity(multiplier: number): void {
     const log = this.log.inactive("updateGlowOpacity");
     
     if (multiplier <= 1) {
-      // No multiplier - hide glow
-      this.dataContext.GlowOpacity = 0;
-      this.dataContext.GlowScale = 1;
+      // No multiplier - hide all glows
+      this.dataContext.Glow1Opacity = 0;
+      this.dataContext.Glow2Opacity = 0;
+      this.dataContext.Glow3Opacity = 0;
+      this.dataContext.Glow4Opacity = 0;
     } else {
-      // Fixed opacity values per tier
-      let opacity: number;
-      switch (multiplier) {
-        case 2:  opacity = 0.7; break;  // 70%
-        case 4:  opacity = 0.8; break;  // 80%
-        case 8:  opacity = 0.9; break;  // 90%
-        case 16: opacity = 1.0; break;  // 100%
-        default: opacity = 0.7; break;
-      }
-      
-      // Calculate scale: starts at 1.0 for 2x, increases 10% per tier
-      // tier 0 (2x) = 1.0, tier 1 (4x) = 1.1, tier 2 (8x) = 1.2, tier 3 (16x) = 1.3
-      const tier = Math.log2(multiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
-      const scale = 1.0 + (tier * 0.1);
-      
-      this.dataContext.GlowOpacity = opacity;
-      this.dataContext.GlowScale = scale;
+      // Show rings based on current multiplier
+      // Each ring gets 70% opacity when active
+      this.dataContext.Glow1Opacity = multiplier >= 2 ? 0.7 : 0;   // 2x+
+      this.dataContext.Glow2Opacity = multiplier >= 4 ? 0.7 : 0;   // 4x+
+      this.dataContext.Glow3Opacity = multiplier >= 8 ? 0.7 : 0;   // 8x+
+      this.dataContext.Glow4Opacity = multiplier >= 16 ? 0.7 : 0;  // 16x
     }
     
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
     
-    log.info(`Glow: opacity=${(this.dataContext.GlowOpacity as number).toFixed(2)}, scale=${(this.dataContext.GlowScale as number).toFixed(2)} for multiplier ${multiplier}x`);
+    log.info(`Glow rings updated for ${multiplier}x: Ring1=${this.dataContext.Glow1Opacity}, Ring2=${this.dataContext.Glow2Opacity}, Ring3=${this.dataContext.Glow3Opacity}, Ring4=${this.dataContext.Glow4Opacity}`);
   }
   
-  // Starts the glow rotation animation
+  // Starts the glow rotation animation with alternating directions
+  // Ring 1 (2x): counter-clockwise, Ring 2 (4x): clockwise
+  // Ring 3 (8x): counter-clockwise, Ring 4 (16x): clockwise
   private startGlowSpin(): void {
     const log = this.log.inactive("startGlowSpin");
     
@@ -554,20 +561,40 @@ class Default extends hz.Component<typeof Default> {
       this.async.clearInterval(this.glowSpinTimerId);
     }
     
-    // Reset rotation
-    this.glowRotation = 0;
+    // Reset rotations and scale
+    this.glow1Rotation = 0;
+    this.glow2Rotation = 0;
+    this.glow3Rotation = 0;
+    this.glow4Scale = 1;
     
-    // Start spinning counter-clockwise at configured speed (default 0.5 degrees per frame = ~30 deg/sec at 60fps)
+    let pulsePhase = 0;
+    const pulseSpeed = 0.05; // Speed of pulse animation
+    
+    // Spin rings with alternating directions and pulse Ring 4
     this.glowSpinTimerId = this.async.setInterval(() => {
-      this.glowRotation = (this.glowRotation - this.props.glowSpinSpeed + 360) % 360;
-      this.dataContext.GlowRotation = this.glowRotation;
+      // Ring 1 & 3: counter-clockwise (negative)
+      this.glow1Rotation = (this.glow1Rotation - this.props.glowSpinSpeed + 360) % 360;
+      this.glow3Rotation = (this.glow3Rotation - this.props.glowSpinSpeed + 360) % 360;
+      
+      // Ring 2: clockwise (positive)
+      this.glow2Rotation = (this.glow2Rotation + this.props.glowSpinSpeed) % 360;
+      
+      // Ring 4: pulse scale by 5% (1.0 to 1.05)
+      pulsePhase += pulseSpeed;
+      const pulseValue = (Math.sin(pulsePhase) + 1) / 2; // 0 to 1
+      this.glow4Scale = 1.0 + (pulseValue * 0.05); // Scale between 1.0 and 1.05
+      
+      this.dataContext.Glow1Rotation = this.glow1Rotation;
+      this.dataContext.Glow2Rotation = this.glow2Rotation;
+      this.dataContext.Glow3Rotation = this.glow3Rotation;
+      this.dataContext.Glow4Scale = this.glow4Scale;
       
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;
       }
     }, 16); // ~60fps
     
-    log.info(`Glow spin started at ${this.props.glowSpinSpeed} deg/frame`);
+    log.info(`Glow rings spinning at ${this.props.glowSpinSpeed} deg/frame (Ring 4 pulsing 5%)`);
   }
   
   // Stops the glow rotation animation
@@ -577,9 +604,16 @@ class Default extends hz.Component<typeof Default> {
       this.glowSpinTimerId = null;
     }
     
-    // Reset rotation
-    this.glowRotation = 0;
-    this.dataContext.GlowRotation = 0;
+    // Reset rotations and scale
+    this.glow1Rotation = 0;
+    this.glow2Rotation = 0;
+    this.glow3Rotation = 0;
+    this.glow4Scale = 1;
+    
+    this.dataContext.Glow1Rotation = 0;
+    this.dataContext.Glow2Rotation = 0;
+    this.dataContext.Glow3Rotation = 0;
+    this.dataContext.Glow4Scale = 1;
     
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
@@ -590,8 +624,10 @@ class Default extends hz.Component<typeof Default> {
   private fadeOutGlow(): void {
     const log = this.log.inactive("fadeOutGlow");
     
-    const startOpacity = this.dataContext.GlowOpacity as number;
-    const startScale = this.dataContext.GlowScale as number;
+    const startOpacity1 = this.dataContext.Glow1Opacity as number;
+    const startOpacity2 = this.dataContext.Glow2Opacity as number;
+    const startOpacity3 = this.dataContext.Glow3Opacity as number;
+    const startOpacity4 = this.dataContext.Glow4Opacity as number;
     const fadeDuration = 1500; // 1500ms fade out
     const startTime = Date.now();
     
@@ -600,8 +636,10 @@ class Default extends hz.Component<typeof Default> {
       const progress = Math.min(elapsed / fadeDuration, 1);
       
       // Linear fade from current values to 0
-      this.dataContext.GlowOpacity = startOpacity * (1 - progress);
-      this.dataContext.GlowScale = startScale - (startScale - 1) * progress;
+      this.dataContext.Glow1Opacity = startOpacity1 * (1 - progress);
+      this.dataContext.Glow2Opacity = startOpacity2 * (1 - progress);
+      this.dataContext.Glow3Opacity = startOpacity3 * (1 - progress);
+      this.dataContext.Glow4Opacity = startOpacity4 * (1 - progress);
       
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;

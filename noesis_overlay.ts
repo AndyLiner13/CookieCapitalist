@@ -298,11 +298,22 @@ class Default extends Component<typeof Default> {
       this.async.clearInterval(this.shakeTimerId);
       this.shakeTimerId = null;
     }
-    // Only clear fade-out timer for new streaks or upgrades
-    // Don't clear pop-in timer - let it complete naturally
-    if (!data.isRefresh && this.fadeOutTimerId !== null) {
+    // Always clear fade-out timer - we want to reset the animation
+    if (this.fadeOutTimerId !== null) {
       this.async.clearInterval(this.fadeOutTimerId);
       this.fadeOutTimerId = null;
+    }
+    // Don't clear pop-in timer - let it complete naturally
+    // Only reset pop-in for new activations
+    if (!data.isRefresh && this.popInTimerId !== null) {
+      this.async.clearInterval(this.popInTimerId);
+      this.popInTimerId = null;
+    }
+    
+    // Reset multiplier display state (opacity, shake position) when refreshing
+    if (data.isRefresh) {
+      this.dataContext.multiplierOpacity = 1;
+      this.dataContext.shakeY = 0;
     }
     
     // Trigger pop-in animation only for new streak or multiplier upgrade (not refreshes)
@@ -322,18 +333,18 @@ class Default extends Component<typeof Default> {
       const remaining = this.multiplierEndTime - Date.now();
       
       if (remaining <= 0) {
-        // Multiplier expired - trigger fade-out animation
+        // Blink complete at 0ms - trigger fall animation (1500ms from 50% to 0%)
         this.fadeOutMultiplier();
-        log.info("Multiplier expired - starting fade-out");
+        log.info("Blink complete - starting fall animation");
       } else {
         // Update display - only visible on home page, no timer shown
         this.dataContext.multiplierText = `${this.currentMultiplier}x`;
         this.dataContext.multiplierVisible = this.currentPage === "home";
         
-        // Smooth pulse when under 5 seconds remaining
+        // Blink animation when under 5 seconds remaining (starts at 100%, ends at 50%)
         if (remaining <= FLASH_THRESHOLD_MS) {
           this.pulsePhase += PULSE_SPEED;
-          // Sine wave oscillation between PULSE_MIN_OPACITY and 1
+          // Sine wave oscillation from 100% to 50% (starts at 1.0, ends at 0.5)
           const pulseValue = (Math.sin(this.pulsePhase) + 1) / 2; // 0 to 1
           this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * pulseValue;
         } else {
@@ -507,6 +518,7 @@ class Default extends Component<typeof Default> {
   }
   
   // Fades out the multiplier text with fall animation over 1500ms
+  // This is called when the timer hits 0, starting the fall from 50% to 0% opacity
   private fadeOutMultiplier(): void {
     const log = this.log.active("fadeOutMultiplier");
     
@@ -525,7 +537,7 @@ class Default extends Component<typeof Default> {
     const fadeDuration = 1500; // 1500ms fade out
     const fallDistance = 120; // Fall down 120 pixels
     const startTime = Date.now();
-    const startOpacity = this.dataContext.multiplierOpacity as number;
+    const startOpacity = 0.5; // Start from 50% (end of blink animation)
     const startScale = this.dataContext.multiplierScale as number;
     const startShakeY = this.dataContext.shakeY as number;
     
@@ -537,7 +549,7 @@ class Default extends Component<typeof Default> {
       const easeIn = progress * progress;
       const fallY = startShakeY + (fallDistance * easeIn);
       
-      // Fade opacity linearly
+      // Fade opacity from 50% to 0%
       const opacity = startOpacity * (1 - progress);
       
       // Scale down slightly as it fades
@@ -561,7 +573,7 @@ class Default extends Component<typeof Default> {
       }
     }, 16); // ~60fps
     
-    log.info("Started multiplier fade-out animation (1500ms)");
+    log.info("Started multiplier fall animation (1500ms from 50% to 0%)");
   }
   // #endregion
 

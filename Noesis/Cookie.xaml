@@ -35,25 +35,46 @@
 
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     
-    <!-- Golden god rays behind cookie (visible during streak) -->
-    <Viewbox x:Name="CookieGlow"
-             Width="{Binding GlowSize}"
-             Height="{Binding GlowSize}"
+    <!-- Golden glow rings behind cookie (4 rings, one per multiplier tier) -->
+    <!-- Each ring rotates in alternating directions -->
+    
+    <!-- Ring 4 (16x) - Outermost, solid yellow glow with 5% pulse -->
+    <Ellipse x:Name="CookieGlow4"
+             Width="{Binding Glow4Size}"
+             Height="{Binding Glow4Size}"
              HorizontalAlignment="Center"
              VerticalAlignment="Center"
-             Opacity="{Binding GlowOpacity}"
+             Opacity="{Binding Glow4Opacity}"
+             Fill="#FFFFD700"
+             RenderTransformOrigin="0.5,0.5"
+             IsHitTestVisible="False">
+      <Ellipse.OpacityMask>
+        <RadialGradientBrush>
+          <GradientStop Color="#FFFFFFFF" Offset="0.0"/>
+          <GradientStop Color="#DDFFFFFF" Offset="0.3"/>
+          <GradientStop Color="#66FFFFFF" Offset="0.6"/>
+          <GradientStop Color="#00FFFFFF" Offset="1.0"/>
+        </RadialGradientBrush>
+      </Ellipse.OpacityMask>
+      <Ellipse.RenderTransform>
+        <ScaleTransform ScaleX="{Binding Glow4Scale}" ScaleY="{Binding Glow4Scale}"/>
+      </Ellipse.RenderTransform>
+    </Ellipse>
+    
+    <!-- Ring 3 (8x) - Third layer, rotates counter-clockwise -->
+    <Viewbox x:Name="CookieGlow3"
+             Width="{Binding Glow3Size}"
+             Height="{Binding Glow3Size}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Opacity="{Binding Glow3Opacity}"
              RenderTransformOrigin="0.5,0.5"
              IsHitTestVisible="False"
              Stretch="Uniform">
       <Viewbox.RenderTransform>
-        <TransformGroup>
-          <ScaleTransform ScaleX="{Binding GlowScale}" ScaleY="{Binding GlowScale}"/>
-          <RotateTransform Angle="{Binding GlowRotation}"/>
-        </TransformGroup>
+        <RotateTransform Angle="{Binding Glow3Rotation}"/>
       </Viewbox.RenderTransform>
-      
       <Grid Width="576" Height="576">
-        <!-- Roulette wheel style - alternating pie segments with radial fade -->
         <Grid.OpacityMask>
           <RadialGradientBrush>
             <GradientStop Color="#FFFFFFFF" Offset="0.1"/>
@@ -62,33 +83,91 @@
             <GradientStop Color="#00FFFFFF" Offset="0.85"/>
           </RadialGradientBrush>
         </Grid.OpacityMask>
-        
-        <!-- 12 alternating pie segments (30° each) filling the full circle -->
-        <!-- Using arc paths: M center L startEdge A radius,radius 0 0 1 endEdge Z -->
-        
-        <!-- Segment 1 (0° to 30°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 576,288 A 288,288 0 0 0 538,144 Z"/>
-        <!-- Segment 2 (30° to 60°) - Dark Gold/Bronze -->
         <Path Fill="#FFB8860B" Data="M 288,288 L 538,144 A 288,288 0 0 0 432,38 Z"/>
-        <!-- Segment 3 (60° to 90°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 432,38 A 288,288 0 0 0 288,0 Z"/>
-        <!-- Segment 4 (90° to 120°) - Dark Gold/Bronze -->
         <Path Fill="#FFB8860B" Data="M 288,288 L 288,0 A 288,288 0 0 0 144,38 Z"/>
-        <!-- Segment 5 (120° to 150°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 144,38 A 288,288 0 0 0 38,144 Z"/>
-        <!-- Segment 6 (150° to 180°) - Dark Gold/Bronze -->
         <Path Fill="#FFB8860B" Data="M 288,288 L 38,144 A 288,288 0 0 0 0,288 Z"/>
-        <!-- Segment 7 (180° to 210°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 0,288 A 288,288 0 0 0 38,432 Z"/>
-        <!-- Segment 8 (210° to 240°) - Dark Gold/Bronze -->
         <Path Fill="#FFB8860B" Data="M 288,288 L 38,432 A 288,288 0 0 0 144,538 Z"/>
-        <!-- Segment 9 (240° to 270°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 144,538 A 288,288 0 0 0 288,576 Z"/>
-        <!-- Segment 10 (270° to 300°) - Dark Gold/Bronze -->
         <Path Fill="#FFB8860B" Data="M 288,288 L 288,576 A 288,288 0 0 0 432,538 Z"/>
-        <!-- Segment 11 (300° to 330°) - Bright Gold -->
         <Path Fill="#FFFFD700" Data="M 288,288 L 432,538 A 288,288 0 0 0 538,432 Z"/>
-        <!-- Segment 12 (330° to 360°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,432 A 288,288 0 0 0 576,288 Z"/>
+      </Grid>
+    </Viewbox>
+    
+    <!-- Ring 2 (4x) - Second layer, rotates clockwise -->
+    <Viewbox x:Name="CookieGlow2"
+             Width="{Binding Glow2Size}"
+             Height="{Binding Glow2Size}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Opacity="{Binding Glow2Opacity}"
+             RenderTransformOrigin="0.5,0.5"
+             IsHitTestVisible="False"
+             Stretch="Uniform">
+      <Viewbox.RenderTransform>
+        <RotateTransform Angle="{Binding Glow2Rotation}"/>
+      </Viewbox.RenderTransform>
+      <Grid Width="576" Height="576">
+        <Grid.OpacityMask>
+          <RadialGradientBrush>
+            <GradientStop Color="#FFFFFFFF" Offset="0.1"/>
+            <GradientStop Color="#DDFFFFFF" Offset="0.25"/>
+            <GradientStop Color="#66FFFFFF" Offset="0.5"/>
+            <GradientStop Color="#00FFFFFF" Offset="0.85"/>
+          </RadialGradientBrush>
+        </Grid.OpacityMask>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 576,288 A 288,288 0 0 0 538,144 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,144 A 288,288 0 0 0 432,38 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,38 A 288,288 0 0 0 288,0 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,0 A 288,288 0 0 0 144,38 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,38 A 288,288 0 0 0 38,144 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,144 A 288,288 0 0 0 0,288 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 0,288 A 288,288 0 0 0 38,432 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,432 A 288,288 0 0 0 144,538 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,538 A 288,288 0 0 0 288,576 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,576 A 288,288 0 0 0 432,538 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,538 A 288,288 0 0 0 538,432 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,432 A 288,288 0 0 0 576,288 Z"/>
+      </Grid>
+    </Viewbox>
+    
+    <!-- Ring 1 (2x) - Innermost, rotates counter-clockwise, appears just around cookie -->
+    <Viewbox x:Name="CookieGlow1"
+             Width="{Binding Glow1Size}"
+             Height="{Binding Glow1Size}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Opacity="{Binding Glow1Opacity}"
+             RenderTransformOrigin="0.5,0.5"
+             IsHitTestVisible="False"
+             Stretch="Uniform">
+      <Viewbox.RenderTransform>
+        <RotateTransform Angle="{Binding Glow1Rotation}"/>
+      </Viewbox.RenderTransform>
+      <Grid Width="576" Height="576">
+        <Grid.OpacityMask>
+          <RadialGradientBrush>
+            <GradientStop Color="#FFFFFFFF" Offset="0.1"/>
+            <GradientStop Color="#DDFFFFFF" Offset="0.25"/>
+            <GradientStop Color="#66FFFFFF" Offset="0.5"/>
+            <GradientStop Color="#00FFFFFF" Offset="0.85"/>
+          </RadialGradientBrush>
+        </Grid.OpacityMask>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 576,288 A 288,288 0 0 0 538,144 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,144 A 288,288 0 0 0 432,38 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,38 A 288,288 0 0 0 288,0 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,0 A 288,288 0 0 0 144,38 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,38 A 288,288 0 0 0 38,144 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,144 A 288,288 0 0 0 0,288 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 0,288 A 288,288 0 0 0 38,432 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,432 A 288,288 0 0 0 144,538 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,538 A 288,288 0 0 0 288,576 Z"/>
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,576 A 288,288 0 0 0 432,538 Z"/>
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,538 A 288,288 0 0 0 538,432 Z"/>
         <Path Fill="#FFB8860B" Data="M 288,288 L 538,432 A 288,288 0 0 0 576,288 Z"/>
       </Grid>
     </Viewbox>
