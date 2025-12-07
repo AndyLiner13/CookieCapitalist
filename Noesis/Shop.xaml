@@ -116,7 +116,7 @@
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     <Grid Background="{x:Null}">
       <Grid.RowDefinitions>
-        <RowDefinition Height="165"/>
+        <RowDefinition Height="140"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>

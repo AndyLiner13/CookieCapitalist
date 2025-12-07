@@ -94,9 +94,6 @@ export const LocalUIEvents = {
   // Dunk multiplier activated - triggers 2x multiplier for 10 seconds
   dunkMultiplier: new LocalEvent<{ multiplier: number; durationMs: number }>("local_dunk_multiplier"),
   
-  // Click rate update - sent from cookie to overlay during active multiplier
-  clickRateUpdate: new LocalEvent<{ clicksPerSecond: number; isActive: boolean }>("local_click_rate_update"),
-  
   // Fall animation started - sent from overlay when 3rd blink begins falling
   fallAnimationStarted: new LocalEvent("local_fall_animation_started"),
   

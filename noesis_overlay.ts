@@ -134,12 +134,6 @@ class Default extends Component<typeof Default> {
       LocalUIEvents.dunkMultiplier,
       (data: { multiplier: number; durationMs: number; isRefresh?: boolean }) => this.onDunkMultiplier(data)
     );
-    
-    // Listen for click rate updates
-    this.connectLocalBroadcastEvent(
-      LocalUIEvents.clickRateUpdate,
-      (data: { clicksPerSecond: number; isActive: boolean }) => this.onClickRateUpdate(data)
-    );
 
     // Build and set initial data context (commands are set once here)
     this.buildDataContext();
@@ -161,11 +155,6 @@ class Default extends Component<typeof Default> {
       // Header data
       cookieCount: formatCookieDisplay(this.cookies),
       cookiesPerSecond: formatCPSDisplay(this.cookiesPerSecond),
-      
-      // Click rate indicator (shown during active multiplier)
-      clicksPerSecondText: "",
-      clicksPerSecondVisible: false,
-      clicksPerSecondColor: "#ffffff",
       
       // Multiplier display
       multiplierText: "2x",
@@ -250,38 +239,6 @@ class Default extends Component<typeof Default> {
     this.cookies = (data.cookies as number) || 0;
     this.cookiesPerSecond = (data.cps as number) || 0;
     this.updateUI();
-  }
-  
-  private onClickRateUpdate(data: { clicksPerSecond: number; isActive: boolean }): void {
-    const log = this.log.inactive("onClickRateUpdate");
-    
-    if (!data.isActive) {
-      // Hide click rate indicator
-      this.dataContext.clicksPerSecondVisible = false;
-      this.dataContext.clicksPerSecondText = "";
-    } else {
-      // Show click rate with color coding
-      const cps = data.clicksPerSecond;
-      const requiredCps = 2; // CLICKS_PER_SECOND_THRESHOLD from noesis_cookie.ts
-      
-      this.dataContext.clicksPerSecondVisible = true;
-      this.dataContext.clicksPerSecondText = `⚡ ${cps.toFixed(1)} clicks/sec`;
-      
-      // Color coding: green if meeting threshold, yellow if close, red if low
-      if (cps >= requiredCps) {
-        this.dataContext.clicksPerSecondColor = "#4CAF50"; // Green
-      } else if (cps >= requiredCps * 0.75) {
-        this.dataContext.clicksPerSecondColor = "#FFC107"; // Yellow/amber
-      } else {
-        this.dataContext.clicksPerSecondColor = "#FF5722"; // Red/orange
-      }
-      
-      log.info(`Click rate: ${cps.toFixed(1)} CPS, color: ${this.dataContext.clicksPerSecondColor}`);
-    }
-    
-    if (this.noesisGizmo) {
-      this.noesisGizmo.dataContext = this.dataContext;
-    }
   }
   
   private onDunkMultiplier(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {

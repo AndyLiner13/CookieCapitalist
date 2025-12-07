@@ -43,7 +43,7 @@
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
 
   <Grid.RowDefinitions>
-    <RowDefinition Height="165"/>
+    <RowDefinition Height="140"/>
     <RowDefinition Height="Auto"/>
     <RowDefinition Height="*"/>
     <RowDefinition Height="124"/>
@@ -56,13 +56,6 @@
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
       <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
       <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
-      <!-- Click rate indicator (only visible during active multiplier) -->
-      <TextBlock Text="{Binding clicksPerSecondText}" 
-                 FontFamily="Fonts/#Anton-Regular" 
-                 FontSize="13" 
-                 Foreground="{Binding clicksPerSecondColor}" 
-                 TextAlignment="Center"
-                 Visibility="{Binding clicksPerSecondVisible, Converter={StaticResource BoolToVis}}"/>
     </StackPanel>
   </Border>
 

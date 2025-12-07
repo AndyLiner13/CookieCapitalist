@@ -72,7 +72,6 @@ class Default extends hz.Component<typeof Default> {
   // Click rate tracking for multiplier upgrades
   private clickTimestamps: number[] = [];
   private clickRateCheckTimerId: number | null = null;
-  private clickRateDisplayTimerId: number | null = null;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -364,9 +363,6 @@ class Default extends hz.Component<typeof Default> {
         // Start click rate checker (5-second window starts now)
         this.startClickRateChecker();
         
-        // Start click rate display updates (every 500ms)
-        this.startClickRateDisplay();
-        
         // Broadcast dunk multiplier event to overlay (triggers pop-in animation)
         this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
           multiplier: this.currentMultiplier,
@@ -471,53 +467,11 @@ class Default extends hz.Component<typeof Default> {
       this.async.clearInterval(this.clickRateCheckTimerId);
       this.clickRateCheckTimerId = null;
     }
-    if (this.clickRateDisplayTimerId !== null) {
-      this.async.clearInterval(this.clickRateDisplayTimerId);
-      this.clickRateDisplayTimerId = null;
-    }
-    
-    // Notify overlay that click rate is no longer active
-    this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
-      clicksPerSecond: 0,
-      isActive: false,
-    });
     
     // Fade out glow over 1500ms when streak ends
     this.fadeOutGlow();
   }
   
-  private startClickRateDisplay(): void {
-    // Clear existing timer if any
-    if (this.clickRateDisplayTimerId !== null) {
-      this.async.clearInterval(this.clickRateDisplayTimerId);
-    }
-    
-    // Update click rate display every 500ms
-    this.clickRateDisplayTimerId = this.async.setInterval(() => {
-      const now = Date.now();
-      
-      // Stop if multiplier expired
-      if (now >= this.multiplierEndTime || this.currentMultiplier <= 1) {
-        this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
-          clicksPerSecond: 0,
-          isActive: false,
-        });
-        return;
-      }
-      
-      // Calculate current click count in window
-      this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
-      const clickCount = this.clickTimestamps.length;
-      const clicksPerSecond = clickCount / (CLICK_RATE_WINDOW_MS / 1000);
-      
-      // Broadcast to overlay
-      this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
-        clicksPerSecond: clicksPerSecond,
-        isActive: true,
-      });
-    }, 500);
-  }
-
   private showPopup(text: string): void {
     const log = this.log.inactive("showPopup");
 
