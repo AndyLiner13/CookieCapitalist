@@ -28,12 +28,12 @@ import {
 const LEADERBOARD_HIDDEN_POS = new Vec3(0, -100, 0);
 // Distance in front of camera when visible
 const LEADERBOARD_DISTANCE_FROM_CAMERA = 1.23; // 2 meters in front of camera
-// Aggressive BorisFX s_shake style - exponential intensity scaling
+// Subtle shake effect - just a few pixels of movement
 // Range = pixels of shake, frequency = new target chance per frame, speed = lerp speed
-const SHAKE_2X = { range: 4, frequency: 0.4, speed: 0.25 };    // 2x: noticeable shake
-const SHAKE_4X = { range: 6, frequency: 0.4, speed: 0.28 };    // 4x: moderate shake
-const SHAKE_8X = { range: 9, frequency: 0.45, speed: 0.32 };   // 8x: stronger shake
-const SHAKE_16X = { range: 14, frequency: 0.5, speed: 0.38 };  // 16x: intense shake
+const SHAKE_2X = { range: 2, frequency: 0.4, speed: 0.25 };    // 2x: subtle shake
+const SHAKE_4X = { range: 3, frequency: 0.4, speed: 0.28 };    // 4x: slightly more
+const SHAKE_8X = { range: 4, frequency: 0.45, speed: 0.32 };   // 8x: moderate shake
+const SHAKE_16X = { range: 5, frequency: 0.5, speed: 0.38 };   // 16x: noticeable shake
 const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
 const PULSE_MIN_OPACITY = 0.35; // Never go below 35% opacity
 const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
@@ -516,11 +516,24 @@ class Default extends Component<typeof Default> {
   private updateUI(): void {
     if (!this.noesisGizmo) return;
     
+    // Calculate effective CPS with multiplier if active
+    const activeMultiplier = this.getActiveMultiplier();
+    const effectiveCps = this.cookiesPerSecond * activeMultiplier;
+    
     // Only update header values - DON'T recreate commands!
     this.dataContext.cookieCount = formatCookieDisplay(this.cookies);
-    this.dataContext.cookiesPerSecond = formatCPSDisplay(this.cookiesPerSecond);
+    this.dataContext.cookiesPerSecond = formatCPSDisplay(effectiveCps);
     
     this.noesisGizmo.dataContext = this.dataContext;
+  }
+  
+  // Returns the active streak multiplier, or 1 if streak has expired
+  private getActiveMultiplier(): number {
+    const now = Date.now();
+    if (now < this.multiplierEndTime && this.currentMultiplier > 1) {
+      return this.currentMultiplier;
+    }
+    return 1;
   }
   // #endregion
 }

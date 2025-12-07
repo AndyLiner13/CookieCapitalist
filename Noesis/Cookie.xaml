@@ -35,6 +35,30 @@
 
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     
+    <!-- Golden glow behind cookie (visible during streak) -->
+    <Ellipse x:Name="CookieGlow"
+             Width="{Binding GlowSize}"
+             Height="{Binding GlowSize}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Opacity="{Binding GlowOpacity}"
+             RenderTransformOrigin="0.5,0.5"
+             IsHitTestVisible="False">
+      <Ellipse.RenderTransform>
+        <TransformGroup>
+          <ScaleTransform ScaleX="{Binding GlowScale}" ScaleY="{Binding GlowScale}"/>
+          <RotateTransform Angle="{Binding GlowRotation}"/>
+        </TransformGroup>
+      </Ellipse.RenderTransform>
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#FFFFD700" Offset="0"/>
+          <GradientStop Color="#80FFD700" Offset="0.4"/>
+          <GradientStop Color="#00FFD700" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+    
     <!-- Cookie image (non-interactive - clicks handled via raycast + collider in controller_player.ts) -->
     <Border x:Name="CookieContainer"
             Width="256"

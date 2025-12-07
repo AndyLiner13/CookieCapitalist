@@ -21,10 +21,19 @@ import {
 // #region 🏷️ Type Definitions
 const POPUP_COUNT = 40;
 const DUNK_BASE_MULTIPLIER = 2;
-const DUNK_DURATION_MS = 15000; // 15 seconds for all multipliers
 const MAX_MULTIPLIER = 16; // Maximum multiplier cap
-const CLICKS_PER_SECOND_THRESHOLD = 2; // Required click rate to double multiplier
-const CLICK_RATE_WINDOW_MS = 5000; // 5 second window to maintain click rate
+const CLICK_RATE_WINDOW_MS = 5000; // 5 second window to count clicks
+
+// Click thresholds to upgrade multiplier (clicks needed in 5 second window)
+const CLICKS_TO_4X = 20;  // 2x -> 4x: 10 clicks in 5 seconds
+const CLICKS_TO_8X = 30;  // 4x -> 8x: 15 clicks in 5 seconds  
+const CLICKS_TO_16X = 40; // 8x -> 16x: 20 clicks in 5 seconds
+
+// Timeout durations per multiplier tier (ms)
+const TIMEOUT_2X = 15000;  // 15 seconds
+const TIMEOUT_4X = 12000;  // 12 seconds
+const TIMEOUT_8X = 9000;   // 9 seconds
+const TIMEOUT_16X = 6000;  // 6 seconds
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -32,6 +41,8 @@ class Default extends hz.Component<typeof Default> {
   static propsDefinition = {
     popupFontSize: { type: hz.PropTypes.Number, default: 48 },
     popupColor: { type: hz.PropTypes.String, default: "#FFFFFF" },
+    glowSize: { type: hz.PropTypes.Number, default: 576 },
+    glowSpinSpeed: { type: hz.PropTypes.Number, default: 0.5 }, // degrees per frame
   };
   // #endregion
 
@@ -48,11 +59,14 @@ class Default extends hz.Component<typeof Default> {
   private currentMultiplier: number = 1;
   private multiplierEndTime: number = 0;
   
+  // Glow rotation state
+  private glowRotation: number = 0;
+  private glowSpinTimerId: number | null = null;
+  
   // Click rate tracking for multiplier upgrades
   private clickTimestamps: number[] = [];
   private clickRateCheckTimerId: number | null = null;
   private clickRateDisplayTimerId: number | null = null;
-  private consecutiveGoodIntervals: number = 0;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -115,6 +129,10 @@ class Default extends hz.Component<typeof Default> {
       dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
+      GlowOpacity: 0,
+      GlowScale: 1,
+      GlowSize: this.props.glowSize,
+      GlowRotation: 0,
     };
 
     for (let i = 0; i < POPUP_COUNT; i++) {
@@ -176,14 +194,26 @@ class Default extends hz.Component<typeof Default> {
       // Keep only clicks from the last 5 seconds
       this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
       
-      // Reset multiplier timer on click
-      this.multiplierEndTime = now + DUNK_DURATION_MS;
-      // Broadcast updated timer to overlay (don't trigger pop-in, just refresh timer)
-      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
-        multiplier: this.currentMultiplier,
-        durationMs: DUNK_DURATION_MS,
-        isRefresh: true,
-      });
+      // Store multiplier before upgrade check
+      const multiplierBeforeCheck = this.currentMultiplier;
+      
+      // Check if we've reached the click threshold to upgrade
+      // This may clear clickTimestamps and update currentMultiplier
+      this.checkMultiplierUpgrade();
+      
+      // Only broadcast refresh if multiplier didn't change (upgrade broadcasts its own event)
+      if (this.currentMultiplier === multiplierBeforeCheck) {
+        // Reset multiplier timer on click (use tier-specific timeout)
+        const currentTimeout = this.getTimeoutForMultiplier(this.currentMultiplier);
+        this.multiplierEndTime = now + currentTimeout;
+        
+        // Broadcast updated timer to overlay (don't trigger pop-in, just refresh timer)
+        this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+          multiplier: this.currentMultiplier,
+          durationMs: currentTimeout,
+          isRefresh: true,
+        });
+      }
     }
 
     // Show +# popup (with multiplier if active)
@@ -248,46 +278,25 @@ class Default extends hz.Component<typeof Default> {
       log.info("Already dunking, ignoring");
       return;
     }
-
-    this.isDunking = true;
     
     const now = Date.now();
     const isMultiplierActive = now < this.multiplierEndTime && this.currentMultiplier > 1;
     
-    // If multiplier is already active, just refresh the timer (don't reset to 2x)
+    // Block dunking while multiplier is active
     if (isMultiplierActive) {
-      this.multiplierEndTime = now + DUNK_DURATION_MS;
-      log.info(`Dunk refreshed timer for ${this.currentMultiplier}x multiplier`);
-      
-      // Broadcast refresh to overlay
-      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
-        multiplier: this.currentMultiplier,
-        durationMs: DUNK_DURATION_MS,
-        isRefresh: true,
-      });
-    } else {
-      // No active multiplier - start fresh at 2x
-      this.currentMultiplier = DUNK_BASE_MULTIPLIER;
-      this.multiplierEndTime = now + DUNK_DURATION_MS;
-      
-      // Reset click tracking
-      this.clickTimestamps = [];
-      this.consecutiveGoodIntervals = 0;
-      
-      // Start click rate checker
-      this.startClickRateChecker();
-      
-      // Start click rate display updates (every 500ms)
-      this.startClickRateDisplay();
-      
-      // Broadcast dunk multiplier event to overlay
-      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
-        multiplier: this.currentMultiplier,
-        durationMs: DUNK_DURATION_MS,
-        isRefresh: false,
-      });
-      log.info(`Dunk started multiplier at ${this.currentMultiplier}x for ${DUNK_DURATION_MS}ms`);
+      log.info("Multiplier already active, cannot dunk again");
+      return;
     }
+
+    this.isDunking = true;
+    
+    // No active multiplier - start fresh at 2x
+    this.currentMultiplier = DUNK_BASE_MULTIPLIER;
+    const initialTimeout = this.getTimeoutForMultiplier(DUNK_BASE_MULTIPLIER);
+    this.multiplierEndTime = Date.now() + initialTimeout + 1700; // Add dunk animation time
+    
+    // Reset click tracking
+    this.clickTimestamps = [];
 
     this.dataContext.dunkAnimate = false;
     if (this.noesisGizmo) {
@@ -300,14 +309,96 @@ class Default extends hz.Component<typeof Default> {
         this.noesisGizmo.dataContext = this.dataContext;
       }
 
+      // After dunk animation completes (1700ms), show multiplier and glow
       this.async.setTimeout(() => {
         this.dataContext.dunkAnimate = false;
         this.isDunking = false;
         if (this.noesisGizmo) {
           this.noesisGizmo.dataContext = this.dataContext;
         }
+        
+        // NOW show the multiplier and glow after animation completes
+        // Start click rate checker
+        this.startClickRateChecker();
+        
+        // Start click rate display updates (every 500ms)
+        this.startClickRateDisplay();
+        
+        // Broadcast dunk multiplier event to overlay
+        this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+          multiplier: this.currentMultiplier,
+          durationMs: this.getTimeoutForMultiplier(this.currentMultiplier),
+          isRefresh: false,
+        });
+        
+        // Update glow opacity for new multiplier
+        this.updateGlowOpacity(this.currentMultiplier);
+        
+        // Start glow spin animation
+        this.startGlowSpin();
+        
+        log.info(`Dunk animation complete - showing ${this.currentMultiplier}x multiplier for ${this.getTimeoutForMultiplier(this.currentMultiplier)}ms`);
       }, 1700);
     }, 50);
+  }
+  
+  // Returns the timeout duration for a given multiplier tier
+  private getTimeoutForMultiplier(multiplier: number): number {
+    switch (multiplier) {
+      case 2: return TIMEOUT_2X;
+      case 4: return TIMEOUT_4X;
+      case 8: return TIMEOUT_8X;
+      case 16: return TIMEOUT_16X;
+      default: return TIMEOUT_2X;
+    }
+  }
+  
+  // Returns the click threshold needed to upgrade from current multiplier
+  private getClickThresholdForUpgrade(currentMultiplier: number): number {
+    switch (currentMultiplier) {
+      case 2: return CLICKS_TO_4X;   // Need 10 clicks to go 2x -> 4x
+      case 4: return CLICKS_TO_8X;   // Need 15 clicks to go 4x -> 8x
+      case 8: return CLICKS_TO_16X;  // Need 20 clicks to go 8x -> 16x
+      default: return Infinity;      // At max, can't upgrade
+    }
+  }
+  
+  // Checks if user has clicked enough to upgrade multiplier
+  private checkMultiplierUpgrade(): void {
+    const log = this.log.active("checkMultiplierUpgrade");
+    
+    if (this.currentMultiplier >= MAX_MULTIPLIER) {
+      return; // Already at max
+    }
+    
+    const clickCount = this.clickTimestamps.length;
+    const threshold = this.getClickThresholdForUpgrade(this.currentMultiplier);
+    
+    log.info(`Click count: ${clickCount}/${threshold} for upgrade from ${this.currentMultiplier}x`);
+    
+    if (clickCount >= threshold) {
+      // Upgrade multiplier!
+      this.currentMultiplier *= 2;
+      
+      // Clear click cache for the new tier
+      this.clickTimestamps = [];
+      
+      // Set new timeout for upgraded tier
+      const newTimeout = this.getTimeoutForMultiplier(this.currentMultiplier);
+      this.multiplierEndTime = Date.now() + newTimeout;
+      
+      log.info(`Multiplier upgraded to ${this.currentMultiplier}x! New timeout: ${newTimeout}ms`);
+      
+      // Broadcast new multiplier with pop-in animation
+      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+        multiplier: this.currentMultiplier,
+        durationMs: newTimeout,
+        isRefresh: false,
+      });
+      
+      // Update glow opacity for increased multiplier
+      this.updateGlowOpacity(this.currentMultiplier);
+    }
   }
   
   private startClickRateChecker(): void {
@@ -318,44 +409,17 @@ class Default extends hz.Component<typeof Default> {
       this.async.clearInterval(this.clickRateCheckTimerId);
     }
     
-    // Check click rate every second
+    // Check for multiplier expiration every 100ms
     this.clickRateCheckTimerId = this.async.setInterval(() => {
       const now = Date.now();
       
       // Stop checking if multiplier expired
       if (now >= this.multiplierEndTime || this.currentMultiplier <= 1) {
         this.stopClickRateChecker();
+        log.info("Multiplier expired");
         return;
       }
-      
-      // Calculate clicks per second over the last 5 seconds
-      this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
-      const clicksPerSecond = this.clickTimestamps.length / (CLICK_RATE_WINDOW_MS / 1000);
-      
-      log.info(`Click rate: ${clicksPerSecond.toFixed(2)} CPS (need ${CLICKS_PER_SECOND_THRESHOLD}), consecutive good: ${this.consecutiveGoodIntervals}`);
-      
-      if (clicksPerSecond >= CLICKS_PER_SECOND_THRESHOLD) {
-        this.consecutiveGoodIntervals++;
-        
-        // After 5 consecutive good intervals (5 seconds), double the multiplier
-        if (this.consecutiveGoodIntervals >= 5 && this.currentMultiplier < MAX_MULTIPLIER) {
-          this.currentMultiplier *= 2;
-          this.consecutiveGoodIntervals = 0;
-          
-          log.info(`Multiplier doubled to ${this.currentMultiplier}x!`);
-          
-          // Broadcast new multiplier with pop-in animation
-          this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
-            multiplier: this.currentMultiplier,
-            durationMs: this.multiplierEndTime - now,
-            isRefresh: false,
-          });
-        }
-      } else {
-        // Reset consecutive counter if click rate drops
-        this.consecutiveGoodIntervals = 0;
-      }
-    }, 1000);
+    }, 100);
   }
   
   private stopClickRateChecker(): void {
@@ -367,13 +431,16 @@ class Default extends hz.Component<typeof Default> {
       this.async.clearInterval(this.clickRateDisplayTimerId);
       this.clickRateDisplayTimerId = null;
     }
-    this.consecutiveGoodIntervals = 0;
     
     // Notify overlay that click rate is no longer active
     this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
       clicksPerSecond: 0,
       isActive: false,
     });
+    
+    // Reset glow when streak ends
+    this.updateGlowOpacity(1);
+    this.stopGlowSpin();
   }
   
   private startClickRateDisplay(): void {
@@ -395,9 +462,10 @@ class Default extends hz.Component<typeof Default> {
         return;
       }
       
-      // Calculate current click rate
+      // Calculate current click count in window
       this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
-      const clicksPerSecond = this.clickTimestamps.length / (CLICK_RATE_WINDOW_MS / 1000);
+      const clickCount = this.clickTimestamps.length;
+      const clicksPerSecond = clickCount / (CLICK_RATE_WINDOW_MS / 1000);
       
       // Broadcast to overlay
       this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
@@ -435,6 +503,78 @@ class Default extends hz.Component<typeof Default> {
     }
 
     log.info(`Showing popup ${popupIndex}: ${text}`);
+  }
+  
+  // Updates the golden glow opacity and scale behind the cookie based on multiplier
+  // Opacity starts at 50% for 2x and increases proportionally to MAX_MULTIPLIER
+  // Scale starts at 1.0 for 2x and increases 10% per tier (2x=1.0, 4x=1.1, 8x=1.2, 16x=1.3)
+  private updateGlowOpacity(multiplier: number): void {
+    const log = this.log.inactive("updateGlowOpacity");
+    
+    if (multiplier <= 1) {
+      // No multiplier - hide glow
+      this.dataContext.GlowOpacity = 0;
+      this.dataContext.GlowScale = 1;
+    } else {
+      // Calculate opacity: starts at 50% for 2x, scales up to 100% at max
+      // tier 0 (2x) = 0.5, tier 1 (4x) = 0.67, tier 2 (8x) = 0.83, tier 3 (16x) = 1.0
+      const tier = Math.log2(multiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
+      const maxTier = Math.log2(MAX_MULTIPLIER) - 1; // 3 for max of 16x
+      const opacity = 0.5 + (0.5 * (tier / maxTier));
+      
+      // Calculate scale: 1.0 at 2x, +10% per tier
+      const scale = 1.0 + (tier * 0.1);
+      
+      this.dataContext.GlowOpacity = opacity;
+      this.dataContext.GlowScale = scale;
+    }
+    
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    log.info(`Glow: opacity=${(this.dataContext.GlowOpacity as number).toFixed(2)}, scale=${(this.dataContext.GlowScale as number).toFixed(2)} for multiplier ${multiplier}x`);
+  }
+  
+  // Starts the glow rotation animation
+  private startGlowSpin(): void {
+    const log = this.log.inactive("startGlowSpin");
+    
+    // Stop existing timer if any
+    if (this.glowSpinTimerId !== null) {
+      this.async.clearInterval(this.glowSpinTimerId);
+    }
+    
+    // Reset rotation
+    this.glowRotation = 0;
+    
+    // Start spinning at configured speed (default 0.5 degrees per frame = ~30 deg/sec at 60fps)
+    this.glowSpinTimerId = this.async.setInterval(() => {
+      this.glowRotation = (this.glowRotation + this.props.glowSpinSpeed) % 360;
+      this.dataContext.GlowRotation = this.glowRotation;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 16); // ~60fps
+    
+    log.info(`Glow spin started at ${this.props.glowSpinSpeed} deg/frame`);
+  }
+  
+  // Stops the glow rotation animation
+  private stopGlowSpin(): void {
+    if (this.glowSpinTimerId !== null) {
+      this.async.clearInterval(this.glowSpinTimerId);
+      this.glowSpinTimerId = null;
+    }
+    
+    // Reset rotation
+    this.glowRotation = 0;
+    this.dataContext.GlowRotation = 0;
+    
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
   }
   // #endregion
 }

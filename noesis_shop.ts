@@ -45,6 +45,10 @@ class Default extends hz.Component<typeof Default> {
   private productionProgress: { [upgradeId: string]: number } = {};
   private lastTickTime: number = 0;
   private static readonly TICK_RATE_MS = 50;
+  
+  // Streak multiplier tracking
+  private streakMultiplier: number = 1;
+  private streakEndTime: number = 0;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -77,6 +81,12 @@ class Default extends hz.Component<typeof Default> {
     this.connectNetworkBroadcastEvent(
       UIEvents.toClient,
       (data: UIEventPayload) => this.handleStateChanged(data)
+    );
+    
+    // Listen for streak multiplier updates from cookie component
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.dunkMultiplier,
+      (data: { multiplier: number; durationMs: number; isRefresh?: boolean }) => this.onStreakMultiplierUpdate(data)
     );
 
     // Start production timer tick
@@ -209,7 +219,11 @@ class Default extends hz.Component<typeof Default> {
       this.productionProgress[config.id] = (this.productionProgress[config.id] || 0) + progressIncrement;
 
       if (this.productionProgress[config.id] >= 1) {
-        const cookiesEarned = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
+        const baseCookiesEarned = calculateCookiesPerCycle(config.cookiesPerCycle, owned);
+        
+        // Apply streak multiplier if active
+        const activeMultiplier = this.getActiveStreakMultiplier();
+        const cookiesEarned = baseCookiesEarned * activeMultiplier;
 
         this.sendNetworkBroadcastEvent(GameEvents.toServer, {
           type: "production_complete",
@@ -282,6 +296,24 @@ class Default extends hz.Component<typeof Default> {
       type: "buy_upgrade",
       upgradeId: upgradeId,
     });
+  }
+  
+  private onStreakMultiplierUpdate(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {
+    const log = this.log.inactive("onStreakMultiplierUpdate");
+    
+    this.streakMultiplier = data.multiplier;
+    this.streakEndTime = Date.now() + data.durationMs;
+    
+    log.info(`Streak multiplier updated: ${data.multiplier}x for ${data.durationMs}ms`);
+  }
+  
+  // Returns the active streak multiplier, or 1 if streak has expired
+  private getActiveStreakMultiplier(): number {
+    const now = Date.now();
+    if (now < this.streakEndTime && this.streakMultiplier > 1) {
+      return this.streakMultiplier;
+    }
+    return 1;
   }
   // #endregion
 }
