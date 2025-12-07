@@ -1,0 +1,201 @@
+<!-- 
+  WelcomeBack Modal - Displays offline earnings (Screen Overlay)
+  Display Mode: Screen Overlay, Render Order: 100 (top layer - covers everything)
+  Input Mode: Interactive, blocking
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="WelcomeBack_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852">
+
+  <Page.Resources>
+    <ResourceDictionary>
+      <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+      
+      <!-- Colors -->
+      <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="#cc000000"/>
+      <SolidColorBrush x:Key="ModalBackgroundBrush" Color="#2a1810"/>
+      <SolidColorBrush x:Key="CollectButtonBrush" Color="#fa9750"/>
+      <SolidColorBrush x:Key="PrimaryTextBrush" Color="#ffffff"/>
+      <SolidColorBrush x:Key="AccentTextBrush" Color="#FFD700"/>
+      
+      <!-- Typography -->
+      <FontFamily x:Key="HeadingFont">Fonts/#Bangers-Regular</FontFamily>
+      <FontFamily x:Key="BodyFont">Fonts/#Anton-Regular</FontFamily>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TitleFontSize">48</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CookiesFontSize">64</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="LabelFontSize">20</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimeFontSize">24</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ButtonFontSize">28</sys:Double>
+      
+      <!-- Layout -->
+      <CornerRadius x:Key="ModalCornerRadius">16</CornerRadius>
+      <CornerRadius x:Key="ButtonCornerRadius">12</CornerRadius>
+      
+      <!-- Button Style -->
+      <Style x:Key="CollectButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource CollectButtonBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="32,12"/>
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}" 
+                      CornerRadius="{StaticResource ButtonCornerRadius}"
+                      Padding="{TemplateBinding Padding}">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </Page.Resources>
+
+    <!-- Full-screen container (always present for proper page sizing) -->
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
+    
+    <!-- Semi-transparent overlay + modal, visibility controlled by TypeScript (isVisible) -->
+    <Grid Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
+        <Grid.Background>
+            <SolidColorBrush Color="#CC000000"/>
+        </Grid.Background>
+    
+    <!-- Center modal card -->
+    <Border
+            CornerRadius="{StaticResource ModalCornerRadius}"
+            Padding="32,40"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Width="340">
+            <Border.Background>
+                <SolidColorBrush Color="#FF000000" Opacity="0.985"/>
+            </Border.Background>
+      
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+        
+        <!-- Title -->
+        <TextBlock Text="Welcome Back!"
+                   FontFamily="{StaticResource HeadingFont}"
+                   FontSize="{StaticResource TitleFontSize}"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   TextAlignment="Center"
+                   Margin="0,0,0,24"/>
+        
+        <!-- Label: While you were away -->
+        <TextBlock Text="While you were away for"
+                   FontFamily="{StaticResource BodyFont}"
+                   FontSize="{StaticResource LabelFontSize}"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   TextAlignment="Center"
+                   Margin="0,0,0,8"/>
+        
+        <!-- Time away display (bound to dataContext.timeAway) -->
+        <TextBlock Text="{Binding timeAway}"
+             d:Text="2d 5h 30m"
+                   FontFamily="{StaticResource BodyFont}"
+                   FontSize="{StaticResource TimeFontSize}"
+                   Foreground="{StaticResource AccentTextBrush}"
+                   TextAlignment="Center"
+                   Margin="0,0,0,32"/>
+        
+        <!-- Label: You earned -->
+        <TextBlock Text="You earned"
+                   FontFamily="{StaticResource BodyFont}"
+                   FontSize="{StaticResource LabelFontSize}"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   TextAlignment="Center"
+                   Margin="0,0,0,8"/>
+        
+        <!-- Cookies earned display (bound to dataContext.cookiesEarned) -->
+        <TextBlock Text="{Binding cookiesEarned}"
+             d:Text="15.2K"
+                   FontFamily="{StaticResource HeadingFont}"
+                   FontSize="{StaticResource CookiesFontSize}"
+                   Foreground="{StaticResource AccentTextBrush}"
+                   TextAlignment="Center"
+                   Margin="0,0,0,40">
+          <TextBlock.Effect>
+            <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Opacity="1" Direction="315"/>
+          </TextBlock.Effect>
+        </TextBlock>
+        
+        <!-- Collect button with press animation -->
+        <Button Content="Collect"
+                Style="{StaticResource CollectButtonStyle}"
+                Command="{Binding onCollect}"
+                HorizontalAlignment="Center"
+                RenderTransformOrigin="0.5,0.5">
+          <Button.RenderTransform>
+            <ScaleTransform x:Name="CollectButtonScale" ScaleX="1" ScaleY="1"/>
+          </Button.RenderTransform>
+          <b:Interaction.Triggers>
+            <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+              <b:ControlStoryboardAction>
+                <b:ControlStoryboardAction.Storyboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     To="0.9" Duration="0:0:0.05"/>
+                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     To="0.9" Duration="0:0:0.05"/>
+                  </Storyboard>
+                </b:ControlStoryboardAction.Storyboard>
+              </b:ControlStoryboardAction>
+            </b:EventTrigger>
+            <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+              <b:ControlStoryboardAction>
+                <b:ControlStoryboardAction.Storyboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                     Storyboard.TargetProperty="ScaleX"
+                                     To="1" Duration="0:0:0.15">
+                      <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseOut"/>
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                     Storyboard.TargetProperty="ScaleY"
+                                     To="1" Duration="0:0:0.15">
+                      <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseOut"/>
+                      </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                  </Storyboard>
+                </b:ControlStoryboardAction.Storyboard>
+              </b:ControlStoryboardAction>
+            </b:EventTrigger>
+          </b:Interaction.Triggers>
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="{TemplateBinding Background}" 
+                      CornerRadius="{StaticResource ButtonCornerRadius}"
+                      Padding="48,16">
+                <TextBlock Text="{TemplateBinding Content}"
+                          FontFamily="{StaticResource BodyFont}"
+                          FontSize="{StaticResource ButtonFontSize}"
+                          Foreground="{StaticResource PrimaryTextBrush}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
+        
+      </StackPanel>
+      
+    </Border>
+    
+  </Grid>
+  
+  </Grid>
+  
+</Page>

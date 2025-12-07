@@ -13,6 +13,7 @@ export interface GameState {
   cookiesPerClick: number;
   upgrades: { [upgradeId: string]: number };
   lastSaveTime: number;
+  lastJoinTime: number;
 }
 
 // Upgrade configuration (static data)
@@ -47,7 +48,7 @@ export type GameEventPayload = {
 
 export type UIEventPayload = {
   [key: string]: SerializableState;
-  type: "state_update" | "purchase_result";
+  type: "state_update" | "purchase_result" | "welcome_back";
 };
 // #endregion
 
@@ -263,6 +264,7 @@ export function createDefaultGameState(): GameState {
     cookiesPerClick: BASE_COOKIES_PER_CLICK,
     upgrades,
     lastSaveTime: Date.now(),
+    lastJoinTime: Date.now(),
   };
 }
 // #endregion

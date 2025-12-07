@@ -14,12 +14,10 @@
   d:DataContext="MobileOnly_DataSet"
   d:DesignWidth="393"
   d:DesignHeight="852"
-  Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Page}}"
-  Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}"
   Background="#E6000000"
   IsHitTestVisible="True">
 
-  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Page}}" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}" IsHitTestVisible="True">
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" IsHitTestVisible="True">
     <!-- Dark overlay background - Transparent background makes entire area clickable -->
     
     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="32" MaxWidth="320" IsHitTestVisible="False">

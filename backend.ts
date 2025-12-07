@@ -48,6 +48,8 @@ const PPV_GROUP = "CookieCapitalist";
 const PPV_COOKIES = `${PPV_GROUP}:Cookies`;
 const PPV_TOTAL_COOKIES = `${PPV_GROUP}:TotalCookies`;
 const PPV_UPGRADES = `${PPV_GROUP}:Upgrades`;
+const PPV_LAST_JOIN_TIME = `${PPV_GROUP}:LastJoinTime`;
+const PPV_LAST_SAVE_TIME = `${PPV_GROUP}:LastSaveTime`;
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -421,9 +423,19 @@ class Default extends Component<typeof Default> {
       const upgradesRaw = this.world.persistentStorage.getPlayerVariable<{ [key: string]: number }>(player, PPV_UPGRADES);
       log.info(`[PPV READ] ${PPV_UPGRADES} = ${JSON.stringify(upgradesRaw)} (type: ${typeof upgradesRaw})`);
       
+      // Load last join time (Number type - returns 0 if not set)
+      const lastJoinTime = this.world.persistentStorage.getPlayerVariable(player, PPV_LAST_JOIN_TIME);
+      log.info(`[PPV READ] ${PPV_LAST_JOIN_TIME} = ${lastJoinTime} (type: ${typeof lastJoinTime})`);
+      
+      // Load last save time (Object type - returns timestamp)
+      const lastSaveTimeRaw = this.world.persistentStorage.getPlayerVariable<{ timestamp: number }>(player, PPV_LAST_SAVE_TIME);
+      log.info(`[PPV READ] ${PPV_LAST_SAVE_TIME} = ${JSON.stringify(lastSaveTimeRaw)} (type: ${typeof lastSaveTimeRaw})`);
+      
       // Apply loaded values to game state
       this.gameState.cookies = typeof cookies === "number" ? cookies : 0;
       this.gameState.totalCookiesEarned = typeof totalCookies === "number" ? totalCookies : 0;
+      this.gameState.lastJoinTime = typeof lastJoinTime === "number" && lastJoinTime > 0 ? lastJoinTime : Date.now();
+      this.gameState.lastSaveTime = (lastSaveTimeRaw && typeof lastSaveTimeRaw === "object" && lastSaveTimeRaw.timestamp) ? lastSaveTimeRaw.timestamp : Date.now();
       
       // Handle upgrades - could be 0 (default), null, or an object
       if (upgradesRaw && typeof upgradesRaw === "object" && upgradesRaw !== null) {
@@ -437,6 +449,43 @@ class Default extends Component<typeof Default> {
       
       // Recalculate CPS based on loaded upgrades
       this.recalculateCPS();
+      
+      // Calculate offline earnings if player has been away
+      const now = Date.now();
+      // Calculate time since last save (not last join) for offline earnings
+      const timeSinceLastSaveMs = Math.abs(now - this.gameState.lastSaveTime);
+      let offlineCookies = 0;
+      
+      // Always show welcome back modal (even with 0 offline earnings for testing)
+      // Calculate offline earnings if player has production upgrades
+      if (this.cookiesPerSecond > 0 && timeSinceLastSaveMs > 0) {
+        // Cap offline time to 7 days to prevent overflow
+        const cappedTimeMs = Math.min(timeSinceLastSaveMs, 7 * 24 * 60 * 60 * 1000);
+        offlineCookies = Math.abs(Math.floor((cappedTimeMs / 1000) * this.cookiesPerSecond));
+        
+        // Award offline cookies
+        this.gameState.cookies += offlineCookies;
+        this.gameState.totalCookiesEarned += offlineCookies;
+        
+        log.info(`[OFFLINE EARNINGS] Time since last save: ${timeSinceLastSaveMs}ms (${cappedTimeMs}ms capped)`);
+        log.info(`[OFFLINE EARNINGS] Earned ${offlineCookies} cookies (${this.cookiesPerSecond} CPS)`);
+      } else {
+        log.info(`[OFFLINE EARNINGS] No CPS or no time since save, showing welcome modal with 0 cookies`);
+      }
+      
+      // Always send welcome back event to client (ensure non-negative values)
+      this.async.setTimeout(() => {
+        const welcomeData: UIEventPayload = {
+          type: "welcome_back",
+          offlineCookies: Math.abs(offlineCookies),
+          timeAwayMs: Math.abs(timeSinceLastSaveMs),
+        };
+        this.sendNetworkBroadcastEvent(UIEvents.toClient, welcomeData);
+        log.info(`[WELCOME BACK] Sent event: ${offlineCookies} cookies, ${timeSinceLastSaveMs}ms since last save`);
+      }, 1000);
+      
+      // Update last join time to now
+      this.gameState.lastJoinTime = now;
       
       log.info(`Loaded PPV state for ${player.name.get()}: ${this.gameState.cookies} cookies, ${this.gameState.totalCookiesEarned} total, ${Object.values(this.gameState.upgrades).reduce((a, b) => a + b, 0)} upgrades`);
       
@@ -480,10 +529,17 @@ class Default extends Component<typeof Default> {
       const cookiesToSave = Math.floor(this.gameState.cookies);
       const totalToSave = Math.floor(this.gameState.totalCookiesEarned);
       const upgradesToSave = this.gameState.upgrades;
+      const lastJoinTimeToSave = this.gameState.lastJoinTime;
+      const lastSaveTimeToSave = Date.now();
+      
+      // Update gameState with save time
+      this.gameState.lastSaveTime = lastSaveTimeToSave;
       
       log.info(`[PPV WRITE] ${PPV_COOKIES} = ${cookiesToSave}`);
       log.info(`[PPV WRITE] ${PPV_TOTAL_COOKIES} = ${totalToSave}`);
       log.info(`[PPV WRITE] ${PPV_UPGRADES} = ${JSON.stringify(upgradesToSave)}`);
+      log.info(`[PPV WRITE] ${PPV_LAST_JOIN_TIME} = ${lastJoinTimeToSave}`);
+      log.info(`[PPV WRITE] ${PPV_LAST_SAVE_TIME} = ${lastSaveTimeToSave}`);
       
       // Save cookies (Number type)
       this.world.persistentStorage.setPlayerVariable(
@@ -504,6 +560,20 @@ class Default extends Component<typeof Default> {
         player,
         PPV_UPGRADES,
         upgradesToSave
+      );
+      
+      // Save last join time (Number type)
+      this.world.persistentStorage.setPlayerVariable(
+        player,
+        PPV_LAST_JOIN_TIME,
+        lastJoinTimeToSave
+      );
+      
+      // Save last save time (Object type - stores timestamp)
+      this.world.persistentStorage.setPlayerVariable(
+        player,
+        PPV_LAST_SAVE_TIME,
+        { timestamp: lastSaveTimeToSave }
       );
       
       log.info(`[PPV WRITE COMPLETE] Saved state for ${player.name.get()}`);
