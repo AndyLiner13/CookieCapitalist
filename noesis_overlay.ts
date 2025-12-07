@@ -37,6 +37,10 @@ const SHAKE_16X = { range: 5, frequency: 0.5, speed: 0.38 };   // 16x: noticeabl
 const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
 const PULSE_MIN_OPACITY = 0.5; // Never go below 50% opacity
 const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
+// Blink animation: number of smooth oscillations between 100% and 50%
+// 3.5 cosine cycles over 5000ms gives 4 smooth dips to 50%,
+// with the last minimum landing exactly at 5000ms.
+const BLINK_CYCLES = 3.5;
 // Pop-in/balloon animation settings
 const POP_IN_DURATION_MS = 870; // 1500ms for pop-in animation (fixed duration)
 const POP_IN_OVERSHOOT = 1.23; // How much to overshoot before settling (smaller bounce)
@@ -341,12 +345,18 @@ class Default extends Component<typeof Default> {
         this.dataContext.multiplierText = `${this.currentMultiplier}x`;
         this.dataContext.multiplierVisible = this.currentPage === "home";
         
-        // Blink animation when under 5 seconds remaining (starts at 100%, ends at 50%)
+        // Blink animation when under 5 seconds remaining (smooth, time-based)
+        // Opacity oscillates between 100% and 50% using a cosine curve
+        // over exactly 5000ms, hitting 50% (minimum) 4 times, with the
+        // last minimum landing exactly at 5000ms.
         if (remaining <= FLASH_THRESHOLD_MS) {
-          this.pulsePhase += PULSE_SPEED;
-          // Sine wave oscillation from 100% to 50% (starts at 1.0, ends at 0.5)
-          const pulseValue = (Math.sin(this.pulsePhase) + 1) / 2; // 0 to 1
-          this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * pulseValue;
+          const elapsedInBlink = FLASH_THRESHOLD_MS - remaining; // 0..5000ms
+          const t = Math.max(0, Math.min(FLASH_THRESHOLD_MS, elapsedInBlink));
+          const normalized = t / FLASH_THRESHOLD_MS; // 0..1
+          const theta = 2 * Math.PI * BLINK_CYCLES * normalized; // 3.5 cycles over 5s
+          const cosValue = Math.cos(theta); // 1 at start, -1 at last 50%
+          const wave01 = (cosValue + 1) / 2; // 1..0
+          this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * wave01;
         } else {
           this.dataContext.multiplierOpacity = 1;
         }
@@ -549,8 +559,13 @@ class Default extends Component<typeof Default> {
       const easeIn = progress * progress;
       const fallY = startShakeY + (fallDistance * easeIn);
       
-      // Fade opacity from 50% to 0%
-      const opacity = startOpacity * (1 - progress);
+      // Fade container opacity from 50% to 0% using a cosine curve
+      // This matches the smooth rate of change used in the
+      // 100%→50% blink phase and starts with zero slope at 50%.
+      const fadeT = progress; // 0..1 over 1500ms
+      const cosValue = Math.cos(Math.PI * fadeT); // 1 -> -1
+      const fadeWave = (cosValue + 1) / 2; // 1 -> 0
+      const opacity = startOpacity * fadeWave;
       
       // Scale down slightly as it fades
       const scale = startScale * (1 - progress * 0.2);
