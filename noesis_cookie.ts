@@ -182,9 +182,9 @@ class Default extends hz.Component<typeof Default> {
     // Trigger release animation
     this.triggerClickUp();
     
-    // Check if multiplier is still active
+    // Check if multiplier is still active (not during dunk animation)
     const now = Date.now();
-    const isMultiplierActive = now < this.multiplierEndTime && this.currentMultiplier > 1;
+    const isMultiplierActive = !this.isDunking && now < this.multiplierEndTime && this.currentMultiplier > 1;
     const activeMultiplier = isMultiplierActive ? this.currentMultiplier : 1;
     const effectiveCookies = this.cookiesPerClick * activeMultiplier;
     
@@ -292,10 +292,8 @@ class Default extends hz.Component<typeof Default> {
     
     // No active multiplier - start fresh at 2x
     this.currentMultiplier = DUNK_BASE_MULTIPLIER;
-    const initialTimeout = this.getTimeoutForMultiplier(DUNK_BASE_MULTIPLIER);
-    this.multiplierEndTime = Date.now() + initialTimeout + 1700; // Add dunk animation time
     
-    // Reset click tracking
+    // Reset click tracking - will start AFTER dunk animation completes
     this.clickTimestamps = [];
 
     this.dataContext.dunkAnimate = false;
@@ -317,17 +315,21 @@ class Default extends hz.Component<typeof Default> {
           this.noesisGizmo.dataContext = this.dataContext;
         }
         
+        // NOW set the multiplier end time - timer starts AFTER dunk animation
+        const initialTimeout = this.getTimeoutForMultiplier(this.currentMultiplier);
+        this.multiplierEndTime = Date.now() + initialTimeout;
+        
         // NOW show the multiplier and glow after animation completes
-        // Start click rate checker
+        // Start click rate checker (5-second window starts now)
         this.startClickRateChecker();
         
         // Start click rate display updates (every 500ms)
         this.startClickRateDisplay();
         
-        // Broadcast dunk multiplier event to overlay
+        // Broadcast dunk multiplier event to overlay (triggers pop-in animation)
         this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
           multiplier: this.currentMultiplier,
-          durationMs: this.getTimeoutForMultiplier(this.currentMultiplier),
+          durationMs: initialTimeout,
           isRefresh: false,
         });
         
@@ -337,7 +339,7 @@ class Default extends hz.Component<typeof Default> {
         // Start glow spin animation
         this.startGlowSpin();
         
-        log.info(`Dunk animation complete - showing ${this.currentMultiplier}x multiplier for ${this.getTimeoutForMultiplier(this.currentMultiplier)}ms`);
+        log.info(`Dunk animation complete - showing ${this.currentMultiplier}x multiplier for ${initialTimeout}ms`);
       }, 1700);
     }, 50);
   }
@@ -378,6 +380,7 @@ class Default extends hz.Component<typeof Default> {
     
     if (clickCount >= threshold) {
       // Upgrade multiplier!
+      const previousMultiplier = this.currentMultiplier;
       this.currentMultiplier *= 2;
       
       // Clear click cache for the new tier
@@ -387,9 +390,9 @@ class Default extends hz.Component<typeof Default> {
       const newTimeout = this.getTimeoutForMultiplier(this.currentMultiplier);
       this.multiplierEndTime = Date.now() + newTimeout;
       
-      log.info(`Multiplier upgraded to ${this.currentMultiplier}x! New timeout: ${newTimeout}ms`);
+      log.info(`Multiplier upgraded from ${previousMultiplier}x to ${this.currentMultiplier}x! New timeout: ${newTimeout}ms`);
       
-      // Broadcast new multiplier with pop-in animation
+      // Broadcast new multiplier with pop-in animation (isRefresh: false)
       this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
         multiplier: this.currentMultiplier,
         durationMs: newTimeout,
@@ -438,9 +441,8 @@ class Default extends hz.Component<typeof Default> {
       isActive: false,
     });
     
-    // Reset glow when streak ends
-    this.updateGlowOpacity(1);
-    this.stopGlowSpin();
+    // Fade out glow over 1500ms when streak ends
+    this.fadeOutGlow();
   }
   
   private startClickRateDisplay(): void {
@@ -582,6 +584,37 @@ class Default extends hz.Component<typeof Default> {
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
+  }
+  
+  // Fades out the glow effect over 1500ms
+  private fadeOutGlow(): void {
+    const log = this.log.inactive("fadeOutGlow");
+    
+    const startOpacity = this.dataContext.GlowOpacity as number;
+    const startScale = this.dataContext.GlowScale as number;
+    const fadeDuration = 1500; // 1500ms fade out
+    const startTime = Date.now();
+    
+    const fadeTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fadeDuration, 1);
+      
+      // Linear fade from current values to 0
+      this.dataContext.GlowOpacity = startOpacity * (1 - progress);
+      this.dataContext.GlowScale = startScale - (startScale - 1) * progress;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+      
+      if (progress >= 1) {
+        this.async.clearInterval(fadeTimerId);
+        this.stopGlowSpin();
+        log.info("Glow fade-out complete");
+      }
+    }, 16); // ~60fps
+    
+    log.info("Started glow fade-out animation (1500ms)");
   }
   // #endregion
 }

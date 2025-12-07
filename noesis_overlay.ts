@@ -38,8 +38,8 @@ const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
 const PULSE_MIN_OPACITY = 0.5; // Never go below 50% opacity
 const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
 // Pop-in/balloon animation settings
-const POP_IN_DURATION_MS = 1500; // 1.5 seconds for dramatic balloon effect
-const POP_IN_OVERSHOOT = 1.5; // How much to overshoot before settling
+const POP_IN_DURATION_MS = 870; // 1500ms for pop-in animation (fixed duration)
+const POP_IN_OVERSHOOT = 1.23; // How much to overshoot before settling (smaller bounce)
 // Scale multiplier per tier (1.23x bigger each level)
 const SCALE_PER_TIER = 1.23;
 // #endregion
@@ -74,6 +74,7 @@ class Default extends Component<typeof Default> {
   private multiplierTimerId: number | null = null;
   private shakeTimerId: number | null = null;
   private popInTimerId: number | null = null;
+  private fadeOutTimerId: number | null = null;
   
   // Smooth animation state
   private targetShakeX: number = 0;
@@ -281,6 +282,7 @@ class Default extends Component<typeof Default> {
     
     const wasActive = this.currentMultiplier > 1;
     const isNewOrUpgraded = !wasActive || (!data.isRefresh && data.multiplier > this.currentMultiplier);
+    const isFirstActivation = !wasActive; // Track if this is the initial 2x activation
     
     this.currentMultiplier = data.multiplier;
     this.multiplierEndTime = Date.now() + data.durationMs;
@@ -290,17 +292,23 @@ class Default extends Component<typeof Default> {
     // Clear existing timers
     if (this.multiplierTimerId !== null) {
       this.async.clearInterval(this.multiplierTimerId);
+      this.multiplierTimerId = null;
     }
     if (this.shakeTimerId !== null) {
       this.async.clearInterval(this.shakeTimerId);
+      this.shakeTimerId = null;
     }
-    if (this.popInTimerId !== null) {
-      this.async.clearInterval(this.popInTimerId);
+    // Only clear fade-out timer for new streaks or upgrades
+    // Don't clear pop-in timer - let it complete naturally
+    if (!data.isRefresh && this.fadeOutTimerId !== null) {
+      this.async.clearInterval(this.fadeOutTimerId);
+      this.fadeOutTimerId = null;
     }
     
     // Trigger pop-in animation only for new streak or multiplier upgrade (not refreshes)
-    if (isNewOrUpgraded) {
-      this.triggerPopInAnimation();
+    // Also check if animation is already running to prevent retriggering
+    if (isNewOrUpgraded && this.popInTimerId === null) {
+      this.triggerPopInAnimation(isFirstActivation);
     }
     
     // Start shake effect based on multiplier tier
@@ -314,9 +322,9 @@ class Default extends Component<typeof Default> {
       const remaining = this.multiplierEndTime - Date.now();
       
       if (remaining <= 0) {
-        // Multiplier expired
-        this.stopMultiplierEffects();
-        log.info("Multiplier expired");
+        // Multiplier expired - trigger fade-out animation
+        this.fadeOutMultiplier();
+        log.info("Multiplier expired - starting fade-out");
       } else {
         // Update display - only visible on home page, no timer shown
         this.dataContext.multiplierText = `${this.currentMultiplier}x`;
@@ -342,14 +350,17 @@ class Default extends Component<typeof Default> {
     this.dataContext.multiplierText = `${this.currentMultiplier}x`;
     this.dataContext.multiplierVisible = this.currentPage === "home";
     this.dataContext.multiplierOpacity = 1;
-    this.dataContext.multiplierScale = 1;
+    // Don't reset scale if pop-in animation is running
+    if (this.popInTimerId === null) {
+      this.dataContext.multiplierScale = 1;
+    }
     
     log.info(`Multiplier UI: visible=${this.dataContext.multiplierVisible}, text=${this.dataContext.multiplierText}, page=${this.currentPage}`);
     
     this.updateUI();
   }
   
-  private triggerPopInAnimation(): void {
+  private triggerPopInAnimation(isFirstActivation: boolean = false): void {
     const log = this.log.active("triggerPopInAnimation");
     log.info("Starting pop-in animation");
     
@@ -359,13 +370,13 @@ class Default extends Component<typeof Default> {
       this.popInTimerId = null;
     }
     
-    // Calculate base scale for this multiplier tier (1.23x per tier)
-    // 2x = tier 0 = scale 1.0, 4x = tier 1 = scale 1.23, 8x = tier 2 = scale 1.51, 16x = tier 3 = scale 1.86
-    const tier = Math.log2(this.currentMultiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
-    this.baseScale = Math.pow(SCALE_PER_TIER, tier);
+    // Use constant base scale of 1.0 for all multiplier tiers
+    // This keeps the text at a consistent size regardless of multiplier value
+    this.baseScale = 1.0;
     
-    // Balloon effect: start small, overshoot big, settle to base scale
-    const startScale = this.baseScale * 0.3;
+    // Balloon effect: start from small scale for first activation, or current scale for upgrades
+    // Use 0.3x of target scale to ensure visible animation for all tiers
+    const startScale = isFirstActivation ? this.baseScale * 0.3 : this.currentScale;
     const overshootScale = this.baseScale * POP_IN_OVERSHOOT;
     const targetScale = this.baseScale;
     
@@ -485,10 +496,72 @@ class Default extends Component<typeof Default> {
       this.async.clearInterval(this.popInTimerId);
       this.popInTimerId = null;
     }
+    if (this.fadeOutTimerId !== null) {
+      this.async.clearInterval(this.fadeOutTimerId);
+      this.fadeOutTimerId = null;
+    }
     
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
+  }
+  
+  // Fades out the multiplier text with fall animation over 1500ms
+  private fadeOutMultiplier(): void {
+    const log = this.log.active("fadeOutMultiplier");
+    
+    // Stop the main multiplier timer
+    if (this.multiplierTimerId !== null) {
+      this.async.clearInterval(this.multiplierTimerId);
+      this.multiplierTimerId = null;
+    }
+    
+    // Stop shake effect
+    if (this.shakeTimerId !== null) {
+      this.async.clearInterval(this.shakeTimerId);
+      this.shakeTimerId = null;
+    }
+    
+    const fadeDuration = 1500; // 1500ms fade out
+    const fallDistance = 120; // Fall down 120 pixels
+    const startTime = Date.now();
+    const startOpacity = this.dataContext.multiplierOpacity as number;
+    const startScale = this.dataContext.multiplierScale as number;
+    const startShakeY = this.dataContext.shakeY as number;
+    
+    this.fadeOutTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fadeDuration, 1);
+      
+      // Ramp animation: accelerate downward (quadratic ease in)
+      const easeIn = progress * progress;
+      const fallY = startShakeY + (fallDistance * easeIn);
+      
+      // Fade opacity linearly
+      const opacity = startOpacity * (1 - progress);
+      
+      // Scale down slightly as it fades
+      const scale = startScale * (1 - progress * 0.2);
+      
+      this.dataContext.shakeX = 0; // Remove horizontal shake during fade
+      this.dataContext.shakeY = fallY;
+      this.dataContext.multiplierOpacity = opacity;
+      this.dataContext.multiplierScale = scale;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+      
+      if (progress >= 1) {
+        // Animation complete - reset everything
+        this.async.clearInterval(this.fadeOutTimerId!);
+        this.fadeOutTimerId = null;
+        this.stopMultiplierEffects();
+        log.info("Multiplier fade-out complete");
+      }
+    }, 16); // ~60fps
+    
+    log.info("Started multiplier fade-out animation (1500ms)");
   }
   // #endregion
 
