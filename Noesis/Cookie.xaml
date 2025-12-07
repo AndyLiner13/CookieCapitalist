@@ -72,7 +72,10 @@
              IsHitTestVisible="False"
              Stretch="Uniform">
       <Viewbox.RenderTransform>
-        <RotateTransform Angle="{Binding Glow3Rotation}"/>
+        <TransformGroup>
+          <ScaleTransform ScaleX="{Binding Glow3Scale}" ScaleY="{Binding Glow3Scale}"/>
+          <RotateTransform Angle="{Binding Glow3Rotation}"/>
+        </TransformGroup>
       </Viewbox.RenderTransform>
       <Grid Width="576" Height="576">
         <Grid.OpacityMask>
@@ -109,7 +112,10 @@
              IsHitTestVisible="False"
              Stretch="Uniform">
       <Viewbox.RenderTransform>
-        <RotateTransform Angle="{Binding Glow2Rotation}"/>
+        <TransformGroup>
+          <ScaleTransform ScaleX="{Binding Glow2Scale}" ScaleY="{Binding Glow2Scale}"/>
+          <RotateTransform Angle="{Binding Glow2Rotation}"/>
+        </TransformGroup>
       </Viewbox.RenderTransform>
       <Grid Width="576" Height="576">
         <Grid.OpacityMask>
@@ -146,7 +152,10 @@
              IsHitTestVisible="False"
              Stretch="Uniform">
       <Viewbox.RenderTransform>
-        <RotateTransform Angle="{Binding Glow1Rotation}"/>
+        <TransformGroup>
+          <ScaleTransform ScaleX="{Binding Glow1Scale}" ScaleY="{Binding Glow1Scale}"/>
+          <RotateTransform Angle="{Binding Glow1Rotation}"/>
+        </TransformGroup>
       </Viewbox.RenderTransform>
       <Grid Width="576" Height="576">
         <Grid.OpacityMask>

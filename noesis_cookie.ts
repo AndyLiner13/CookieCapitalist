@@ -138,16 +138,19 @@ class Default extends hz.Component<typeof Default> {
       // 4 glow rings - sizes configurable via props
       Glow1Opacity: 0,
       Glow1Size: this.props.glow1Size,
+      Glow1Scale: 0,
       Glow1Rotation: 0,
       Glow2Opacity: 0,
       Glow2Size: this.props.glow2Size,
+      Glow2Scale: 0,
       Glow2Rotation: 0,
       Glow3Opacity: 0,
       Glow3Size: this.props.glow3Size,
+      Glow3Scale: 0,
       Glow3Rotation: 0,
       Glow4Opacity: 0,
       Glow4Size: this.props.glow4Size,
-      Glow4Scale: 1,
+      Glow4Scale: 0,
     };
 
     for (let i = 0; i < POPUP_COUNT; i++) {
@@ -535,12 +538,23 @@ class Default extends hz.Component<typeof Default> {
       this.dataContext.Glow3Opacity = 0;
       this.dataContext.Glow4Opacity = 0;
     } else {
-      // Show rings based on current multiplier
+      // Show rings based on current multiplier and trigger pop-in animation for new rings
       // Each ring gets 70% opacity when active
+      const wasRing1Active = (this.dataContext.Glow1Opacity as number) > 0;
+      const wasRing2Active = (this.dataContext.Glow2Opacity as number) > 0;
+      const wasRing3Active = (this.dataContext.Glow3Opacity as number) > 0;
+      const wasRing4Active = (this.dataContext.Glow4Opacity as number) > 0;
+      
       this.dataContext.Glow1Opacity = multiplier >= 2 ? 0.7 : 0;   // 2x+
       this.dataContext.Glow2Opacity = multiplier >= 4 ? 0.7 : 0;   // 4x+
       this.dataContext.Glow3Opacity = multiplier >= 8 ? 0.7 : 0;   // 8x+
       this.dataContext.Glow4Opacity = multiplier >= 16 ? 0.7 : 0;  // 16x
+      
+      // Trigger pop-in animations for newly active rings
+      if (!wasRing1Active && multiplier >= 2) this.popInGlowRing(1);
+      if (!wasRing2Active && multiplier >= 4) this.popInGlowRing(2);
+      if (!wasRing3Active && multiplier >= 8) this.popInGlowRing(3);
+      if (!wasRing4Active && multiplier >= 16) this.popInGlowRing(4);
     }
     
     if (this.noesisGizmo) {
@@ -548,6 +562,37 @@ class Default extends hz.Component<typeof Default> {
     }
     
     log.info(`Glow rings updated for ${multiplier}x: Ring1=${this.dataContext.Glow1Opacity}, Ring2=${this.dataContext.Glow2Opacity}, Ring3=${this.dataContext.Glow3Opacity}, Ring4=${this.dataContext.Glow4Opacity}`);
+  }
+  
+  // Pop-in animation for a glow ring (scales from 0 to 1 over 300ms)
+  private popInGlowRing(ringNumber: number): void {
+    const log = this.log.inactive("popInGlowRing");
+    const duration = 300; // 300ms pop-in
+    const startTime = Date.now();
+    
+    const scaleKey = `Glow${ringNumber}Scale`;
+    
+    const popInTimer = this.async.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease out cubic for smooth pop-in
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const scale = easeOut;
+      
+      this.dataContext[scaleKey] = scale;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+      
+      if (progress >= 1) {
+        this.async.clearInterval(popInTimer);
+        log.info(`Ring ${ringNumber} pop-in complete`);
+      }
+    }, 16);
+    
+    log.info(`Starting pop-in animation for Ring ${ringNumber}`);
   }
   
   // Starts the glow rotation animation with alternating directions
@@ -565,7 +610,7 @@ class Default extends hz.Component<typeof Default> {
     this.glow1Rotation = 0;
     this.glow2Rotation = 0;
     this.glow3Rotation = 0;
-    this.glow4Scale = 1;
+    this.glow4Scale = this.dataContext.Glow4Scale as number || 1; // Use current scale from pop-in
     
     let pulsePhase = 0;
     const pulseSpeed = 0.05; // Speed of pulse animation
@@ -579,15 +624,20 @@ class Default extends hz.Component<typeof Default> {
       // Ring 2: clockwise (positive)
       this.glow2Rotation = (this.glow2Rotation + this.props.glowSpinSpeed) % 360;
       
-      // Ring 4: pulse scale by 5% (1.0 to 1.05)
-      pulsePhase += pulseSpeed;
-      const pulseValue = (Math.sin(pulsePhase) + 1) / 2; // 0 to 1
-      this.glow4Scale = 1.0 + (pulseValue * 0.05); // Scale between 1.0 and 1.05
+      // Ring 4: pulse scale by 5% (only if fully scaled in)
+      const currentScale4 = this.dataContext.Glow4Scale as number;
+      if (currentScale4 >= 0.99) {
+        // Ring 4 is fully popped in, apply pulse
+        pulsePhase += pulseSpeed;
+        const pulseValue = (Math.sin(pulsePhase) + 1) / 2; // 0 to 1
+        this.glow4Scale = 1.0 + (pulseValue * 0.05); // Pulse between 1.0 and 1.05
+        this.dataContext.Glow4Scale = this.glow4Scale;
+      }
+      // Otherwise, let the pop-in animation control the scale
       
       this.dataContext.Glow1Rotation = this.glow1Rotation;
       this.dataContext.Glow2Rotation = this.glow2Rotation;
       this.dataContext.Glow3Rotation = this.glow3Rotation;
-      this.dataContext.Glow4Scale = this.glow4Scale;
       
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;
@@ -608,38 +658,44 @@ class Default extends hz.Component<typeof Default> {
     this.glow1Rotation = 0;
     this.glow2Rotation = 0;
     this.glow3Rotation = 0;
-    this.glow4Scale = 1;
+    this.glow4Scale = 0;
     
     this.dataContext.Glow1Rotation = 0;
+    this.dataContext.Glow1Scale = 0;
     this.dataContext.Glow2Rotation = 0;
+    this.dataContext.Glow2Scale = 0;
     this.dataContext.Glow3Rotation = 0;
-    this.dataContext.Glow4Scale = 1;
+    this.dataContext.Glow3Scale = 0;
+    this.dataContext.Glow4Scale = 0;
     
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
   }
   
-  // Fades out the glow effect over 1500ms
+  // Scales down the glow effect to 0 over 1500ms
   private fadeOutGlow(): void {
     const log = this.log.inactive("fadeOutGlow");
     
-    const startOpacity1 = this.dataContext.Glow1Opacity as number;
-    const startOpacity2 = this.dataContext.Glow2Opacity as number;
-    const startOpacity3 = this.dataContext.Glow3Opacity as number;
-    const startOpacity4 = this.dataContext.Glow4Opacity as number;
-    const fadeDuration = 1500; // 1500ms fade out
+    const startScale1 = this.dataContext.Glow1Scale as number;
+    const startScale2 = this.dataContext.Glow2Scale as number;
+    const startScale3 = this.dataContext.Glow3Scale as number;
+    const startScale4 = this.dataContext.Glow4Scale as number;
+    const fadeDuration = 1500; // 1500ms scale down
     const startTime = Date.now();
     
     const fadeTimerId = this.async.setInterval(() => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / fadeDuration, 1);
       
-      // Linear fade from current values to 0
-      this.dataContext.Glow1Opacity = startOpacity1 * (1 - progress);
-      this.dataContext.Glow2Opacity = startOpacity2 * (1 - progress);
-      this.dataContext.Glow3Opacity = startOpacity3 * (1 - progress);
-      this.dataContext.Glow4Opacity = startOpacity4 * (1 - progress);
+      // Ease in cubic for smooth scale down
+      const easeIn = progress * progress * progress;
+      
+      // Scale from current values to 0
+      this.dataContext.Glow1Scale = startScale1 * (1 - easeIn);
+      this.dataContext.Glow2Scale = startScale2 * (1 - easeIn);
+      this.dataContext.Glow3Scale = startScale3 * (1 - easeIn);
+      this.dataContext.Glow4Scale = startScale4 * (1 - easeIn);
       
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;
@@ -647,12 +703,17 @@ class Default extends hz.Component<typeof Default> {
       
       if (progress >= 1) {
         this.async.clearInterval(fadeTimerId);
+        // Reset opacities after scale-down complete
+        this.dataContext.Glow1Opacity = 0;
+        this.dataContext.Glow2Opacity = 0;
+        this.dataContext.Glow3Opacity = 0;
+        this.dataContext.Glow4Opacity = 0;
         this.stopGlowSpin();
-        log.info("Glow fade-out complete");
+        log.info("Glow scale-down complete");
       }
     }, 16); // ~60fps
     
-    log.info("Started glow fade-out animation (1500ms)");
+    log.info("Started glow scale-down animation (1500ms)");
   }
   // #endregion
 }
