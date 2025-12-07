@@ -41,7 +41,7 @@ class Default extends hz.Component<typeof Default> {
   static propsDefinition = {
     popupFontSize: { type: hz.PropTypes.Number, default: 48 },
     popupColor: { type: hz.PropTypes.String, default: "#FFFFFF" },
-    glowSize: { type: hz.PropTypes.Number, default: 576 },
+    glowSize: { type: hz.PropTypes.Number, default: 420 },
     glowSpinSpeed: { type: hz.PropTypes.Number, default: 0.5 }, // degrees per frame
   };
   // #endregion
@@ -505,9 +505,10 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Showing popup ${popupIndex}: ${text}`);
   }
   
-  // Updates the golden glow opacity and scale behind the cookie based on multiplier
-  // Opacity starts at 50% for 2x and increases proportionally to MAX_MULTIPLIER
-  // Scale starts at 1.0 for 2x and increases 10% per tier (2x=1.0, 4x=1.1, 8x=1.2, 16x=1.3)
+  // Updates the golden glow opacity behind the cookie based on multiplier
+  // Opacity: 2x=70%, 4x=80%, 8x=90%, 16x=100%
+  // Scale: starts at 1.3 (16x base size) and increases 10% per tier down from there
+  // So 2x=1.0, 4x=1.1, 8x=1.2, 16x=1.3
   private updateGlowOpacity(multiplier: number): void {
     const log = this.log.inactive("updateGlowOpacity");
     
@@ -516,13 +517,19 @@ class Default extends hz.Component<typeof Default> {
       this.dataContext.GlowOpacity = 0;
       this.dataContext.GlowScale = 1;
     } else {
-      // Calculate opacity: starts at 50% for 2x, scales up to 100% at max
-      // tier 0 (2x) = 0.5, tier 1 (4x) = 0.67, tier 2 (8x) = 0.83, tier 3 (16x) = 1.0
-      const tier = Math.log2(multiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
-      const maxTier = Math.log2(MAX_MULTIPLIER) - 1; // 3 for max of 16x
-      const opacity = 0.5 + (0.5 * (tier / maxTier));
+      // Fixed opacity values per tier
+      let opacity: number;
+      switch (multiplier) {
+        case 2:  opacity = 0.7; break;  // 70%
+        case 4:  opacity = 0.8; break;  // 80%
+        case 8:  opacity = 0.9; break;  // 90%
+        case 16: opacity = 1.0; break;  // 100%
+        default: opacity = 0.7; break;
+      }
       
-      // Calculate scale: 1.0 at 2x, +10% per tier
+      // Calculate scale: starts at 1.0 for 2x, increases 10% per tier
+      // tier 0 (2x) = 1.0, tier 1 (4x) = 1.1, tier 2 (8x) = 1.2, tier 3 (16x) = 1.3
+      const tier = Math.log2(multiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
       const scale = 1.0 + (tier * 0.1);
       
       this.dataContext.GlowOpacity = opacity;
@@ -548,9 +555,9 @@ class Default extends hz.Component<typeof Default> {
     // Reset rotation
     this.glowRotation = 0;
     
-    // Start spinning at configured speed (default 0.5 degrees per frame = ~30 deg/sec at 60fps)
+    // Start spinning counter-clockwise at configured speed (default 0.5 degrees per frame = ~30 deg/sec at 60fps)
     this.glowSpinTimerId = this.async.setInterval(() => {
-      this.glowRotation = (this.glowRotation + this.props.glowSpinSpeed) % 360;
+      this.glowRotation = (this.glowRotation - this.props.glowSpinSpeed + 360) % 360;
       this.dataContext.GlowRotation = this.glowRotation;
       
       if (this.noesisGizmo) {

@@ -69,8 +69,8 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Multiplier Display (shows above cookie when active)                              -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border Grid.Row="1" Background="{x:Null}" Padding="0,16,0,0" HorizontalAlignment="Center"
-          Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
+  <Border Grid.Row="1" Background="{x:Null}" Padding="0,16,0,0" HorizontalAlignment="Center" Width="300"
+          Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False" ClipToBounds="False">
     <TextBlock x:Name="MultiplierText"
                Text="{Binding multiplierText}" 
                FontFamily="Fonts/#Bangers-Regular" 
@@ -79,7 +79,9 @@
                TextAlignment="Center"
                HorizontalAlignment="Center"
                RenderTransformOrigin="0.5,0.5"
-               Opacity="{Binding multiplierOpacity}">
+               Opacity="{Binding multiplierOpacity}"
+               Width="200"
+               ClipToBounds="False">
       <TextBlock.RenderTransform>
         <TransformGroup>
           <TranslateTransform x:Name="MultiplierShake" X="{Binding shakeX}" Y="{Binding shakeY}"/>

@@ -35,7 +35,7 @@ const SHAKE_4X = { range: 3, frequency: 0.4, speed: 0.28 };    // 4x: slightly m
 const SHAKE_8X = { range: 4, frequency: 0.45, speed: 0.32 };   // 8x: moderate shake
 const SHAKE_16X = { range: 5, frequency: 0.5, speed: 0.38 };   // 16x: noticeable shake
 const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
-const PULSE_MIN_OPACITY = 0.35; // Never go below 35% opacity
+const PULSE_MIN_OPACITY = 0.5; // Never go below 50% opacity
 const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
 // Pop-in/balloon animation settings
 const POP_IN_DURATION_MS = 1500; // 1.5 seconds for dramatic balloon effect

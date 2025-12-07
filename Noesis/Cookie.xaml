@@ -35,29 +35,63 @@
 
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     
-    <!-- Golden glow behind cookie (visible during streak) -->
-    <Ellipse x:Name="CookieGlow"
+    <!-- Golden god rays behind cookie (visible during streak) -->
+    <Viewbox x:Name="CookieGlow"
              Width="{Binding GlowSize}"
              Height="{Binding GlowSize}"
              HorizontalAlignment="Center"
              VerticalAlignment="Center"
              Opacity="{Binding GlowOpacity}"
              RenderTransformOrigin="0.5,0.5"
-             IsHitTestVisible="False">
-      <Ellipse.RenderTransform>
+             IsHitTestVisible="False"
+             Stretch="Uniform">
+      <Viewbox.RenderTransform>
         <TransformGroup>
           <ScaleTransform ScaleX="{Binding GlowScale}" ScaleY="{Binding GlowScale}"/>
           <RotateTransform Angle="{Binding GlowRotation}"/>
         </TransformGroup>
-      </Ellipse.RenderTransform>
-      <Ellipse.Fill>
-        <RadialGradientBrush>
-          <GradientStop Color="#FFFFD700" Offset="0"/>
-          <GradientStop Color="#80FFD700" Offset="0.4"/>
-          <GradientStop Color="#00FFD700" Offset="1"/>
-        </RadialGradientBrush>
-      </Ellipse.Fill>
-    </Ellipse>
+      </Viewbox.RenderTransform>
+      
+      <Grid Width="576" Height="576">
+        <!-- Roulette wheel style - alternating pie segments with radial fade -->
+        <Grid.OpacityMask>
+          <RadialGradientBrush>
+            <GradientStop Color="#FFFFFFFF" Offset="0.1"/>
+            <GradientStop Color="#DDFFFFFF" Offset="0.25"/>
+            <GradientStop Color="#66FFFFFF" Offset="0.5"/>
+            <GradientStop Color="#00FFFFFF" Offset="0.85"/>
+          </RadialGradientBrush>
+        </Grid.OpacityMask>
+        
+        <!-- 12 alternating pie segments (30° each) filling the full circle -->
+        <!-- Using arc paths: M center L startEdge A radius,radius 0 0 1 endEdge Z -->
+        
+        <!-- Segment 1 (0° to 30°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 576,288 A 288,288 0 0 0 538,144 Z"/>
+        <!-- Segment 2 (30° to 60°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,144 A 288,288 0 0 0 432,38 Z"/>
+        <!-- Segment 3 (60° to 90°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,38 A 288,288 0 0 0 288,0 Z"/>
+        <!-- Segment 4 (90° to 120°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,0 A 288,288 0 0 0 144,38 Z"/>
+        <!-- Segment 5 (120° to 150°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,38 A 288,288 0 0 0 38,144 Z"/>
+        <!-- Segment 6 (150° to 180°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,144 A 288,288 0 0 0 0,288 Z"/>
+        <!-- Segment 7 (180° to 210°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 0,288 A 288,288 0 0 0 38,432 Z"/>
+        <!-- Segment 8 (210° to 240°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 38,432 A 288,288 0 0 0 144,538 Z"/>
+        <!-- Segment 9 (240° to 270°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 144,538 A 288,288 0 0 0 288,576 Z"/>
+        <!-- Segment 10 (270° to 300°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 288,576 A 288,288 0 0 0 432,538 Z"/>
+        <!-- Segment 11 (300° to 330°) - Bright Gold -->
+        <Path Fill="#FFFFD700" Data="M 288,288 L 432,538 A 288,288 0 0 0 538,432 Z"/>
+        <!-- Segment 12 (330° to 360°) - Dark Gold/Bronze -->
+        <Path Fill="#FFB8860B" Data="M 288,288 L 538,432 A 288,288 0 0 0 576,288 Z"/>
+      </Grid>
+    </Viewbox>
     
     <!-- Cookie image (non-interactive - clicks handled via raycast + collider in controller_player.ts) -->
     <Border x:Name="CookieContainer"
@@ -100,7 +134,7 @@
         </b:DataTrigger>
       </b:Interaction.Triggers>
       <Grid>
-        <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
+        <Image x:Name="CookieImage" Source="Images/Coogie.png" Width="256" Height="256" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5" d:IsHidden="True">
           <Image.RenderTransform>
             <TranslateTransform x:Name="CookieDunkTranslate" Y="0"/>
           </Image.RenderTransform>
