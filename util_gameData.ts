@@ -12,6 +12,7 @@ export interface GameState {
   totalCookiesEarned: number;
   cookiesPerClick: number;
   upgrades: { [upgradeId: string]: number };
+  upgradeProgress: { [upgradeId: string]: number }; // Production progress 0.0-1.0 for each upgrade
   lastSaveTime: number;
   lastJoinTime: number;
 }
@@ -43,12 +44,12 @@ export type PageType = "home" | "shop" | "stats";
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
   [key: string]: SerializableState;
-  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save" | "device_type_report";
+  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save" | "device_type_report" | "sync_progress";
 };
 
 export type UIEventPayload = {
   [key: string]: SerializableState;
-  type: "state_update" | "purchase_result" | "welcome_back";
+  type: "state_update" | "purchase_result" | "welcome_back" | "state_with_progress";
 };
 // #endregion
 
@@ -254,8 +255,10 @@ export function formatPrice(cost: number): string {
 // Create default game state
 export function createDefaultGameState(): GameState {
   const upgrades: { [upgradeId: string]: number } = {};
+  const upgradeProgress: { [upgradeId: string]: number } = {};
   for (const config of UPGRADE_CONFIGS) {
     upgrades[config.id] = 0;
+    upgradeProgress[config.id] = 0;
   }
   
   return {
@@ -263,6 +266,7 @@ export function createDefaultGameState(): GameState {
     totalCookiesEarned: 0,
     cookiesPerClick: BASE_COOKIES_PER_CLICK,
     upgrades,
+    upgradeProgress,
     lastSaveTime: Date.now(),
     lastJoinTime: Date.now(),
   };

@@ -45,6 +45,7 @@ class Default extends hz.Component<typeof Default> {
   private productionProgress: { [upgradeId: string]: number } = {};
   private lastTickTime: number = 0;
   private static readonly TICK_RATE_MS = 50;
+  private static readonly PROGRESS_SYNC_INTERVAL_MS = 5000; // Sync progress every 5 seconds
   
   // Streak multiplier tracking
   private streakMultiplier: number = 1;
@@ -92,6 +93,9 @@ class Default extends hz.Component<typeof Default> {
     // Start production timer tick
     this.lastTickTime = Date.now();
     this.async.setInterval(() => this.productionTick(), Default.TICK_RATE_MS);
+    
+    // Start progress sync interval (sends production progress to backend for saving)
+    this.async.setInterval(() => this.syncProgressToBackend(), Default.PROGRESS_SYNC_INTERVAL_MS);
 
     // Start hidden until Shop tab is clicked
     this.noesisGizmo.setLocalEntityVisibility(false);
@@ -258,7 +262,7 @@ class Default extends hz.Component<typeof Default> {
   private handleStateChanged(data: UIEventPayload): void {
     const log = this.log.inactive("handleStateChanged");
 
-    if (data.type !== "state_update") return;
+    if (data.type !== "state_update" && data.type !== "state_with_progress") return;
 
     this.cookies = (data.cookies as number) || 0;
     this.cookiesPerClick = (data.cookiesPerClick as number) || 1;
@@ -268,6 +272,14 @@ class Default extends hz.Component<typeof Default> {
       for (const [id, count] of Object.entries(data.upgrades as { [key: string]: number })) {
         this.upgrades[id] = count;
       }
+    }
+    
+    // Restore upgrade progress if provided (from server load)
+    if (data.type === "state_with_progress" && data.upgradeProgress) {
+      for (const [id, progress] of Object.entries(data.upgradeProgress as { [key: string]: number })) {
+        this.productionProgress[id] = progress;
+      }
+      log.info(`Restored upgrade progress from server: ${JSON.stringify(this.productionProgress)}`);
     }
 
     this.updateShopData();
@@ -314,6 +326,22 @@ class Default extends hz.Component<typeof Default> {
       return this.streakMultiplier;
     }
     return 1;
+  }
+  
+  // Sync production progress to backend for saving
+  private syncProgressToBackend(): void {
+    const log = this.log.inactive("syncProgressToBackend");
+    
+    // Only sync if we have any progress to sync
+    const hasProgress = Object.values(this.productionProgress).some(p => p > 0);
+    if (!hasProgress) return;
+    
+    this.sendNetworkBroadcastEvent(GameEvents.toServer, {
+      type: "sync_progress",
+      progress: this.productionProgress,
+    });
+    
+    log.info(`Synced progress to backend: ${JSON.stringify(this.productionProgress)}`);
   }
   // #endregion
 }
