@@ -52,7 +52,7 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Header - Cookie Count (Shared across all pages)                                  -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0">
+  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16,58,16,8" Grid.Row="0" IsHitTestVisible="True">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
       <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
       <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
@@ -62,10 +62,10 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Multiplier Display (shows above cookie when active)                              -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border Grid.Row="1" Background="{x:Null}" Padding="0,16,0,0" HorizontalAlignment="Center" Width="300"
+  <Border Grid.Row="1" Background="{x:Null}" Padding="0,28,0,0" HorizontalAlignment="Center" Width="300"
           Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False" ClipToBounds="False">
     <!-- Container for blink animation - opacity applied here, not on TextBlock -->
-    <Border Background="{x:Null}" Opacity="{Binding multiplierOpacity}">
+    <Border Background="{x:Null}" Opacity="{Binding multiplierOpacity}" IsHitTestVisible="False">
       <TextBlock x:Name="MultiplierText"
                  Text="{Binding multiplierText}" 
                  FontFamily="Fonts/#Bangers-Regular" 
@@ -75,7 +75,8 @@
                  HorizontalAlignment="Center"
                  RenderTransformOrigin="0.5,0.5"
                  Width="200"
-                 ClipToBounds="False">
+                 ClipToBounds="False"
+                 IsHitTestVisible="False">
         <TextBlock.RenderTransform>
           <TransformGroup>
             <TranslateTransform x:Name="MultiplierShake" X="{Binding shakeX}" Y="{Binding shakeY}"/>
@@ -96,7 +97,7 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="{x:Null}" Padding="16" Grid.Row="3">
+  <Border HorizontalAlignment="Stretch" Background="#01000000" Padding="16" Grid.Row="3" IsHitTestVisible="True">
     <Grid HorizontalAlignment="Center">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
