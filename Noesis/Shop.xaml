@@ -22,8 +22,8 @@
       <!-- Card Layout Constants -->
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardHeight">100</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardCornerRadius">8</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">30</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">47</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">33</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">44</sys:Double>
       <CornerRadius x:Key="CardBorderRadius">8</CornerRadius>
       <CornerRadius x:Key="BarCornerRadius">5</CornerRadius>
       <CornerRadius x:Key="TierBadgeRadius">4</CornerRadius>
@@ -116,13 +116,13 @@
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     <Grid Background="{x:Null}">
       <Grid.RowDefinitions>
-        <RowDefinition Height="143"/>
+        <RowDefinition Height="165"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
       
       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,140">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,96">
           
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 1: Clicker                                                             -->
@@ -545,6 +545,67 @@
                   </Button>
                   <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding planet.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
+                  </Border>
+                </Grid>
+              </StackPanel>
+            </Grid>
+          </Border>
+          
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <!-- Upgrade Card 8: Galaxy                                                              -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
+          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
+                <Image Source="Images/GalaxyImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+                <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
+                  <TextBlock Text="{Binding galaxy.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
+                </Border>
+              </Grid>
+              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                  <Grid>
+                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
+                      <Border.RenderTransform><ScaleTransform ScaleX="{Binding galaxy.progress}" ScaleY="1"/></Border.RenderTransform>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
+                      <TextBlock Text="{Binding galaxy.name}" Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text=" " Style="{StaticResource CardNameTextStyle}"/>
+                      <TextBlock Text="{Binding galaxy.rateDisplay}" Style="{StaticResource CardRateTextStyle}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Grid Margin="{StaticResource ButtonRowMargin}">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding galaxy.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                    <Button.RenderTransform><ScaleTransform x:Name="GalaxyBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
+                    <b:Interaction.Triggers>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                      <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
+                    </b:Interaction.Triggers>
+                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding galaxy.isMaxed}" Value="True"><Setter Property="Background" Value="{StaticResource BuyButtonMaxedBrush}"/></DataTrigger>
+                            <DataTrigger Binding="{Binding galaxy.canAfford}" Value="False"><Setter Property="Background" Value="{StaticResource BuyButtonDisabledBrush}"/></DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <TextBlock Text="{Binding galaxy.price}" Style="{StaticResource CardPriceTextStyle}"/>
+                    </Border>
+                  </Button>
+                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding galaxy.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
               </StackPanel>

@@ -10,7 +10,7 @@ import * as hz from "horizon/core";
 import { Gestures, SwipeDirection } from "horizon/mobile_gestures";
 import LocalCamera from "horizon/camera";
 import { Logger } from "./util_logger";
-import { LocalUIEvents } from "./util_gameData";
+import { GameEvents, LocalUIEvents, UIEvents, UIEventPayload } from "./util_gameData";
 
 // #region 🏷️ Type Definitions
 // #endregion
@@ -30,11 +30,14 @@ class Default extends hz.Component<typeof Default> {
   private raycastGizmo: hz.RaycastGizmo | null = null;
   private cookieCollider: hz.Entity | null = null;
   private isCookiePressed: boolean = false;
+  private deviceTypeReported: boolean = false; // Only report device type once
+  private isInputBlocked: boolean = false; // Blocks input when non-mobile user on mobile-only mode
+  private isMobile: boolean = false; // Cached device type
   // #endregion
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.active("start");
+    const log = this.log.inactive("start");
 
     const localPlayer = this.world.getLocalPlayer();
     const serverPlayer = this.world.getServerPlayer();
@@ -66,12 +69,77 @@ class Default extends hz.Component<typeof Default> {
 
     // Set up raycast-based cookie tapping (mobile/web)
     this.setupRaycastCookieClick();
+
+    // Report device type to server on first state update
+    this.connectNetworkBroadcastEvent(
+      UIEvents.toClient,
+      (data: UIEventPayload) => this.reportDeviceType(data, localPlayer)
+    );
+    
+    // Listen for mobileOnly state changes to block/unblock input
+    this.connectNetworkBroadcastEvent(
+      UIEvents.toClient,
+      (data: UIEventPayload) => this.handleInputBlockingState(data)
+    );
   }
   // #endregion
   
   // #region 🎬 Handlers
+  // Report device type to backend once when first state update arrives
+  private reportDeviceType(data: UIEventPayload, player: hz.Player): void {
+    const log = this.log.active("reportDeviceType");
+
+    if (data.type !== "state_update") {
+      return;
+    }
+
+    // Only report device type once
+    if (this.deviceTypeReported) {
+      return;
+    }
+
+    this.deviceTypeReported = true;
+
+    // Get device type - possible values: "VR", "Mobile", "Desktop"
+    const deviceType = player.deviceType.get();
+    this.isMobile = deviceType === hz.PlayerDeviceType.Mobile;
+
+    log.info(`[DEVICE TYPE] Detected: "${deviceType}", isMobile=${this.isMobile}`);
+
+    // Send device type to backend
+    this.sendNetworkBroadcastEvent(GameEvents.toServer, {
+      type: "device_type_report",
+      isMobile: this.isMobile,
+    });
+    
+    log.info(`[DEVICE TYPE] Reported to backend: isMobile=${this.isMobile}`);
+  }
+  
+  // Update input blocking state based on backend's mobileOnly setting
+  private handleInputBlockingState(data: UIEventPayload): void {
+    const log = this.log.active("handleInputBlockingState");
+    
+    if (data.type !== "state_update") {
+      return;
+    }
+    
+    // Check if mobileOnly mode is enabled on backend
+    const mobileOnlyFlag = (data as any).mobileOnly as boolean | undefined;
+    if (typeof mobileOnlyFlag !== "boolean") {
+      return;
+    }
+    
+    // Only update if we've reported device type
+    if (!this.deviceTypeReported) {
+      return;
+    }
+    
+    // Input is blocked if mobileOnly is enabled AND player is NOT on mobile
+    this.isInputBlocked = mobileOnlyFlag && !this.isMobile;
+    log.info(`[INPUT BLOCKING] Set to: ${this.isInputBlocked} (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
+  }
   private positionCameraAtCookie(): void {
-    const log = this.log.active("positionCameraAtCookie");
+    const log = this.log.inactive("positionCameraAtCookie");
 
     if (!this.props.cookieGizmo) {
       log.warn("No cookie gizmo configured for camera positioning");
@@ -106,13 +174,18 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private setupMobileGestures(): void {
-    const log = this.log.active("setupMobileGestures");
+    const log = this.log.inactive("setupMobileGestures");
     
     try {
       this.gestures = new Gestures(this);
       
       // Detect swipe down gesture
       this.gestures.onSwipe.connectLocalEvent(({ swipeDirection }) => {
+        // Block gestures when mobile-only warning is shown
+        if (this.isInputBlocked) {
+          return;
+        }
+        
         if (swipeDirection === SwipeDirection.Down) {
           log.info("Swipe down detected!");
           this.sendLocalBroadcastEvent(LocalUIEvents.swipeDown, {});
@@ -126,7 +199,7 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private setupRaycastCookieClick(): void {
-    const log = this.log.active("setupRaycastCookieClick");
+    const log = this.log.inactive("setupRaycastCookieClick");
 
     if (!this.props.raycastGizmo) {
       log.warn("raycastGizmo prop not set - cookie tap handling disabled");
@@ -175,6 +248,11 @@ class Default extends hz.Component<typeof Default> {
     if (!this.raycastGizmo || !this.cookieCollider) {
       return;
     }
+    
+    // Block input when mobile-only warning is shown
+    if (this.isInputBlocked) {
+      return;
+    }
 
     const interactions = interactionInfo || [];
     
@@ -195,6 +273,11 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
+    // Block input when mobile-only warning is shown
+    if (this.isInputBlocked) {
+      return;
+    }
+    
     // If cookie was pressed, release it regardless of where the finger ended
     // This handles the case where user swipes away (e.g., dunk gesture)
     if (this.isCookiePressed) {

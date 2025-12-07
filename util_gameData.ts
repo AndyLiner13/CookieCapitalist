@@ -42,7 +42,7 @@ export type PageType = "home" | "shop" | "stats";
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
   [key: string]: SerializableState;
-  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save";
+  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save" | "device_type_report";
 };
 
 export type UIEventPayload = {
@@ -90,6 +90,15 @@ export const LocalUIEvents = {
   
   // Swipe down gesture detected (mobile only)
   swipeDown: new LocalEvent("local_swipe_down"),
+  
+  // Dunk multiplier activated - triggers 2x multiplier for 10 seconds
+  dunkMultiplier: new LocalEvent<{ multiplier: number; durationMs: number }>("local_dunk_multiplier"),
+  
+  // Click rate update - sent from cookie to overlay during active multiplier
+  clickRateUpdate: new LocalEvent<{ clicksPerSecond: number; isActive: boolean }>("local_click_rate_update"),
+  
+  // Mobile only check - backend tells UI whether to show warning
+  mobileOnlyCheck: new LocalEvent<{ showWarning: boolean }>("local_mobile_only_check"),
 };
 // #endregion
 
@@ -98,12 +107,13 @@ export const LocalUIEvents = {
 // Production model: Each owned upgrade produces cookiesPerCycle every productionTimeMs
 export const UPGRADE_CONFIGS: UpgradeConfig[] = [
   { id: "clicker", image: "Images/ClickerImage.png", name: "Clicker", baseCost: 15, cookiesPerCycle: 1, productionTimeMs: 10000, rateDisplay: "+1" },
-  { id: "grandma", image: "Images/GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerCycle: 10, productionTimeMs: 10000, rateDisplay: "+10" },
-  { id: "farm", image: "Images/FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerCycle: 80, productionTimeMs: 10000, rateDisplay: "+80" },
-  { id: "factory", image: "Images/FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerCycle: 470, productionTimeMs: 10000, rateDisplay: "+470" },
-  { id: "lab", image: "Images/LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerCycle: 2600, productionTimeMs: 10000, rateDisplay: "+2.6K" },
-  { id: "fab", image: "Images/FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerCycle: 14000, productionTimeMs: 10000, rateDisplay: "+14K" },
-  { id: "planet", image: "Images/PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerCycle: 78000, productionTimeMs: 10000, rateDisplay: "+78K" },
+  { id: "grandma", image: "Images/GrandmaImage.png", name: "Grandma", baseCost: 100, cookiesPerCycle: 10, productionTimeMs: 15000, rateDisplay: "+10" },
+  { id: "farm", image: "Images/FarmImage.png", name: "Cookie Farm", baseCost: 1100, cookiesPerCycle: 80, productionTimeMs: 20000, rateDisplay: "+80" },
+  { id: "factory", image: "Images/FactoryImage.png", name: "Cookie Factory", baseCost: 12000, cookiesPerCycle: 470, productionTimeMs: 30000, rateDisplay: "+470" },
+  { id: "lab", image: "Images/LabImage.png", name: "Cookie Laboratory", baseCost: 130000, cookiesPerCycle: 2600, productionTimeMs: 45000, rateDisplay: "+2.6K" },
+  { id: "fab", image: "Images/FabImage.png", name: "Cookie Fab Plant", baseCost: 1400000, cookiesPerCycle: 14000, productionTimeMs: 60000, rateDisplay: "+14K" },
+  { id: "planet", image: "Images/PlanetImage.png", name: "Cookie Planet", baseCost: 20000000, cookiesPerCycle: 78000, productionTimeMs: 90000, rateDisplay: "+78K" },
+  { id: "galaxy", image: "Images/GalaxyImage.png", name: "Cookie Galaxy", baseCost: 330000000, cookiesPerCycle: 440000, productionTimeMs: 120000, rateDisplay: "+440K" },
 ];
 
 // Cost scaling factor per upgrade owned
@@ -223,9 +233,9 @@ export function formatNumber(num: number): string {
   return Math.floor(num).toLocaleString();
 }
 
-// Format cookie count for header display (shows full number)
+// Format cookie count for header display (uses compact format like 1.1M)
 export function formatCookieDisplay(cookies: number): string {
-  return `${Math.floor(cookies).toLocaleString()} Cookies!`;
+  return `${formatNumber(Math.floor(cookies))} Cookies!`;
 }
 
 // Format CPS for header display

@@ -20,6 +20,11 @@ import {
 
 // #region 🏷️ Type Definitions
 const POPUP_COUNT = 40;
+const DUNK_BASE_MULTIPLIER = 2;
+const DUNK_DURATION_MS = 15000; // 15 seconds for all multipliers
+const MAX_MULTIPLIER = 16; // Maximum multiplier cap
+const CLICKS_PER_SECOND_THRESHOLD = 2; // Required click rate to double multiplier
+const CLICK_RATE_WINDOW_MS = 5000; // 5 second window to maintain click rate
 // #endregion
 
 class Default extends hz.Component<typeof Default> {
@@ -38,11 +43,21 @@ class Default extends hz.Component<typeof Default> {
   private cookiesPerClick: number = 1;
   private nextPopupIndex: number = 0;
   private isDunking: boolean = false;
+  
+  // Multiplier state
+  private currentMultiplier: number = 1;
+  private multiplierEndTime: number = 0;
+  
+  // Click rate tracking for multiplier upgrades
+  private clickTimestamps: number[] = [];
+  private clickRateCheckTimerId: number | null = null;
+  private clickRateDisplayTimerId: number | null = null;
+  private consecutiveGoodIntervals: number = 0;
   // #endregion
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.active("start");
+    const log = this.log.inactive("start");
 
     this.noesisGizmo = this.entity.as(NoesisGizmo);
     if (!this.noesisGizmo) {
@@ -148,13 +163,36 @@ class Default extends hz.Component<typeof Default> {
 
     // Trigger release animation
     this.triggerClickUp();
+    
+    // Check if multiplier is still active
+    const now = Date.now();
+    const isMultiplierActive = now < this.multiplierEndTime && this.currentMultiplier > 1;
+    const activeMultiplier = isMultiplierActive ? this.currentMultiplier : 1;
+    const effectiveCookies = this.cookiesPerClick * activeMultiplier;
+    
+    // Track click for rate calculation if multiplier is active
+    if (isMultiplierActive) {
+      this.clickTimestamps.push(now);
+      // Keep only clicks from the last 5 seconds
+      this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
+      
+      // Reset multiplier timer on click
+      this.multiplierEndTime = now + DUNK_DURATION_MS;
+      // Broadcast updated timer to overlay (don't trigger pop-in, just refresh timer)
+      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+        multiplier: this.currentMultiplier,
+        durationMs: DUNK_DURATION_MS,
+        isRefresh: true,
+      });
+    }
 
-    // Show +# popup
-    this.showPopup(`+${this.cookiesPerClick}`);
+    // Show +# popup (with multiplier if active)
+    this.showPopup(`+${effectiveCookies}`);
 
-    // Send to server via NETWORK event
+    // Send to server via NETWORK event with multiplier
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "cookie_clicked",
+      multiplier: activeMultiplier,
     });
   }
 
@@ -212,6 +250,44 @@ class Default extends hz.Component<typeof Default> {
     }
 
     this.isDunking = true;
+    
+    const now = Date.now();
+    const isMultiplierActive = now < this.multiplierEndTime && this.currentMultiplier > 1;
+    
+    // If multiplier is already active, just refresh the timer (don't reset to 2x)
+    if (isMultiplierActive) {
+      this.multiplierEndTime = now + DUNK_DURATION_MS;
+      log.info(`Dunk refreshed timer for ${this.currentMultiplier}x multiplier`);
+      
+      // Broadcast refresh to overlay
+      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+        multiplier: this.currentMultiplier,
+        durationMs: DUNK_DURATION_MS,
+        isRefresh: true,
+      });
+    } else {
+      // No active multiplier - start fresh at 2x
+      this.currentMultiplier = DUNK_BASE_MULTIPLIER;
+      this.multiplierEndTime = now + DUNK_DURATION_MS;
+      
+      // Reset click tracking
+      this.clickTimestamps = [];
+      this.consecutiveGoodIntervals = 0;
+      
+      // Start click rate checker
+      this.startClickRateChecker();
+      
+      // Start click rate display updates (every 500ms)
+      this.startClickRateDisplay();
+      
+      // Broadcast dunk multiplier event to overlay
+      this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+        multiplier: this.currentMultiplier,
+        durationMs: DUNK_DURATION_MS,
+        isRefresh: false,
+      });
+      log.info(`Dunk started multiplier at ${this.currentMultiplier}x for ${DUNK_DURATION_MS}ms`);
+    }
 
     this.dataContext.dunkAnimate = false;
     if (this.noesisGizmo) {
@@ -232,6 +308,103 @@ class Default extends hz.Component<typeof Default> {
         }
       }, 1700);
     }, 50);
+  }
+  
+  private startClickRateChecker(): void {
+    const log = this.log.active("startClickRateChecker");
+    
+    // Clear existing timer if any
+    if (this.clickRateCheckTimerId !== null) {
+      this.async.clearInterval(this.clickRateCheckTimerId);
+    }
+    
+    // Check click rate every second
+    this.clickRateCheckTimerId = this.async.setInterval(() => {
+      const now = Date.now();
+      
+      // Stop checking if multiplier expired
+      if (now >= this.multiplierEndTime || this.currentMultiplier <= 1) {
+        this.stopClickRateChecker();
+        return;
+      }
+      
+      // Calculate clicks per second over the last 5 seconds
+      this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
+      const clicksPerSecond = this.clickTimestamps.length / (CLICK_RATE_WINDOW_MS / 1000);
+      
+      log.info(`Click rate: ${clicksPerSecond.toFixed(2)} CPS (need ${CLICKS_PER_SECOND_THRESHOLD}), consecutive good: ${this.consecutiveGoodIntervals}`);
+      
+      if (clicksPerSecond >= CLICKS_PER_SECOND_THRESHOLD) {
+        this.consecutiveGoodIntervals++;
+        
+        // After 5 consecutive good intervals (5 seconds), double the multiplier
+        if (this.consecutiveGoodIntervals >= 5 && this.currentMultiplier < MAX_MULTIPLIER) {
+          this.currentMultiplier *= 2;
+          this.consecutiveGoodIntervals = 0;
+          
+          log.info(`Multiplier doubled to ${this.currentMultiplier}x!`);
+          
+          // Broadcast new multiplier with pop-in animation
+          this.sendLocalBroadcastEvent(LocalUIEvents.dunkMultiplier, {
+            multiplier: this.currentMultiplier,
+            durationMs: this.multiplierEndTime - now,
+            isRefresh: false,
+          });
+        }
+      } else {
+        // Reset consecutive counter if click rate drops
+        this.consecutiveGoodIntervals = 0;
+      }
+    }, 1000);
+  }
+  
+  private stopClickRateChecker(): void {
+    if (this.clickRateCheckTimerId !== null) {
+      this.async.clearInterval(this.clickRateCheckTimerId);
+      this.clickRateCheckTimerId = null;
+    }
+    if (this.clickRateDisplayTimerId !== null) {
+      this.async.clearInterval(this.clickRateDisplayTimerId);
+      this.clickRateDisplayTimerId = null;
+    }
+    this.consecutiveGoodIntervals = 0;
+    
+    // Notify overlay that click rate is no longer active
+    this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
+      clicksPerSecond: 0,
+      isActive: false,
+    });
+  }
+  
+  private startClickRateDisplay(): void {
+    // Clear existing timer if any
+    if (this.clickRateDisplayTimerId !== null) {
+      this.async.clearInterval(this.clickRateDisplayTimerId);
+    }
+    
+    // Update click rate display every 500ms
+    this.clickRateDisplayTimerId = this.async.setInterval(() => {
+      const now = Date.now();
+      
+      // Stop if multiplier expired
+      if (now >= this.multiplierEndTime || this.currentMultiplier <= 1) {
+        this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
+          clicksPerSecond: 0,
+          isActive: false,
+        });
+        return;
+      }
+      
+      // Calculate current click rate
+      this.clickTimestamps = this.clickTimestamps.filter(t => now - t < CLICK_RATE_WINDOW_MS);
+      const clicksPerSecond = this.clickTimestamps.length / (CLICK_RATE_WINDOW_MS / 1000);
+      
+      // Broadcast to overlay
+      this.sendLocalBroadcastEvent(LocalUIEvents.clickRateUpdate, {
+        clicksPerSecond: clicksPerSecond,
+        isActive: true,
+      });
+    }, 500);
   }
 
   private showPopup(text: string): void {

@@ -53,7 +53,7 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.active("start");
+    const log = this.log.inactive("start");
 
     this.noesisGizmo = this.entity.as(NoesisGizmo);
     if (!this.noesisGizmo) {

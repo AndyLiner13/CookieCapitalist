@@ -1,0 +1,64 @@
+<!-- 
+  MobileOnly - Warning screen for non-mobile users (Screen Overlay)
+  Display Mode: Screen Overlay, Render Order: 100 (top-most layer)
+  Input Mode: Interactive, blocking
+  Shows warning when user is playing on web instead of mobile
+-->
+
+<Page
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  mc:Ignorable="d"
+  d:DataContext="MobileOnly_DataSet"
+  d:DesignWidth="393"
+  d:DesignHeight="852"
+  Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Page}}"
+  Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}"
+  Background="#E6000000"
+  IsHitTestVisible="True">
+
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Page}}" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}" IsHitTestVisible="True">
+    <!-- Dark overlay background - Transparent background makes entire area clickable -->
+    
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="32" MaxWidth="320" IsHitTestVisible="False">
+      
+      <!-- Warning Icon -->
+      <TextBlock Text="⚠️" 
+                 FontSize="80" 
+                 HorizontalAlignment="Center" 
+                 Margin="0,0,0,24"/>
+      
+      <!-- Title -->
+      <TextBlock Text="Mobile Only" 
+                 FontFamily="Fonts/#Anton-Regular" 
+                 FontSize="48" 
+                 Foreground="#FFD700" 
+                 HorizontalAlignment="Center"
+                 TextAlignment="Center"
+                 Margin="0,0,0,16">
+        <TextBlock.Effect>
+          <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="3" Opacity="0.8"/>
+        </TextBlock.Effect>
+      </TextBlock>
+      
+      <!-- Message -->
+      <TextBlock Text="This game must be played on mobile to keep the game fair for all players." 
+                 FontFamily="Fonts/#Roboto-Regular" 
+                 FontSize="25" 
+                 Foreground="#FFFFFF" 
+                 HorizontalAlignment="Center"
+                 TextAlignment="Center"
+                 TextWrapping="Wrap"
+                 MaxWidth="320"
+                 Margin="0,0,0,32"
+                 Opacity="0.9"/>
+      
+      <!-- Instructions -->
+      
+      <!-- Footer note -->
+      
+    </StackPanel>
+  </Grid>
+</Page>

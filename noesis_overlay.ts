@@ -28,12 +28,28 @@ import {
 const LEADERBOARD_HIDDEN_POS = new Vec3(0, -100, 0);
 // Distance in front of camera when visible
 const LEADERBOARD_DISTANCE_FROM_CAMERA = 1.23; // 2 meters in front of camera
+// Aggressive BorisFX s_shake style - exponential intensity scaling
+// Range = pixels of shake, frequency = new target chance per frame, speed = lerp speed
+const SHAKE_2X = { range: 4, frequency: 0.4, speed: 0.25 };    // 2x: noticeable shake
+const SHAKE_4X = { range: 6, frequency: 0.4, speed: 0.28 };    // 4x: moderate shake
+const SHAKE_8X = { range: 9, frequency: 0.45, speed: 0.32 };   // 8x: stronger shake
+const SHAKE_16X = { range: 14, frequency: 0.5, speed: 0.38 };  // 16x: intense shake
+const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
+const PULSE_MIN_OPACITY = 0.35; // Never go below 35% opacity
+const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
+// Pop-in/balloon animation settings
+const POP_IN_DURATION_MS = 1500; // 1.5 seconds for dramatic balloon effect
+const POP_IN_OVERSHOOT = 1.5; // How much to overshoot before settling
+// Scale multiplier per tier (1.23x bigger each level)
+const SCALE_PER_TIER = 1.23;
 // #endregion
 
 class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     leaderboardGizmo: { type: PropTypes.Entity },
+    milkBackgroundGizmo: { type: PropTypes.Entity },
+    milkForegroundGizmo: { type: PropTypes.Entity },
   };
   // #endregion
 
@@ -42,6 +58,8 @@ class Default extends Component<typeof Default> {
   private noesisGizmo: NoesisGizmo | null = null;
   private dataContext: IUiViewModelObject = {};
   private leaderboardGizmo: Entity | null = null;
+  private milkBackgroundGizmo: Entity | null = null;
+  private milkForegroundGizmo: Entity | null = null;
   
   // Current page
   private currentPage: PageType = "home";
@@ -49,11 +67,27 @@ class Default extends Component<typeof Default> {
   // Cached game state for header
   private cookies: number = 0;
   private cookiesPerSecond: number = 0;
+  
+  // Multiplier state
+  private currentMultiplier: number = 1;
+  private multiplierEndTime: number = 0;
+  private multiplierTimerId: number | null = null;
+  private shakeTimerId: number | null = null;
+  private popInTimerId: number | null = null;
+  
+  // Smooth animation state
+  private targetShakeX: number = 0;
+  private targetShakeY: number = 0;
+  private currentShakeX: number = 0;
+  private currentShakeY: number = 0;
+  private pulsePhase: number = 0;
+  private currentScale: number = 1;
+  private baseScale: number = 1; // Base scale increases 1.23x per tier
   // #endregion
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.active("start");
+    const log = this.log.inactive("start");
 
     this.noesisGizmo = this.entity.as(NoesisGizmo);
     if (!this.noesisGizmo) {
@@ -75,10 +109,28 @@ class Default extends Component<typeof Default> {
       log.warn("leaderboardGizmo prop is NOT SET on overlay entity - cannot control leaderboard visibility");
     }
 
+    // Cache milk gizmos (optional)
+    this.milkBackgroundGizmo = this.props.milkBackgroundGizmo || null;
+    this.milkForegroundGizmo = this.props.milkForegroundGizmo || null;
+    log.info(`Milk background prop: ${this.milkBackgroundGizmo ? "SET" : "NULL"}`);
+    log.info(`Milk foreground prop: ${this.milkForegroundGizmo ? "SET" : "NULL"}`);
+
     // Listen for state updates via NETWORK event (from Backend)
     this.connectNetworkBroadcastEvent(
       UIEvents.toClient,
       (data: UIEventPayload) => this.handleStateChanged(data)
+    );
+    
+    // Listen for dunk multiplier events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.dunkMultiplier,
+      (data: { multiplier: number; durationMs: number; isRefresh?: boolean }) => this.onDunkMultiplier(data)
+    );
+    
+    // Listen for click rate updates
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.clickRateUpdate,
+      (data: { clicksPerSecond: number; isActive: boolean }) => this.onClickRateUpdate(data)
     );
 
     // Build and set initial data context (commands are set once here)
@@ -102,6 +154,19 @@ class Default extends Component<typeof Default> {
       cookieCount: formatCookieDisplay(this.cookies),
       cookiesPerSecond: formatCPSDisplay(this.cookiesPerSecond),
       
+      // Click rate indicator (shown during active multiplier)
+      clicksPerSecondText: "",
+      clicksPerSecondVisible: false,
+      clicksPerSecondColor: "#ffffff",
+      
+      // Multiplier display
+      multiplierText: "2x",
+      multiplierVisible: false,
+      multiplierOpacity: 1,
+      multiplierScale: 1,
+      shakeX: 0,
+      shakeY: 0,
+      
       // Navigation commands (set once, never recreated)
       onShopClick: () => this.navigateToPage("shop"),
       onHomeClick: () => this.navigateToPage("home"),
@@ -123,6 +188,9 @@ class Default extends Component<typeof Default> {
     // Broadcast page change to CoreGame and other overlays (Clickers, Background)
     this.sendLocalBroadcastEvent(LocalUIEvents.changePage, { page });
     
+    // Update multiplier visibility based on page (only show on home)
+    this.updateMultiplierVisibility();
+    
     // Request save when navigating to stats (leaderboard) - ensures latest data is saved
     if (page === "stats") {
       log.info("Requesting PPV save before viewing leaderboard");
@@ -136,8 +204,8 @@ class Default extends Component<typeof Default> {
         const cameraPos = LocalCamera.position.get();
         const cameraForward = LocalCamera.forward.get();
         
-        // Position leaderboard in front of camera
-        const leaderboardPos = cameraPos.add(cameraForward.mul(LEADERBOARD_DISTANCE_FROM_CAMERA));
+        // Position leaderboard in front of camera, slightly lower
+        const leaderboardPos = cameraPos.add(cameraForward.mul(LEADERBOARD_DISTANCE_FROM_CAMERA)).sub(new Vec3(0, 0.065, 0));
         
         // Rotate to face the same direction as camera (not back at it)
         const leaderboardRot = Quaternion.lookRotation(cameraForward, Vec3.up);
@@ -151,20 +219,300 @@ class Default extends Component<typeof Default> {
         log.info(`Leaderboard moved to hidden position: ${LEADERBOARD_HIDDEN_POS.toString()}`);
       }
     }
+    
+    // Show/hide milk gizmos based on page (only visible on home)
+    const showMilk = page === "home";
+    if (this.milkBackgroundGizmo) {
+      this.milkBackgroundGizmo.visible.set(showMilk);
+      log.info(`Milk background ${showMilk ? "shown" : "hidden"}`);
+    }
+    if (this.milkForegroundGizmo) {
+      this.milkForegroundGizmo.visible.set(showMilk);
+      log.info(`Milk foreground ${showMilk ? "shown" : "hidden"}`);
+    }
   }
   // #endregion
 
   // #region 🎬 Handlers
   private handleStateChanged(data: UIEventPayload): void {
+    const log = this.log.inactive("handleStateChanged");
+    
     if (data.type !== "state_update") return;
     
     this.cookies = (data.cookies as number) || 0;
     this.cookiesPerSecond = (data.cps as number) || 0;
     this.updateUI();
   }
+  
+  private onClickRateUpdate(data: { clicksPerSecond: number; isActive: boolean }): void {
+    const log = this.log.inactive("onClickRateUpdate");
+    
+    if (!data.isActive) {
+      // Hide click rate indicator
+      this.dataContext.clicksPerSecondVisible = false;
+      this.dataContext.clicksPerSecondText = "";
+    } else {
+      // Show click rate with color coding
+      const cps = data.clicksPerSecond;
+      const requiredCps = 2; // CLICKS_PER_SECOND_THRESHOLD from noesis_cookie.ts
+      
+      this.dataContext.clicksPerSecondVisible = true;
+      this.dataContext.clicksPerSecondText = `⚡ ${cps.toFixed(1)} clicks/sec`;
+      
+      // Color coding: green if meeting threshold, yellow if close, red if low
+      if (cps >= requiredCps) {
+        this.dataContext.clicksPerSecondColor = "#4CAF50"; // Green
+      } else if (cps >= requiredCps * 0.75) {
+        this.dataContext.clicksPerSecondColor = "#FFC107"; // Yellow/amber
+      } else {
+        this.dataContext.clicksPerSecondColor = "#FF5722"; // Red/orange
+      }
+      
+      log.info(`Click rate: ${cps.toFixed(1)} CPS, color: ${this.dataContext.clicksPerSecondColor}`);
+    }
+    
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  
+  private onDunkMultiplier(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {
+    const log = this.log.active("onDunkMultiplier");
+    
+    const wasActive = this.currentMultiplier > 1;
+    const isNewOrUpgraded = !wasActive || (!data.isRefresh && data.multiplier > this.currentMultiplier);
+    
+    this.currentMultiplier = data.multiplier;
+    this.multiplierEndTime = Date.now() + data.durationMs;
+    
+    log.info(`Multiplier ${data.isRefresh ? 'refreshed' : 'activated'}: ${data.multiplier}x for ${data.durationMs}ms`);
+    
+    // Clear existing timers
+    if (this.multiplierTimerId !== null) {
+      this.async.clearInterval(this.multiplierTimerId);
+    }
+    if (this.shakeTimerId !== null) {
+      this.async.clearInterval(this.shakeTimerId);
+    }
+    if (this.popInTimerId !== null) {
+      this.async.clearInterval(this.popInTimerId);
+    }
+    
+    // Trigger pop-in animation only for new streak or multiplier upgrade (not refreshes)
+    if (isNewOrUpgraded) {
+      this.triggerPopInAnimation();
+    }
+    
+    // Start shake effect based on multiplier tier
+    this.startShakeEffect();
+    
+    // Reset pulse phase
+    this.pulsePhase = 0;
+    
+    // Start countdown timer (update every 16ms for smooth animations)
+    this.multiplierTimerId = this.async.setInterval(() => {
+      const remaining = this.multiplierEndTime - Date.now();
+      
+      if (remaining <= 0) {
+        // Multiplier expired
+        this.stopMultiplierEffects();
+        log.info("Multiplier expired");
+      } else {
+        // Update display - only visible on home page, no timer shown
+        this.dataContext.multiplierText = `${this.currentMultiplier}x`;
+        this.dataContext.multiplierVisible = this.currentPage === "home";
+        
+        // Smooth pulse when under 5 seconds remaining
+        if (remaining <= FLASH_THRESHOLD_MS) {
+          this.pulsePhase += PULSE_SPEED;
+          // Sine wave oscillation between PULSE_MIN_OPACITY and 1
+          const pulseValue = (Math.sin(this.pulsePhase) + 1) / 2; // 0 to 1
+          this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * pulseValue;
+        } else {
+          this.dataContext.multiplierOpacity = 1;
+        }
+      }
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 16);
+    
+    // Initial update - only visible on home page
+    this.dataContext.multiplierText = `${this.currentMultiplier}x`;
+    this.dataContext.multiplierVisible = this.currentPage === "home";
+    this.dataContext.multiplierOpacity = 1;
+    this.dataContext.multiplierScale = 1;
+    
+    log.info(`Multiplier UI: visible=${this.dataContext.multiplierVisible}, text=${this.dataContext.multiplierText}, page=${this.currentPage}`);
+    
+    this.updateUI();
+  }
+  
+  private triggerPopInAnimation(): void {
+    const log = this.log.active("triggerPopInAnimation");
+    log.info("Starting pop-in animation");
+    
+    // Clear any existing pop-in animation
+    if (this.popInTimerId !== null) {
+      this.async.clearInterval(this.popInTimerId);
+      this.popInTimerId = null;
+    }
+    
+    // Calculate base scale for this multiplier tier (1.23x per tier)
+    // 2x = tier 0 = scale 1.0, 4x = tier 1 = scale 1.23, 8x = tier 2 = scale 1.51, 16x = tier 3 = scale 1.86
+    const tier = Math.log2(this.currentMultiplier) - 1; // 2x=0, 4x=1, 8x=2, 16x=3
+    this.baseScale = Math.pow(SCALE_PER_TIER, tier);
+    
+    // Balloon effect: start small, overshoot big, settle to base scale
+    const startScale = this.baseScale * 0.3;
+    const overshootScale = this.baseScale * POP_IN_OVERSHOOT;
+    const targetScale = this.baseScale;
+    
+    this.currentScale = startScale;
+    this.dataContext.multiplierScale = startScale;
+    
+    const startTime = Date.now();
+    
+    this.popInTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / POP_IN_DURATION_MS, 1);
+      
+      if (progress >= 1) {
+        // Animation complete - settle at base scale
+        this.currentScale = this.baseScale;
+        this.dataContext.multiplierScale = this.baseScale;
+        if (this.popInTimerId !== null) {
+          this.async.clearInterval(this.popInTimerId);
+          this.popInTimerId = null;
+        }
+        log.info(`Pop-in animation complete, baseScale: ${this.baseScale.toFixed(2)}`);
+      } else {
+        // Balloon effect: elastic ease out with overshoot (1500ms duration)
+        // Phase 1 (0-0.4): rapid expansion from start to overshoot
+        // Phase 2 (0.4-1): slow settle down to target
+        let scale: number;
+        if (progress < 0.4) {
+          // Expand rapidly to overshoot (first 600ms)
+          const t = progress / 0.4; // 0 to 1 in first 40%
+          const easeOut = 1 - Math.pow(1 - t, 3); // Cubic ease out
+          scale = startScale + (overshootScale - startScale) * easeOut;
+        } else {
+          // Settle down slowly to target (remaining 900ms)
+          const t = (progress - 0.4) / 0.6; // 0 to 1 in remaining 60%
+          const easeOut = 1 - Math.pow(1 - t, 2.5); // Slow ease out
+          scale = overshootScale + (targetScale - overshootScale) * easeOut;
+        }
+        this.currentScale = scale;
+        this.dataContext.multiplierScale = scale;
+      }
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 16);
+  }
+  
+  private startShakeEffect(): void {
+    // Determine shake intensity based on multiplier - exponential scaling
+    let shakeConfig = SHAKE_2X;
+    if (this.currentMultiplier >= 16) {
+      shakeConfig = SHAKE_16X;
+    } else if (this.currentMultiplier >= 8) {
+      shakeConfig = SHAKE_8X;
+    } else if (this.currentMultiplier >= 4) {
+      shakeConfig = SHAKE_4X;
+    }
+    
+    // BorisFX s_shake style - aggressive random movement with fast lerp
+    this.shakeTimerId = this.async.setInterval(() => {
+      const range = shakeConfig.range;
+      const frequency = shakeConfig.frequency;
+      const speed = shakeConfig.speed;
+      
+      // High frequency target changes for jittery aggressive shake
+      if (Math.random() < frequency) {
+        // Random direction with full range
+        this.targetShakeX = (Math.random() - 0.5) * 2 * range;
+        this.targetShakeY = (Math.random() - 0.5) * 2 * range;
+      }
+      
+      // Fast interpolation for snappy movement
+      this.currentShakeX += (this.targetShakeX - this.currentShakeX) * speed;
+      this.currentShakeY += (this.targetShakeY - this.currentShakeY) * speed;
+      
+      // Add micro-jitter for extra aggression
+      const jitter = range * 0.1;
+      const finalX = this.currentShakeX + (Math.random() - 0.5) * jitter;
+      const finalY = this.currentShakeY + (Math.random() - 0.5) * jitter;
+      
+      this.dataContext.shakeX = finalX;
+      this.dataContext.shakeY = finalY;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, 16);
+  }
+  
+  private stopMultiplierEffects(): void {
+    this.currentMultiplier = 1;
+    this.dataContext.multiplierVisible = false;
+    this.dataContext.multiplierText = "";
+    this.dataContext.shakeX = 0;
+    this.dataContext.shakeY = 0;
+    this.dataContext.multiplierOpacity = 1;
+    this.dataContext.multiplierScale = 1;
+    
+    // Reset smooth animation state
+    this.currentShakeX = 0;
+    this.currentShakeY = 0;
+    this.targetShakeX = 0;
+    this.targetShakeY = 0;
+    this.pulsePhase = 0;
+    this.currentScale = 1;
+    this.baseScale = 1;
+    
+    if (this.multiplierTimerId !== null) {
+      this.async.clearInterval(this.multiplierTimerId);
+      this.multiplierTimerId = null;
+    }
+    if (this.shakeTimerId !== null) {
+      this.async.clearInterval(this.shakeTimerId);
+      this.shakeTimerId = null;
+    }
+    if (this.popInTimerId !== null) {
+      this.async.clearInterval(this.popInTimerId);
+      this.popInTimerId = null;
+    }
+    
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
   // #endregion
 
   // #region 🛠️ Helper Methods
+  private updateMultiplierVisibility(): void {
+    // Multiplier is only visible on home page AND when active
+    const isMultiplierActive = this.currentMultiplier > 1 && Date.now() < this.multiplierEndTime;
+    this.dataContext.multiplierVisible = this.currentPage === "home" && isMultiplierActive;
+    
+    // Reset shake position when hidden
+    if (!this.dataContext.multiplierVisible) {
+      this.dataContext.shakeX = 0;
+      this.dataContext.shakeY = 0;
+      this.currentShakeX = 0;
+      this.currentShakeY = 0;
+      this.targetShakeX = 0;
+      this.targetShakeY = 0;
+    }
+    
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  
   private updateUI(): void {
     if (!this.noesisGizmo) return;
     

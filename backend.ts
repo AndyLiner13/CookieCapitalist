@@ -54,7 +54,9 @@ class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     playerController: { type: PropTypes.Entity },
+    mobileOnlyGizmo: { type: PropTypes.Entity },
     resetStats: { type: PropTypes.Boolean, default: false }, // When enabled, resets all player stats to 0 on join
+    mobileOnly: { type: PropTypes.Boolean, default: false }, // When enabled, shows warning for non-mobile users
   };
   // #endregion
 
@@ -83,6 +85,9 @@ class Default extends Component<typeof Default> {
   // Active player reference
   private activePlayer: Player | null = null;
   
+  // Device type tracking
+  private playerIsMobile: boolean | null = null;
+  
   // Auto-save interval ID
   private autoSaveTimerId: number | null = null;
   private static readonly AUTO_SAVE_INTERVAL_MS = 30000; // Save every 30 seconds
@@ -90,7 +95,7 @@ class Default extends Component<typeof Default> {
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.active("start");
+    const log = this.log.inactive("start");
     
     // === SERVER-SIDE SETUP ===
 
@@ -111,6 +116,12 @@ class Default extends Component<typeof Default> {
     this.connectNetworkBroadcastEvent(
       GameEvents.toServer,
       (data: GameEventPayload) => this.handlePlayerEvent(data)
+    );
+    
+    // Listen for device type reports from local player script
+    this.connectNetworkBroadcastEvent(
+      GameEvents.toServer,
+      (data: GameEventPayload) => this.handleDeviceTypeReport(data)
     );
     
     // Note: Production timers are now handled client-side (noesis_coreGame.ts)
@@ -155,10 +166,11 @@ class Default extends Component<typeof Default> {
   
   // Handle player entering world
   private onPlayerEnter(player: Player): void {
-    const log = this.log.active("onPlayerEnter");
+    const log = this.log.inactive("onPlayerEnter");
     log.info(`Player entered: ${player.name.get()}`);
     
     this.activePlayer = player;
+    this.playerIsMobile = null; // Reset device type - will be reported by controller
     this.assignPlayerController(player);
     
     // Check if stats should be reset
@@ -186,6 +198,9 @@ class Default extends Component<typeof Default> {
     controller.owner.set(player);
     log.info(`Assigned player controller ownership to ${player.name.get()}`);
   }
+  
+  // Note: MobileOnly overlay visibility is now handled by noesis_mobileOnly.ts
+  // which uses setLocalEntityVisibility() for proper client-side control
   
   // Reset all player stats to 0 and save to PPVs
   private resetPlayerStats(player: Player): void {
@@ -237,6 +252,7 @@ class Default extends Component<typeof Default> {
     
     if (this.activePlayer === player) {
       this.activePlayer = null;
+      this.playerIsMobile = null;
     }
   }
   
@@ -261,7 +277,7 @@ class Default extends Component<typeof Default> {
     
     switch (data.type) {
       case "cookie_clicked":
-        this.handleCookieClick();
+        this.handleCookieClick(data.multiplier as number | undefined);
         break;
         
       case "buy_upgrade":
@@ -279,17 +295,22 @@ class Default extends Component<typeof Default> {
       case "request_save":
         this.handleSaveRequest();
         break;
+        
+      case "device_type_report":
+        this.handleDeviceTypeReport(data);
+        break;
     }
   }
   
-  private handleCookieClick(): void {
+  private handleCookieClick(multiplier?: number): void {
     const log = this.log.inactive("handleCookieClick");
     
-    const earnedAmount = this.gameState.cookiesPerClick;
+    const effectiveMultiplier = multiplier && multiplier > 1 ? multiplier : 1;
+    const earnedAmount = this.gameState.cookiesPerClick * effectiveMultiplier;
     this.gameState.cookies += earnedAmount;
     this.gameState.totalCookiesEarned += earnedAmount; // Leaderboard stat - never decreases
     
-    log.info(`Cookie clicked! Earned: ${earnedAmount}, Total: ${this.gameState.cookies}, Lifetime: ${this.gameState.totalCookiesEarned}`);
+    log.info(`Cookie clicked! Earned: ${earnedAmount} (${effectiveMultiplier}x), Total: ${this.gameState.cookies}, Lifetime: ${this.gameState.totalCookiesEarned}`);
     this.throttledBroadcastStateUpdate();
   }
   
@@ -370,6 +391,9 @@ class Default extends Component<typeof Default> {
       cps: this.cookiesPerSecond,
       cookiesPerClick: this.gameState.cookiesPerClick,
       upgrades: this.gameState.upgrades,
+      // Mirror backend MobileOnly prop into client state so local scripts
+      // (controller_player, MobileOnly overlay) can apply device-specific rules.
+      mobileOnly: this.props.mobileOnly,
     };
     
     this.sendNetworkBroadcastEvent(UIEvents.toClient, stateData);
@@ -579,6 +603,48 @@ class Default extends Component<typeof Default> {
     } catch (error) {
       log.error(`[LEADERBOARD] Failed: ${error}`);
     }
+  }
+  
+  // Handle device type report from local player script
+  private handleDeviceTypeReport(data: GameEventPayload): void {
+    const log = this.log.active("handleDeviceTypeReport");
+    
+    if (data.type !== "device_type_report") {
+      return;
+    }
+    
+    const isMobile = data.isMobile as boolean | undefined;
+    if (typeof isMobile !== "boolean") {
+      log.warn("Invalid device type report - isMobile not boolean");
+      return;
+    }
+    
+    this.playerIsMobile = isMobile;
+    log.info(`[DEVICE TYPE] Player reported: ${isMobile ? "Mobile" : "Desktop/VR"}`);
+    
+    // Update MobileOnly gizmo visibility based on device type and mobileOnly setting
+    this.updateMobileOnlyVisibility();
+  }
+  
+  // Update MobileOnly overlay visibility based on player device and backend setting
+  private updateMobileOnlyVisibility(): void {
+    const log = this.log.active("updateMobileOnlyVisibility");
+    
+    if (!this.props.mobileOnlyGizmo) {
+      log.info("[MOBILE ONLY] mobileOnlyGizmo prop not set - skipping");
+      return;
+    }
+    
+    if (this.playerIsMobile === null) {
+      log.info("[MOBILE ONLY] Device type not yet reported - skipping");
+      return;
+    }
+    
+    // Show overlay if mobileOnly is enabled AND player is NOT on mobile
+    const shouldShow = this.props.mobileOnly && !this.playerIsMobile;
+    
+    this.props.mobileOnlyGizmo.visible.set(shouldShow);
+    log.info(`[MOBILE ONLY] Overlay visibility: ${shouldShow} (mobileOnly=${this.props.mobileOnly}, isMobile=${this.playerIsMobile})`);
   }
   
   // Force leaderboard update (bypasses throttle) - used for initial load

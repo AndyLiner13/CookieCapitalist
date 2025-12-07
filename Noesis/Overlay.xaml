@@ -19,6 +19,8 @@
 
 <Page.Resources>
   <ResourceDictionary>
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    
     <!-- Invisible button style - no hover/click visual feedback -->
     <Style x:Key="InvisibleButtonStyle" TargetType="Button">
       <Setter Property="Background" Value="Transparent"/>
@@ -41,7 +43,8 @@
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
 
   <Grid.RowDefinitions>
-    <RowDefinition Height="143"/>
+    <RowDefinition Height="165"/>
+    <RowDefinition Height="Auto"/>
     <RowDefinition Height="*"/>
     <RowDefinition Height="124"/>
   </Grid.RowDefinitions>
@@ -53,7 +56,40 @@
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
       <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
       <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center"/>
+      <!-- Click rate indicator (only visible during active multiplier) -->
+      <TextBlock Text="{Binding clicksPerSecondText}" 
+                 FontFamily="Fonts/#Anton-Regular" 
+                 FontSize="13" 
+                 Foreground="{Binding clicksPerSecondColor}" 
+                 TextAlignment="Center"
+                 Visibility="{Binding clicksPerSecondVisible, Converter={StaticResource BoolToVis}}"/>
     </StackPanel>
+  </Border>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- Region: Multiplier Display (shows above cookie when active)                              -->
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
+  <Border Grid.Row="1" Background="{x:Null}" Padding="0,16,0,0" HorizontalAlignment="Center"
+          Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
+    <TextBlock x:Name="MultiplierText"
+               Text="{Binding multiplierText}" 
+               FontFamily="Fonts/#Bangers-Regular" 
+               FontSize="64" 
+               Foreground="#FFD700" 
+               TextAlignment="Center"
+               HorizontalAlignment="Center"
+               RenderTransformOrigin="0.5,0.5"
+               Opacity="{Binding multiplierOpacity}">
+      <TextBlock.RenderTransform>
+        <TransformGroup>
+          <TranslateTransform x:Name="MultiplierShake" X="{Binding shakeX}" Y="{Binding shakeY}"/>
+          <ScaleTransform x:Name="MultiplierScale" ScaleX="{Binding multiplierScale}" ScaleY="{Binding multiplierScale}"/>
+        </TransformGroup>
+      </TextBlock.RenderTransform>
+      <TextBlock.Effect>
+        <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Opacity="1" Direction="315"/>
+      </TextBlock.Effect>
+    </TextBlock>
   </Border>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
@@ -63,7 +99,7 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#80000000" Padding="16" Grid.Row="2">
+  <Border HorizontalAlignment="Stretch" Background="{x:Null}" Padding="16" Grid.Row="3">
     <Grid HorizontalAlignment="Center">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
