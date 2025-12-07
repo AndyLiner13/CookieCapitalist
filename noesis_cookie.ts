@@ -61,6 +61,7 @@ class Default extends hz.Component<typeof Default> {
   // Multiplier state
   private currentMultiplier: number = 1;
   private multiplierEndTime: number = 0;
+  private streakStartTime: number = 0; // When the current streak started (multiplier > 1)
   
   // Glow rotation state (4 rings with alternating directions)
   private glow1Rotation: number = 0; // 2x - counter-clockwise
@@ -268,6 +269,20 @@ class Default extends hz.Component<typeof Default> {
   private onFallAnimationStarted(): void {
     const log = this.log.active("onFallAnimationStarted");
     
+    // Calculate and report streak duration if there was an active streak
+    if (this.streakStartTime > 0) {
+      const streakDuration = Date.now() - this.streakStartTime;
+      log.info(`Streak ended! Duration: ${streakDuration}ms (${(streakDuration / 1000).toFixed(1)}s)`);
+      
+      // Send streak_ended event to backend
+      this.sendNetworkBroadcastEvent(GameEvents.toServer, {
+        type: "streak_ended",
+        durationMs: streakDuration,
+      });
+      
+      this.streakStartTime = 0;
+    }
+    
     // End the streak - set multiplier to 1 and end time to past
     this.currentMultiplier = 1;
     this.multiplierEndTime = 0;
@@ -419,6 +434,12 @@ class Default extends hz.Component<typeof Default> {
       // Upgrade multiplier!
       const previousMultiplier = this.currentMultiplier;
       this.currentMultiplier *= 2;
+      
+      // Start streak timer if this is the first upgrade (1x -> 2x)
+      if (previousMultiplier === 1) {
+        this.streakStartTime = Date.now();
+        log.info(`Streak started at ${this.streakStartTime}`);
+      }
       
       // Clear click cache for the new tier
       this.clickTimestamps = [];
