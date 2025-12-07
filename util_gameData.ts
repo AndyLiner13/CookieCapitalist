@@ -97,6 +97,9 @@ export const LocalUIEvents = {
   // Click rate update - sent from cookie to overlay during active multiplier
   clickRateUpdate: new LocalEvent<{ clicksPerSecond: number; isActive: boolean }>("local_click_rate_update"),
   
+  // Fall animation started - sent from overlay when 3rd blink begins falling
+  fallAnimationStarted: new LocalEvent("local_fall_animation_started"),
+  
   // Mobile only check - backend tells UI whether to show warning
   mobileOnlyCheck: new LocalEvent<{ showWarning: boolean }>("local_mobile_only_check"),
 };

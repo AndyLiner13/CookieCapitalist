@@ -118,6 +118,12 @@ class Default extends hz.Component<typeof Default> {
       LocalUIEvents.cookieClicked,
       () => this.onCookieClickedEvent()
     );
+    
+    // Listen for fall animation started (from overlay)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.fallAnimationStarted,
+      () => this.onFallAnimationStarted()
+    );
 
     log.info("Cookie UI initialized");
   }
@@ -258,6 +264,23 @@ class Default extends hz.Component<typeof Default> {
         this.noesisGizmo.dataContext = this.dataContext;
       }
     }, 1);
+  }
+  
+  private onFallAnimationStarted(): void {
+    const log = this.log.active("onFallAnimationStarted");
+    
+    // End the streak - set multiplier to 1 and end time to past
+    this.currentMultiplier = 1;
+    this.multiplierEndTime = 0;
+    this.clickTimestamps = [];
+    
+    // Stop all multiplier timers immediately
+    this.stopClickRateChecker();
+    
+    // Trigger glow collapse animation
+    this.fadeOutGlow();
+    
+    log.info("Fall animation started - streak ended, multiplier cleared, glow collapsing");
   }
 
   private triggerClickUp(): void {

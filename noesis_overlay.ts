@@ -391,6 +391,10 @@ class Default extends Component<typeof Default> {
             this.currentShakeY = 0;
             this.targetShakeX = 0;
             this.targetShakeY = 0;
+            
+            // Broadcast that fall has started - cookie will trigger glow collapse
+            this.sendLocalBroadcastEvent(LocalUIEvents.fallAnimationStarted, {});
+            log.info("Fall animation started - broadcasted to cookie");
           }
           
           // Fall progresses over the entire 3rd segment (0..1) once started
