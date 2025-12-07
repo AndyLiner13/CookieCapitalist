@@ -376,8 +376,9 @@ class Default extends Component<typeof Default> {
           const fadeWave = (Math.cos(Math.PI * segmentT) + 1) / 2; // 1 -> 0
           this.dataContext.multiplierOpacity = fadeWave;
           
-          // Fall animation starts immediately when 3rd blink begins (as soon as it starts fading from 100%)
-          if (!this.isFalling) {
+          // Fall animation starts when opacity drops below 95% (very early in the fade)
+          // This ensures the fade is visibly underway before fall motion begins
+          if (fadeWave < 0.95 && !this.isFalling) {
             this.isFalling = true;
             this.fallStartShakeY = this.dataContext.shakeY as number;
             this.fallStartScale = this.dataContext.multiplierScale as number;
@@ -392,17 +393,19 @@ class Default extends Component<typeof Default> {
             this.targetShakeY = 0;
           }
           
-          // Fall progresses over the entire 3rd segment (0..1)
-          const fallDistance = 120;
-          const easeIn = segmentT * segmentT; // quadratic ease-in for downward motion
-          const fallY = this.fallStartShakeY + (fallDistance * easeIn);
-          
-          // Scale down slightly as it falls
-          const scale = this.fallStartScale * (1 - segmentT * 0.2);
-          
-          this.dataContext.shakeX = 0; // Remove horizontal shake during fall
-          this.dataContext.shakeY = fallY;
-          this.dataContext.multiplierScale = scale;
+          // Fall progresses over the entire 3rd segment (0..1) once started
+          if (this.isFalling) {
+            const fallDistance = 120;
+            const easeIn = segmentT * segmentT; // quadratic ease-in for downward motion
+            const fallY = this.fallStartShakeY + (fallDistance * easeIn);
+            
+            // Scale down slightly as it falls
+            const scale = this.fallStartScale * (1 - segmentT * 0.2);
+            
+            this.dataContext.shakeX = 0; // Remove horizontal shake during fall
+            this.dataContext.shakeY = fallY;
+            this.dataContext.multiplierScale = scale;
+          }
         }
       }
       
