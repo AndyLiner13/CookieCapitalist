@@ -38,9 +38,9 @@ const FLASH_THRESHOLD_MS = 5000; // Start pulsing at 5 seconds remaining
 const PULSE_MIN_OPACITY = 0.5; // Never go below 50% opacity
 const PULSE_SPEED = 0.12; // Faster pulse speed (1 second cycle = 0.12 per frame @ 60fps)
 // Blink animation: number of smooth oscillations between 100% and 50%
-// 3.5 cosine cycles over 5000ms gives 4 smooth dips to 50%,
+// 2.5 cosine cycles over 5000ms gives 3 smooth dips to 50%,
 // with the last minimum landing exactly at 5000ms.
-const BLINK_CYCLES = 3.5;
+const BLINK_CYCLES = 2.5;
 // Pop-in/balloon animation settings
 const POP_IN_DURATION_MS = 870; // 1500ms for pop-in animation (fixed duration)
 const POP_IN_OVERSHOOT = 1.23; // How much to overshoot before settling (smaller bounce)
@@ -88,6 +88,9 @@ class Default extends Component<typeof Default> {
   private pulsePhase: number = 0;
   private currentScale: number = 1;
   private baseScale: number = 1; // Base scale increases 1.23x per tier
+  private isFalling: boolean = false;
+  private fallStartShakeY: number = 0;
+  private fallStartScale: number = 1;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -334,31 +337,72 @@ class Default extends Component<typeof Default> {
     
     // Start countdown timer (update every 16ms for smooth animations)
     this.multiplierTimerId = this.async.setInterval(() => {
-      const remaining = this.multiplierEndTime - Date.now();
+      const now = Date.now();
+      const remaining = this.multiplierEndTime - now;
+      
+      // Update display - only visible on home page, no timer shown
+      this.dataContext.multiplierText = `${this.currentMultiplier}x`;
+      this.dataContext.multiplierVisible = this.currentPage === "home";
       
       if (remaining <= 0) {
-        // Blink complete at 0ms - trigger fall animation (1500ms from 50% to 0%)
-        this.fadeOutMultiplier();
-        log.info("Blink complete - starting fall animation");
+        // Ensure final state is fully faded/finished, then stop effects
+        this.dataContext.multiplierOpacity = 0;
+        if (this.noesisGizmo) {
+          this.noesisGizmo.dataContext = this.dataContext;
+        }
+        this.stopMultiplierEffects();
+        log.info("Multiplier animation complete (blink + fall)");
+        return;
+      }
+      
+      // When more than FLASH_THRESHOLD_MS remains, keep full opacity (no blink/fall yet)
+      if (remaining > FLASH_THRESHOLD_MS) {
+        this.dataContext.multiplierOpacity = 1;
       } else {
-        // Update display - only visible on home page, no timer shown
-        this.dataContext.multiplierText = `${this.currentMultiplier}x`;
-        this.dataContext.multiplierVisible = this.currentPage === "home";
+        // Time within the 5000ms blink window
+        const elapsedInBlink = FLASH_THRESHOLD_MS - remaining; // 0..5000ms
+        const clamped = Math.max(0, Math.min(FLASH_THRESHOLD_MS, elapsedInBlink));
+        const segmentDuration = FLASH_THRESHOLD_MS / 3; // 3 segments: 2 blinks + 1 blink+fall
+        const segmentIndex = Math.min(2, Math.floor(clamped / segmentDuration)); // 0,1,2
+        const segmentT = (clamped - segmentIndex * segmentDuration) / segmentDuration; // 0..1
         
-        // Blink animation when under 5 seconds remaining (smooth, time-based)
-        // Opacity oscillates between 100% and 50% using a cosine curve
-        // over exactly 5000ms, hitting 50% (minimum) 4 times, with the
-        // last minimum landing exactly at 5000ms.
-        if (remaining <= FLASH_THRESHOLD_MS) {
-          const elapsedInBlink = FLASH_THRESHOLD_MS - remaining; // 0..5000ms
-          const t = Math.max(0, Math.min(FLASH_THRESHOLD_MS, elapsedInBlink));
-          const normalized = t / FLASH_THRESHOLD_MS; // 0..1
-          const theta = 2 * Math.PI * BLINK_CYCLES * normalized; // 3.5 cycles over 5s
-          const cosValue = Math.cos(theta); // 1 at start, -1 at last 50%
-          const wave01 = (cosValue + 1) / 2; // 1..0
-          this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * wave01;
+        if (segmentIndex < 2) {
+          // First two segments: classic blink between 100% and 50% (cosine wave)
+          const wave = (Math.cos(2 * Math.PI * segmentT) + 1) / 2; // 1 -> 0 -> 1
+          this.dataContext.multiplierOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * wave;
         } else {
-          this.dataContext.multiplierOpacity = 1;
+          // Third segment: final blink from 100% to 0% opacity.
+          // Opacity eases down using a half-cosine wave.
+          const fadeWave = (Math.cos(Math.PI * segmentT) + 1) / 2; // 1 -> 0
+          this.dataContext.multiplierOpacity = fadeWave;
+          
+          // Fall animation starts immediately when 3rd blink begins (as soon as it starts fading from 100%)
+          if (!this.isFalling) {
+            this.isFalling = true;
+            this.fallStartShakeY = this.dataContext.shakeY as number;
+            this.fallStartScale = this.dataContext.multiplierScale as number;
+            // Stop shake timer so only the fall animation controls shakeY.
+            if (this.shakeTimerId !== null) {
+              this.async.clearInterval(this.shakeTimerId);
+              this.shakeTimerId = null;
+            }
+            this.currentShakeX = 0;
+            this.currentShakeY = 0;
+            this.targetShakeX = 0;
+            this.targetShakeY = 0;
+          }
+          
+          // Fall progresses over the entire 3rd segment (0..1)
+          const fallDistance = 120;
+          const easeIn = segmentT * segmentT; // quadratic ease-in for downward motion
+          const fallY = this.fallStartShakeY + (fallDistance * easeIn);
+          
+          // Scale down slightly as it falls
+          const scale = this.fallStartScale * (1 - segmentT * 0.2);
+          
+          this.dataContext.shakeX = 0; // Remove horizontal shake during fall
+          this.dataContext.shakeY = fallY;
+          this.dataContext.multiplierScale = scale;
         }
       }
       
@@ -504,6 +548,9 @@ class Default extends Component<typeof Default> {
     this.pulsePhase = 0;
     this.currentScale = 1;
     this.baseScale = 1;
+    this.isFalling = false;
+    this.fallStartShakeY = 0;
+    this.fallStartScale = 1;
     
     if (this.multiplierTimerId !== null) {
       this.async.clearInterval(this.multiplierTimerId);
@@ -532,63 +579,9 @@ class Default extends Component<typeof Default> {
   private fadeOutMultiplier(): void {
     const log = this.log.active("fadeOutMultiplier");
     
-    // Stop the main multiplier timer
-    if (this.multiplierTimerId !== null) {
-      this.async.clearInterval(this.multiplierTimerId);
-      this.multiplierTimerId = null;
-    }
-    
-    // Stop shake effect
-    if (this.shakeTimerId !== null) {
-      this.async.clearInterval(this.shakeTimerId);
-      this.shakeTimerId = null;
-    }
-    
-    const fadeDuration = 1500; // 1500ms fade out
-    const fallDistance = 120; // Fall down 120 pixels
-    const startTime = Date.now();
-    const startOpacity = 0.5; // Start from 50% (end of blink animation)
-    const startScale = this.dataContext.multiplierScale as number;
-    const startShakeY = this.dataContext.shakeY as number;
-    
-    this.fadeOutTimerId = this.async.setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / fadeDuration, 1);
-      
-      // Ramp animation: accelerate downward (quadratic ease in)
-      const easeIn = progress * progress;
-      const fallY = startShakeY + (fallDistance * easeIn);
-      
-      // Fade container opacity from 50% to 0% using a cosine curve
-      // This matches the smooth rate of change used in the
-      // 100%→50% blink phase and starts with zero slope at 50%.
-      const fadeT = progress; // 0..1 over 1500ms
-      const cosValue = Math.cos(Math.PI * fadeT); // 1 -> -1
-      const fadeWave = (cosValue + 1) / 2; // 1 -> 0
-      const opacity = startOpacity * fadeWave;
-      
-      // Scale down slightly as it fades
-      const scale = startScale * (1 - progress * 0.2);
-      
-      this.dataContext.shakeX = 0; // Remove horizontal shake during fade
-      this.dataContext.shakeY = fallY;
-      this.dataContext.multiplierOpacity = opacity;
-      this.dataContext.multiplierScale = scale;
-      
-      if (this.noesisGizmo) {
-        this.noesisGizmo.dataContext = this.dataContext;
-      }
-      
-      if (progress >= 1) {
-        // Animation complete - reset everything
-        this.async.clearInterval(this.fadeOutTimerId!);
-        this.fadeOutTimerId = null;
-        this.stopMultiplierEffects();
-        log.info("Multiplier fade-out complete");
-      }
-    }, 16); // ~60fps
-    
-    log.info("Started multiplier fall animation (1500ms from 50% to 0%)");
+    // Legacy method no longer used – fall is now driven directly
+    // from the main multiplier timer's third segment.
+    log.info("fadeOutMultiplier called, but fall is now handled in onDunkMultiplier timer");
   }
   // #endregion
 
