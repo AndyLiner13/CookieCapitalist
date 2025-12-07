@@ -293,7 +293,7 @@ class Default extends Component<typeof Default> {
     
     log.info(`Multiplier ${data.isRefresh ? 'refreshed' : 'activated'}: ${data.multiplier}x for ${data.durationMs}ms`);
     
-    // Clear existing timers
+    // Clear existing timers for active streak logic
     if (this.multiplierTimerId !== null) {
       this.async.clearInterval(this.multiplierTimerId);
       this.multiplierTimerId = null;
@@ -302,11 +302,11 @@ class Default extends Component<typeof Default> {
       this.async.clearInterval(this.shakeTimerId);
       this.shakeTimerId = null;
     }
-    // Always clear fade-out timer - we want to reset the animation
-    if (this.fadeOutTimerId !== null) {
-      this.async.clearInterval(this.fadeOutTimerId);
-      this.fadeOutTimerId = null;
-    }
+    // Do NOT clear fade-out timer here – the falling animation
+    // is treated as a separate, one-shot animation that only
+    // plays after blinking has finished. Clicks that refresh or
+    // start a new streak shouldn't restart or cancel an in-flight
+    // fall; it just runs to completion once triggered.
     // Don't clear pop-in timer - let it complete naturally
     // Only reset pop-in for new activations
     if (!data.isRefresh && this.popInTimerId !== null) {
