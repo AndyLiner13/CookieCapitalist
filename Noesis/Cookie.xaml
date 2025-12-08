@@ -433,5 +433,45 @@
         <SolidColorBrush Color="#000000" Opacity="0.85"/>
       </Border.Background>
     </Border>
+    
+    <!-- Onboarding swipe down animation - shows finger icon swiping down over cookie -->
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+          Visibility="{Binding showSwipeAnimation, Converter={StaticResource BoolToVis}}"
+          IsHitTestVisible="False"
+          Margin="100,-60,0,0">
+      <Border x:Name="SwipeIcon" RenderTransformOrigin="0.5,0.5" Width="80" Height="80">
+        <Border.RenderTransform>
+          <TranslateTransform x:Name="SwipeTranslate" Y="0"/>
+        </Border.RenderTransform>
+        <Border.Triggers>
+          <EventTrigger RoutedEvent="Border.Loaded">
+            <BeginStoryboard>
+              <Storyboard RepeatBehavior="Forever">
+                <!-- Move from slightly above center to below cookie -->
+                <DoubleAnimation Storyboard.TargetName="SwipeTranslate"
+                                 Storyboard.TargetProperty="Y"
+                                 From="-30" To="200" Duration="0:0:2.0">
+                  <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseInOut"/>
+                  </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <!-- Fade in at start -->
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SwipeIconOpacity"
+                                               Storyboard.TargetProperty="Opacity">
+                  <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                  <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
+                  <LinearDoubleKeyFrame KeyTime="0:0:1.7" Value="1"/>
+                  <LinearDoubleKeyFrame KeyTime="0:0:2.0" Value="0"/>
+                </DoubleAnimationUsingKeyFrames>
+              </Storyboard>
+            </BeginStoryboard>
+          </EventTrigger>
+        </Border.Triggers>
+        <Border x:Name="SwipeIconOpacity" Opacity="0">
+          <!-- Use home button icon as finger indicator -->
+          <Image Source="Images/MiddleTab.png" Width="70" Height="70" Stretch="Uniform"/>
+        </Border>
+      </Border>
+    </Grid>
   </Grid>
 </Page>

@@ -15,6 +15,24 @@
   },
 
   "quests": {
+    "cookies": {
+      "$description": "Awarded when player reaches cookie milestones (current balance)",
+      "$count": 1,
+      "items": [
+        {
+          "scriptId": "quest_cookies15",
+          "name": "First Batch",
+          "description": "Have 15 cookies",
+          "type": "simple",
+          "status": "pending",
+          "reward": {
+            "cookies": 0,
+            "message": "🍪 First Batch Complete!"
+          }
+        }
+      ]
+    },
+    
     "onboarding": {
       "$description": "Awarded when player completes the tutorial",
       "$count": 1,

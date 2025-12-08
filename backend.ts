@@ -319,7 +319,11 @@ class Default extends Component<typeof Default> {
     this.gameState.cookies += earnedAmount;
     this.gameState.totalCookiesEarned += earnedAmount;
     
-    log.info(`Cookie clicked! Earned: ${earnedAmount} (${effectiveMultiplier}x), Total: ${this.gameState.cookies}, Lifetime: ${this.gameState.totalCookiesEarned}`);
+    log.info(`Cookie clicked! Earned: ${earnedAmount} (${effectiveMultiplier}x), Total: ${this.gameState.cookies}`);
+    
+    // Check cookie milestone quests
+    this.checkCookieQuests();
+    
     this.throttledBroadcastStateUpdate();
   }
   
@@ -464,6 +468,41 @@ class Default extends Component<typeof Default> {
       log.error(`[LEADERBOARD] Failed: ${error}`);
     }
   }
+  
+  // #region 🎯 Quest System
+  // Quest IDs must match those created in Systems > Quests in Desktop Editor
+  private static readonly QUEST_COOKIES_15 = "quest_cookies15";
+  
+  // Check and complete cookie milestone quests
+  private checkCookieQuests(): void {
+    const log = this.log.inactive("checkCookieQuests");
+    
+    if (!this.activePlayer) return;
+    
+    const cookies = this.gameState.cookies;
+    
+    // Quest: Have 15 cookies
+    if (cookies >= 15) {
+      this.tryCompleteQuest(Default.QUEST_COOKIES_15);
+    }
+  }
+  
+  // Attempt to complete a quest (only if not already completed)
+  private tryCompleteQuest(questId: string): void {
+    const log = this.log.active("tryCompleteQuest");
+    
+    if (!this.activePlayer) return;
+    
+    // Check if already completed
+    if (this.activePlayer.hasCompletedAchievement(questId)) {
+      return; // Already completed, skip
+    }
+    
+    // Mark quest as complete
+    this.activePlayer.setAchievementComplete(questId, true);
+    log.info(`[QUEST] Completed: ${questId} for ${this.activePlayer.name.get()}`);
+  }
+  // #endregion
   
   // #region 💾 PPV (Persistent Player Variables)
   // Load player's saved state from PPVs

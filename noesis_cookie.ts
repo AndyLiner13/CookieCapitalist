@@ -132,6 +132,14 @@ class Default extends hz.Component<typeof Default> {
         this.onOnboardingFocus(data);
       }
     );
+    
+    // Listen for onboarding swipe animation events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingSwipeAnimation,
+      (data: { show: boolean }) => {
+        this.onOnboardingSwipeAnimation(data);
+      }
+    );
 
     log.info("Cookie UI initialized");
   }
@@ -151,6 +159,8 @@ class Default extends hz.Component<typeof Default> {
       PopupColor: this.props.popupColor,
       // Onboarding dimmed state
       onboardingDimmed: false,
+      // Onboarding swipe animation
+      showSwipeAnimation: false,
       // 4 glow rings - sizes configurable via props
       Glow1Opacity: 0,
       Glow1Size: this.props.glow1Size,
@@ -301,6 +311,17 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Onboarding focus: cookie=${data.cookie}`);
     
     this.dataContext.onboardingDimmed = !data.cookie;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  
+  // Handle onboarding swipe animation event - show/hide swipe down animation
+  private onOnboardingSwipeAnimation(data: { show: boolean }): void {
+    const log = this.log.active("onOnboardingSwipeAnimation");
+    log.info(`Onboarding swipe animation: show=${data.show}`);
+    
+    this.dataContext.showSwipeAnimation = data.show;
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }

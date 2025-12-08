@@ -125,6 +125,9 @@ export const LocalUIEvents = {
   
   // Onboarding cookie collection - tells overlay to show "X/15 Cookies!" and blink
   onboardingCookieCollection: new LocalEvent<{ active: boolean; target: number }>("local_onboarding_cookie_collection"),
+  
+  // Onboarding swipe animation - tells Cookie UI to show swipe down animation
+  onboardingSwipeAnimation: new LocalEvent<{ show: boolean }>("local_onboarding_swipe_animation"),
 };
 // #region ⚙️ Game Constants
 // All upgrade types in the game

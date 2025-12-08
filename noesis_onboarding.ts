@@ -105,8 +105,8 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 	// Swipe down tutorial
 	{
 		id: "swipe_intro",
-		chatText: "Great job! Now I'll teach you a secret move... Swipe DOWN on the cookie!",
-		showChatBubble: true,
+		chatText: "",
+		showChatBubble: false, // No mascot during swipe tutorial
 		showTapPrompt: false,
 		focus: { header: false, cookie: true, milk: true, footer: false },
 		showSwipeAnimation: true,
@@ -316,14 +316,22 @@ class Default extends Component<typeof Default> {
 		});
 		log.info(`Dunk enabled: ${isDunkStep}`);
 
-		// Hide the Noesis entity only during cookie interaction steps (not swipe steps)
-		// This prevents it from blocking focused interaction input to the cookie
-		// For swipe steps, we need to show the entity to display the swipe animation
-		const shouldHideEntity = (step.waitForCookies !== undefined || step.waitForMultiplier !== undefined) && !step.waitForSwipeDown;
+		// Hide the Noesis entity during any game interaction step (cookie, multiplier, swipe)
+		// This prevents it from blocking focused interaction input
+		// The swipe animation will be shown on the Cookie UI instead
+		const shouldHideEntity = step.waitForCookies !== undefined || 
+			step.waitForMultiplier !== undefined || 
+			step.waitForSwipeDown;
 		if (this.noesisGizmo) {
 			this.noesisGizmo.setLocalEntityVisibility(!shouldHideEntity);
 			log.info(`Onboarding entity visibility: ${!shouldHideEntity}`);
 		}
+		
+		// Broadcast swipe animation state to Cookie UI
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingSwipeAnimation, {
+			show: step.showSwipeAnimation === true,
+		});
+		log.info(`Swipe animation on Cookie UI: ${step.showSwipeAnimation === true}`);
 		
 		// Reset focused interaction when entering a cookie step (first cookie tap step)
 		// This ensures a clean interaction state before the user starts clicking the cookie
