@@ -164,24 +164,32 @@ class Default extends Component<typeof Default> {
       shakeX: 0,
       shakeY: 0,
       
+      // Header click - resets focused interaction mode (exit then re-enter)
+      onHeaderClick: () => {
+        const player = this.world.getLocalPlayer();
+        player.exitFocusedInteractionMode();
+        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+      },
+      
       // Navigation commands (set once, never recreated)
-      // Shop/Leaderboard: Exit focused interaction and keep it disabled (no mobile input detection)
-      // Home: Instantly enable focused interaction for cookie clicking
+      // All pages: Reset focused interaction on click to clear drag artifacts
       onShopClick: () => {
-        this.world.getLocalPlayer().exitFocusedInteractionMode();
+        const player = this.world.getLocalPlayer();
+        player.exitFocusedInteractionMode();
+        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
         this.navigateToPage("shop");
-        // Stay in non-focused mode - no mobile input detection on shop page
       },
       onHomeClick: () => {
         const player = this.world.getLocalPlayer();
-        // Instantly enable focused interaction for cookie clicking
+        player.exitFocusedInteractionMode();
         player.enterFocusedInteractionMode({ disableFocusExitButton: true });
         this.navigateToPage("home");
       },
       onLeaderboardClick: () => {
-        this.world.getLocalPlayer().exitFocusedInteractionMode();
+        const player = this.world.getLocalPlayer();
+        player.exitFocusedInteractionMode();
+        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
         this.navigateToPage("leaderboard");
-        // Stay in non-focused mode - no mobile input detection on leaderboard page
       },
     };
   }
@@ -249,7 +257,7 @@ class Default extends Component<typeof Default> {
   private handleStateChanged(data: UIEventPayload): void {
     const log = this.log.inactive("handleStateChanged");
     
-    if (data.type !== "state_update") return;
+    if (data.type !== "state_update" && data.type !== "state_with_progress") return;
     
     this.cookies = (data.cookies as number) || 0;
     this.cookiesPerSecond = (data.cps as number) || 0;

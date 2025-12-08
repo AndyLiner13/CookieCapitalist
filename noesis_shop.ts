@@ -153,6 +153,7 @@ class Default extends hz.Component<typeof Default> {
       fab: upgradeData["fab"],
       planet: upgradeData["planet"],
       galaxy: upgradeData["galaxy"],
+      onShopInteraction: () => this.resetFocusedInteraction(),
     };
 
     log.info("Shop dataContext initialized");
@@ -309,6 +310,8 @@ class Default extends hz.Component<typeof Default> {
       upgradeId: upgradeId,
     });
   }
+  // Note: We no longer reset focused interaction on each purchase so
+  // rapid buy clicks behave like cookie clicks without extra delay.
   
   private onStreakMultiplierUpdate(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {
     const log = this.log.inactive("onStreakMultiplierUpdate");

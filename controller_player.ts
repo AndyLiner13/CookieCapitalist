@@ -34,6 +34,7 @@ class Default extends hz.Component<typeof Default> {
   private isInputBlocked: boolean = false; // Blocks input when non-mobile user on mobile-only mode
   private isMobile: boolean = false; // Cached device type
   private isNavInputBlocked: boolean = false; // Temporarily blocks input when nav buttons are pressed
+  private currentPage: string = "home"; // Track current page to block gestures/clicks on non-home pages
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -84,6 +85,12 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       LocalUIEvents.navInputBlock,
       (data: { block: boolean }) => this.handleNavInputBlock(data)
+    );
+    
+    // Listen for page changes to enable/disable input detection
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.changePage,
+      (data: { page: string }) => this.handlePageChange(data)
     );
   }
   // #endregion
@@ -144,6 +151,13 @@ class Default extends hz.Component<typeof Default> {
     log.info(`[INPUT BLOCKING] Disabled (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
   }
   
+  // Track page changes to conditionally block input on non-home pages
+  private handlePageChange(data: { page: string }): void {
+    const log = this.log.inactive("handlePageChange");
+    this.currentPage = data.page;
+    log.info(`Page changed to: ${this.currentPage}`);
+  }
+  
   // Handle navigation input block events from overlay
   private handleNavInputBlock(data: { block: boolean }): void {
     const log = this.log.inactive("handleNavInputBlock");
@@ -202,8 +216,8 @@ class Default extends hz.Component<typeof Default> {
       
       // Detect swipe down gesture
       this.gestures.onSwipe.connectLocalEvent(({ swipeDirection }) => {
-        // Block gestures when mobile-only warning is shown or nav button was pressed
-        if (this.isInputBlocked || this.isNavInputBlocked) {
+        // Block gestures when mobile-only warning is shown, nav button was pressed, or on non-home pages
+        if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
           return;
         }
         
@@ -270,8 +284,8 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Block input when mobile-only warning is shown or nav button was pressed
-    if (this.isInputBlocked || this.isNavInputBlocked) {
+    // Block input when mobile-only warning is shown, nav button was pressed, or on non-home pages
+    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
       return;
     }
 
@@ -294,8 +308,8 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
-    // Block input when mobile-only warning is shown or nav button was pressed
-    if (this.isInputBlocked || this.isNavInputBlocked) {
+    // Block input when mobile-only warning is shown, nav button was pressed, or on non-home pages
+    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
       return;
     }
     

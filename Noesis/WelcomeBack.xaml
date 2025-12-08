@@ -89,10 +89,10 @@
         </Viewbox>
         
         <!-- Label: While you were away -->
-        <Viewbox MaxHeight="28" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+        <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
           <TextBlock Text="While you were away for"
                      FontFamily="{StaticResource BodyFont}"
-                     FontSize="20"
+                     FontSize="24"
                      Foreground="{StaticResource PrimaryTextBrush}"
                      TextAlignment="Center"/>
         </Viewbox>
@@ -108,27 +108,29 @@
         </Viewbox>
         
         <!-- Label: You earned -->
-        <Viewbox MaxHeight="28" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+        <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
           <TextBlock Text="You earned"
                      FontFamily="{StaticResource BodyFont}"
-                     FontSize="20"
+                     FontSize="24"
                      Foreground="{StaticResource PrimaryTextBrush}"
                      TextAlignment="Center"/>
         </Viewbox>
         
         <!-- Cookies earned display (bound to dataContext.cookiesEarned) -->
-        <TextBlock Text="{Binding cookiesEarned}"
-             d:Text="15.2K"
-                   FontFamily="{StaticResource HeadingFont}"
-                   FontSize="56"
-                   Foreground="{StaticResource AccentTextBrush}"
-                   TextAlignment="Center"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,40">
-          <TextBlock.Effect>
-            <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Opacity="1" Direction="315"/>
-          </TextBlock.Effect>
-        </TextBlock>
+        <Viewbox MaxHeight="64" Stretch="Uniform" HorizontalAlignment="Center" Margin="24,0,24,40">
+          <TextBlock Text="{Binding cookiesEarned}"
+               d:Text="15.2K"
+                     FontFamily="{StaticResource HeadingFont}"
+                     FontSize="56"
+                     Foreground="{StaticResource AccentTextBrush}"
+                     TextAlignment="Center"
+                     HorizontalAlignment="Center">
+            <TextBlock.Effect>
+              <!-- Centered glow to avoid right-edge artifact -->
+              <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="0" Opacity="0.8" Direction="0"/>
+            </TextBlock.Effect>
+          </TextBlock>
+        </Viewbox>
         
         <!-- Collect button with press animation -->
         <Button Content="Collect"

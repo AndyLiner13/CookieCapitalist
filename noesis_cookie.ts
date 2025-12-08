@@ -172,7 +172,7 @@ class Default extends hz.Component<typeof Default> {
   private handleStateChanged(data: UIEventPayload): void {
     const log = this.log.inactive("handleStateChanged");
 
-    if (data.type !== "state_update") return;
+    if (data.type !== "state_update" && data.type !== "state_with_progress") return;
 
     this.cookiesPerClick = (data.cookiesPerClick as number) || 1;
     log.info(`cookiesPerClick updated from backend: ${this.cookiesPerClick}`);
@@ -193,6 +193,13 @@ class Default extends hz.Component<typeof Default> {
   // #region 🎬 Handlers
   private onCookiePressedEvent(): void {
     const log = this.log.active("onCookiePressedEvent");
+    
+    // Ignore presses while dunk animation is playing
+    if (this.isDunking) {
+      log.info("Ignoring cookie press during dunk animation");
+      return;
+    }
+
     log.info("Cookie pressed down - triggering animation");
 
     // Trigger press down animation
@@ -201,6 +208,13 @@ class Default extends hz.Component<typeof Default> {
 
   private onCookieClickedEvent(): void {
     const log = this.log.active("onCookieClickedEvent");
+    
+    // Ignore clicks while dunk animation is playing
+    if (this.isDunking) {
+      log.info("Ignoring cookie click during dunk animation");
+      return;
+    }
+
     log.info("Cookie released - processing click");
 
     // Trigger release animation

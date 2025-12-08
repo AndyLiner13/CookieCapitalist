@@ -58,23 +58,37 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Header - Cookie Count (Shared across all pages)                                  -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#80000000" Grid.Row="0" IsHitTestVisible="True" Padding="16,54,16,8">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-      <!-- Cookie count -->
-      <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
-      <!-- CPS display -->
-      <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center" Margin="0,4,0,0"/>
-    </StackPanel>
-  </Border>
+  <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" 
+          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+          Style="{StaticResource InvisibleButtonStyle}" Command="{Binding onHeaderClick}">
+    <b:Interaction.Triggers>
+      <!-- Reset focused interaction when mouse/touch starts in header -->
+      <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+        <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
+      </b:EventTrigger>
+      <!-- Also reset when mouse/touch is released in header (supports drag from cookie into header) -->
+      <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+        <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
+      </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#80000000" Padding="16,54,16,8">
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <!-- Cookie count -->
+        <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center"/>
+        <!-- CPS display -->
+        <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="15" Foreground="#ffffff" TextAlignment="Center" Margin="0,4,0,0"/>
+      </StackPanel>
+    </Border>
+  </Button>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Multiplier Display (shows above cookie when active)                              -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border Grid.Row="1" Background="{x:Null}" Padding="0,28,0,0" HorizontalAlignment="Center"
+  <Border Grid.Row="1" Background="{x:Null}" Padding="16,28,16,0" HorizontalAlignment="Stretch"
           Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False" ClipToBounds="False">
     <!-- Container for blink animation - opacity applied here, not on TextBlock -->
     <Border Background="{x:Null}" Opacity="{Binding multiplierOpacity}" IsHitTestVisible="False">
-      <Viewbox MaxHeight="80" MaxWidth="250" Stretch="Uniform" HorizontalAlignment="Center">
+      <Viewbox MaxHeight="80" Stretch="Uniform" HorizontalAlignment="Stretch">
         <TextBlock x:Name="MultiplierText"
                    Text="{Binding multiplierText}" 
                    FontFamily="Fonts/#Bangers-Regular" 
@@ -92,7 +106,8 @@
             </TransformGroup>
           </TextBlock.RenderTransform>
           <TextBlock.Effect>
-            <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Opacity="1" Direction="315"/>
+            <!-- Centered glow to avoid right-edge clipping -->
+            <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="0" Opacity="0.8" Direction="0"/>
           </TextBlock.Effect>
         </TextBlock>
       </Viewbox>
@@ -107,6 +122,13 @@
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <Border HorizontalAlignment="Stretch" Background="#01000000" Grid.Row="3" IsHitTestVisible="True">
+    <b:Interaction.Triggers>
+      <!-- Reset focused interaction when mouse/touch is released in footer (even if press started on cookie) -->
+      <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+        <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
+      </b:EventTrigger>
+    </b:Interaction.Triggers>
+
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
@@ -163,6 +185,8 @@
         </Button.RenderTransform>
         <b:Interaction.Triggers>
           <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+            <!-- Instantly navigate + reset focused interaction on press -->
+            <b:InvokeCommandAction Command="{Binding onHomeClick}"/>
             <b:ControlStoryboardAction>
               <b:ControlStoryboardAction.Storyboard>
                 <Storyboard>
