@@ -6,7 +6,7 @@
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
-import { Component } from "horizon/core";
+import { Component, PlayerDeviceType } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
 import { UIEvents, UIEventPayload, formatNumber } from "./util_gameData";
@@ -71,6 +71,15 @@ class Default extends Component<typeof Default> {
 		if (data.type !== "welcome_back") {
 			return;
 		}
+		
+		// Only show WelcomeBack modal on mobile devices
+		// Non-mobile users will see the MobileOnly warning instead
+		const localPlayer = this.world.getLocalPlayer();
+		const deviceType = localPlayer.deviceType.get();
+		if (deviceType !== PlayerDeviceType.Mobile) {
+			log.info(`Skipping WelcomeBack modal - device is ${deviceType}, not Mobile`);
+			return;
+		}
 
 		const offlineCookies = (data.offlineCookies as number) || 0;
 		const timeAwayMs = (data.timeAwayMs as number) || 0;
@@ -88,10 +97,18 @@ class Default extends Component<typeof Default> {
 	}
 
 	private onCollect(): void {
-		const log = this.log.inactive("onCollect");
+		const log = this.log.active("onCollect");
 
 		this.updateDataContext({ isVisible: false });
-		log.info("WelcomeBack modal dismissed by player");
+		
+		// Enable focused interaction mode now that player has dismissed the modal
+		// This allows cookie clicking and gesture detection
+		log.info("Enabling focused interaction mode for cookie clicking...");
+		this.world.getLocalPlayer().enterFocusedInteractionMode({
+			disableFocusExitButton: true,
+		});
+		
+		log.info("WelcomeBack modal dismissed by player, focused interaction enabled");
 	}
 	// #endregion
 

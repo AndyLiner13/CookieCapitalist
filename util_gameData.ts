@@ -9,12 +9,18 @@ import { NetworkEvent, LocalEvent, SerializableState } from "horizon/core";
 // Serializable game state for persistence
 export interface GameState {
   cookies: number;
-  totalCookiesEarned: number;
+  totalCookiesEarned: number; // Session-only tracking (not persisted)
   cookiesPerClick: number;
   upgrades: { [upgradeId: string]: number };
   upgradeProgress: { [upgradeId: string]: number }; // Production progress 0.0-1.0 for each upgrade
   lastSaveTime: number;
-  lastJoinTime: number;
+}
+
+// PPV GameState object - consolidates upgradeProgress and lastSaveTime
+export interface PPVGameState {
+  [key: string]: { [upgradeId: string]: number } | number; // Index signature for PersistentSerializableState
+  upgradeProgress: { [upgradeId: string]: number };
+  lastSaveTime: number;
 }
 
 // Upgrade configuration (static data)
@@ -39,7 +45,7 @@ export interface UpgradeDisplayData {
 }
 
 // Page types for navigation
-export type PageType = "home" | "shop" | "stats";
+export type PageType = "home" | "shop" | "leaderboard";
 
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
@@ -101,6 +107,10 @@ export const LocalUIEvents = {
   
   // Mobile only check - backend tells UI whether to show warning
   mobileOnlyCheck: new LocalEvent<{ showWarning: boolean }>("local_mobile_only_check"),
+  
+  // Navigation input block - temporarily disables focused interaction input
+  // Used when overlay buttons are pressed to prevent drag line artifacts
+  navInputBlock: new LocalEvent<{ block: boolean; restoreDelayMs?: number }>("local_nav_input_block"),
 };
 // #endregion
 
@@ -268,7 +278,19 @@ export function createDefaultGameState(): GameState {
     upgrades,
     upgradeProgress,
     lastSaveTime: Date.now(),
-    lastJoinTime: Date.now(),
+  };
+}
+
+// Create default PPV game state object
+export function createDefaultPPVGameState(): PPVGameState {
+  const upgradeProgress: { [upgradeId: string]: number } = {};
+  for (const config of UPGRADE_CONFIGS) {
+    upgradeProgress[config.id] = 0;
+  }
+  
+  return {
+    upgradeProgress,
+    lastSaveTime: Date.now(),
   };
 }
 // #endregion

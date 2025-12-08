@@ -9,7 +9,7 @@
 // Must use Shared execution mode for proper Noesis integration.
 // #endregion
 
-import { Component, PropTypes, Entity, Vec3, Quaternion } from "horizon/core";
+import { Component, PropTypes, Entity, Vec3, Quaternion, Player } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import LocalCamera from "horizon/camera";
 import { Logger } from "./util_logger";
@@ -165,9 +165,24 @@ class Default extends Component<typeof Default> {
       shakeY: 0,
       
       // Navigation commands (set once, never recreated)
-      onShopClick: () => this.navigateToPage("shop"),
-      onHomeClick: () => this.navigateToPage("home"),
-      onStatsClick: () => this.navigateToPage("stats"),
+      // Shop/Leaderboard: Exit focused interaction and keep it disabled (no mobile input detection)
+      // Home: Instantly enable focused interaction for cookie clicking
+      onShopClick: () => {
+        this.world.getLocalPlayer().exitFocusedInteractionMode();
+        this.navigateToPage("shop");
+        // Stay in non-focused mode - no mobile input detection on shop page
+      },
+      onHomeClick: () => {
+        const player = this.world.getLocalPlayer();
+        // Instantly enable focused interaction for cookie clicking
+        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+        this.navigateToPage("home");
+      },
+      onLeaderboardClick: () => {
+        this.world.getLocalPlayer().exitFocusedInteractionMode();
+        this.navigateToPage("leaderboard");
+        // Stay in non-focused mode - no mobile input detection on leaderboard page
+      },
     };
   }
 
@@ -188,15 +203,15 @@ class Default extends Component<typeof Default> {
     // Update multiplier visibility based on page (only show on home)
     this.updateMultiplierVisibility();
     
-    // Request save when navigating to stats (leaderboard) - ensures latest data is saved
-    if (page === "stats") {
+    // Request save when navigating to leaderboard - ensures latest data is saved
+    if (page === "leaderboard") {
       log.info("Requesting PPV save before viewing leaderboard");
       this.sendNetworkBroadcastEvent(GameEvents.toServer, { type: "request_save" });
     }
 
     // Toggle leaderboard gizmo position when changing pages
     if (this.leaderboardGizmo) {
-      if (page === "stats") {
+      if (page === "leaderboard") {
         // Get current camera position and forward direction
         const cameraPos = LocalCamera.position.get();
         const cameraForward = LocalCamera.forward.get();

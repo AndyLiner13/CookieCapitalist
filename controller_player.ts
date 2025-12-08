@@ -33,6 +33,7 @@ class Default extends hz.Component<typeof Default> {
   private deviceTypeReported: boolean = false; // Only report device type once
   private isInputBlocked: boolean = false; // Blocks input when non-mobile user on mobile-only mode
   private isMobile: boolean = false; // Cached device type
+  private isNavInputBlocked: boolean = false; // Temporarily blocks input when nav buttons are pressed
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -54,12 +55,9 @@ class Default extends hz.Component<typeof Default> {
     this.entity.owner.set(localPlayer);
     log.info("Entity ownership transferred to local player");
 
-    // Force interaction mode - hides thumbstick/jump, enables gesture detection
-    localPlayer.enterFocusedInteractionMode({
-      disableFocusExitButton: true,
-    });
-
-    log.info("Forced interaction mode enabled");
+    // NOTE: Focused interaction mode is NOT enabled on start.
+    // It will be enabled when the user clicks the Collect button in the WelcomeBack modal.
+    // This prevents drag line artifacts from appearing on the overlay buttons.
     
     // Position camera to face the cookie
     this.positionCameraAtCookie();
@@ -80,6 +78,12 @@ class Default extends hz.Component<typeof Default> {
     this.connectNetworkBroadcastEvent(
       UIEvents.toClient,
       (data: UIEventPayload) => this.handleInputBlockingState(data)
+    );
+    
+    // Listen for navigation input block events (prevents drag line artifacts)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.navInputBlock,
+      (data: { block: boolean }) => this.handleNavInputBlock(data)
     );
   }
   // #endregion
@@ -134,10 +138,27 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Input is blocked if mobileOnly is enabled AND player is NOT on mobile
-    this.isInputBlocked = mobileOnlyFlag && !this.isMobile;
-    log.info(`[INPUT BLOCKING] Set to: ${this.isInputBlocked} (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
+    // Don't block input - allow Web/VR users to still play even with MobileOnly overlay shown
+    // The overlay is just a warning, not a hard block
+    this.isInputBlocked = false;
+    log.info(`[INPUT BLOCKING] Disabled (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
   }
+  
+  // Handle navigation input block events from overlay
+  private handleNavInputBlock(data: { block: boolean }): void {
+    const log = this.log.inactive("handleNavInputBlock");
+    
+    this.isNavInputBlocked = data.block;
+    
+    // If blocking, also reset any pressed state to prevent stuck finger
+    if (data.block && this.isCookiePressed) {
+      this.isCookiePressed = false;
+      log.info("Reset cookie pressed state due to nav input block");
+    }
+    
+    log.info(`Nav input block: ${data.block}`);
+  }
+  
   private positionCameraAtCookie(): void {
     const log = this.log.inactive("positionCameraAtCookie");
 
@@ -181,8 +202,8 @@ class Default extends hz.Component<typeof Default> {
       
       // Detect swipe down gesture
       this.gestures.onSwipe.connectLocalEvent(({ swipeDirection }) => {
-        // Block gestures when mobile-only warning is shown
-        if (this.isInputBlocked) {
+        // Block gestures when mobile-only warning is shown or nav button was pressed
+        if (this.isInputBlocked || this.isNavInputBlocked) {
           return;
         }
         
@@ -228,7 +249,7 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       hz.PlayerControls.onFocusedInteractionInputStarted,
       (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const innerLog = this.log.inactive("onFocusedInteractionInputStarted");
+        const innerLog = this.log.active("onFocusedInteractionInputStarted");
         this.handleInteractionStart(data.interactionInfo, innerLog);
       }
     );
@@ -236,7 +257,7 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       hz.PlayerControls.onFocusedInteractionInputEnded,
       (data: { interactionInfo: hz.InteractionInfo[] }) => {
-        const innerLog = this.log.inactive("onFocusedInteractionInputEnded");
+        const innerLog = this.log.active("onFocusedInteractionInputEnded");
         this.handleInteractionEnd(data.interactionInfo, innerLog);
       }
     );
@@ -249,8 +270,8 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Block input when mobile-only warning is shown
-    if (this.isInputBlocked) {
+    // Block input when mobile-only warning is shown or nav button was pressed
+    if (this.isInputBlocked || this.isNavInputBlocked) {
       return;
     }
 
@@ -273,23 +294,18 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
-    // Block input when mobile-only warning is shown
-    if (this.isInputBlocked) {
+    // Block input when mobile-only warning is shown or nav button was pressed
+    if (this.isInputBlocked || this.isNavInputBlocked) {
       return;
     }
     
     // If cookie was pressed, release it regardless of where the finger ended
     // This handles the case where user swipes away (e.g., dunk gesture)
     if (this.isCookiePressed) {
-      const interactions = interactionInfo || [];
-      for (const interaction of interactions) {
-        if (interaction.interactionIndex !== 0) continue;
-        
-        log.info("Cookie released (was pressed)");
-        this.isCookiePressed = false;
-        this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
-        return;
-      }
+      log.info("Cookie released (was pressed)");
+      this.isCookiePressed = false;
+      this.sendLocalBroadcastEvent(LocalUIEvents.cookieClicked, {});
+      return;
     }
     
     // If cookie wasn't already pressed, check if this is a quick tap on the cookie

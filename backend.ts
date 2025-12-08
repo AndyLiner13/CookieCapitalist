@@ -15,6 +15,7 @@
 
 import { Component, Player, CodeBlockEvents, PropTypes, LEADEBOARD_SCORE_MAX_VALUE } from "horizon/core";
 import { Logger } from "./util_logger";
+import { PPVManager } from "./util_ppv";
 import {
   GameState,
   GameEventPayload,
@@ -42,16 +43,6 @@ const LEADERBOARD_CPS = "CookiesPerSecond"; // Cookies per second (base, no mult
 function clampLeaderboardScore(score: number): number {
   return Math.min(Math.max(Math.floor(score), -LEADEBOARD_SCORE_MAX_VALUE), LEADEBOARD_SCORE_MAX_VALUE);
 }
-
-// PPV (Persistent Player Variable) keys - format: "VariableGroupName:VariableName"
-// These must match the variable group and variable names created in Systems > Variable Groups
-const PPV_GROUP = "CookieCapitalist";
-const PPV_COOKIES = `${PPV_GROUP}:Cookies`;
-const PPV_TOTAL_COOKIES = `${PPV_GROUP}:TotalCookies`;
-const PPV_UPGRADES = `${PPV_GROUP}:Upgrades`;
-const PPV_UPGRADE_PROGRESS = `${PPV_GROUP}:UpgradeProgress`;
-const PPV_LAST_JOIN_TIME = `${PPV_GROUP}:LastJoinTime`;
-const PPV_LAST_SAVE_TIME = `${PPV_GROUP}:LastSaveTime`;
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -66,6 +57,9 @@ class Default extends Component<typeof Default> {
 
   // #region 📊 State
   private log = new Logger("backend");
+  
+  // PPV Manager for persistent storage
+  private ppv!: PPVManager;
   
   // Core game state (server authoritative)
   private gameState: GameState = createDefaultGameState();
@@ -105,6 +99,9 @@ class Default extends Component<typeof Default> {
     const log = this.log.inactive("start");
     
     // === SERVER-SIDE SETUP ===
+    
+    // Initialize PPV Manager
+    this.ppv = new PPVManager(this.world);
 
     // Listen for player events
     this.connectCodeBlockEvent(
@@ -471,67 +468,28 @@ class Default extends Component<typeof Default> {
   // #region 💾 PPV (Persistent Player Variables)
   // Load player's saved state from PPVs
   private loadPlayerState(player: Player): void {
-    const log = this.log.inactive("loadPlayerState");
+    const log = this.log.active("loadPlayerState");
     
     try {
-      // Load cookies (Number type - returns 0 if not set)
-      const cookies = this.world.persistentStorage.getPlayerVariable(player, PPV_COOKIES);
-      log.info(`[PPV READ] ${PPV_COOKIES} = ${cookies} (type: ${typeof cookies})`);
-      
-      // Load total cookies earned (Number type - returns 0 if not set)
-      const totalCookies = this.world.persistentStorage.getPlayerVariable(player, PPV_TOTAL_COOKIES);
-      log.info(`[PPV READ] ${PPV_TOTAL_COOKIES} = ${totalCookies} (type: ${typeof totalCookies})`);
-      
-      // Load upgrades (Object type - returns 0 if not set, null for uninitialized objects)
-      const upgradesRaw = this.world.persistentStorage.getPlayerVariable<{ [key: string]: number }>(player, PPV_UPGRADES);
-      log.info(`[PPV READ] ${PPV_UPGRADES} = ${JSON.stringify(upgradesRaw)} (type: ${typeof upgradesRaw})`);
-      
-      // Load last join time (Number type - returns 0 if not set)
-      const lastJoinTime = this.world.persistentStorage.getPlayerVariable(player, PPV_LAST_JOIN_TIME);
-      log.info(`[PPV READ] ${PPV_LAST_JOIN_TIME} = ${lastJoinTime} (type: ${typeof lastJoinTime})`);
-      
-      // Load last save time (Object type - returns timestamp)
-      const lastSaveTimeRaw = this.world.persistentStorage.getPlayerVariable<{ timestamp: number }>(player, PPV_LAST_SAVE_TIME);
-      log.info(`[PPV READ] ${PPV_LAST_SAVE_TIME} = ${JSON.stringify(lastSaveTimeRaw)} (type: ${typeof lastSaveTimeRaw})`);
-      
-      // Load upgrade progress (Object type - production progress 0.0-1.0 for each upgrade)
-      const upgradeProgressRaw = this.world.persistentStorage.getPlayerVariable<{ [key: string]: number }>(player, PPV_UPGRADE_PROGRESS);
-      log.info(`[PPV READ] ${PPV_UPGRADE_PROGRESS} = ${JSON.stringify(upgradeProgressRaw)} (type: ${typeof upgradeProgressRaw})`);
+      // Load data using PPV utility
+      const ppvData = this.ppv.load(player);
       
       // Apply loaded values to game state
-      this.gameState.cookies = typeof cookies === "number" ? cookies : 0;
-      this.gameState.totalCookiesEarned = typeof totalCookies === "number" ? totalCookies : 0;
-      this.gameState.lastJoinTime = typeof lastJoinTime === "number" && lastJoinTime > 0 ? lastJoinTime : Date.now();
-      this.gameState.lastSaveTime = (lastSaveTimeRaw && typeof lastSaveTimeRaw === "object" && lastSaveTimeRaw.timestamp) ? lastSaveTimeRaw.timestamp : Date.now();
+      this.gameState.cookies = ppvData.cookies;
+      this.gameState.upgrades = ppvData.upgrades;
+      this.gameState.upgradeProgress = ppvData.upgradeProgress;
+      this.gameState.lastSaveTime = ppvData.lastSaveTime;
+      this.gameState.totalCookiesEarned = 0; // Reset session tracking (not persisted)
       
       // Reset leaderboard-only tracking for this session
       this.longestStreakMs = 0;
       this.totalTimeOnlineMs = 0;
-      
-      // Handle upgrade progress - could be 0 (default), null, or an object
-      if (upgradeProgressRaw && typeof upgradeProgressRaw === "object" && upgradeProgressRaw !== null) {
-        const defaultState = createDefaultGameState();
-        this.gameState.upgradeProgress = { ...defaultState.upgradeProgress, ...upgradeProgressRaw };
-      } else {
-        this.gameState.upgradeProgress = createDefaultGameState().upgradeProgress;
-      }
-      
-      // Handle upgrades - could be 0 (default), null, or an object
-      if (upgradesRaw && typeof upgradesRaw === "object" && upgradesRaw !== null) {
-        // Merge loaded upgrades with defaults (in case new upgrade types were added)
-        const defaultState = createDefaultGameState();
-        this.gameState.upgrades = { ...defaultState.upgrades, ...upgradesRaw };
-      } else {
-        // No saved upgrades - use defaults
-        this.gameState.upgrades = createDefaultGameState().upgrades;
-      }
       
       // Recalculate CPS based on loaded upgrades
       this.recalculateCPS();
       
       // Calculate offline earnings if player has been away
       const now = Date.now();
-      // Calculate time since last save (not last join) for offline earnings
       const timeSinceLastSaveMs = Math.abs(now - this.gameState.lastSaveTime);
       let offlineCookies = 0;
       
@@ -559,14 +517,10 @@ class Default extends Component<typeof Default> {
           
           // First, complete the partial cycle if there was one
           if (savedProgress > 0 && remainingOfflineTime >= timeRemainingInCycleMs) {
-            // Complete the partial cycle
             upgradeOfflineCookies += calculateCookiesPerCycle(config.cookiesPerCycle, owned);
             remainingOfflineTime -= timeRemainingInCycleMs;
-            
-            // Reset progress for this upgrade (new cycle will start)
             this.gameState.upgradeProgress[config.id] = 0;
           } else if (savedProgress > 0 && remainingOfflineTime > 0) {
-            // Didn't complete the partial cycle, add progress
             const additionalProgress = remainingOfflineTime / effectiveProductionTime;
             this.gameState.upgradeProgress[config.id] = Math.min(1, savedProgress + additionalProgress);
             remainingOfflineTime = 0;
@@ -577,10 +531,8 @@ class Default extends Component<typeof Default> {
             const fullCycles = Math.floor(remainingOfflineTime / effectiveProductionTime);
             const partialCycleTime = remainingOfflineTime % effectiveProductionTime;
             
-            // Award cookies for full cycles
             upgradeOfflineCookies += fullCycles * calculateCookiesPerCycle(config.cookiesPerCycle, owned);
             
-            // Store partial progress for next session
             if (partialCycleTime > 0) {
               this.gameState.upgradeProgress[config.id] = partialCycleTime / effectiveProductionTime;
             }
@@ -597,12 +549,12 @@ class Default extends Component<typeof Default> {
         }
         
         log.info(`[OFFLINE EARNINGS] Time since last save: ${timeSinceLastSaveMs}ms (${cappedTimeMs}ms capped)`);
-        log.info(`[OFFLINE EARNINGS] Total earned: ${offlineCookies} cookies (precise calculation with progress)`);
+        log.info(`[OFFLINE EARNINGS] Total earned: ${offlineCookies} cookies`);
       } else {
         log.info(`[OFFLINE EARNINGS] No time since save, showing welcome modal with 0 cookies`);
       }
       
-      // Always send welcome back event to client (ensure non-negative values)
+      // Always send welcome back event to client
       this.async.setTimeout(() => {
         const welcomeData: UIEventPayload = {
           type: "welcome_back",
@@ -613,10 +565,7 @@ class Default extends Component<typeof Default> {
         log.info(`[WELCOME BACK] Sent event: ${offlineCookies} cookies, ${timeSinceLastSaveMs}ms since last save`);
       }, 1000);
       
-      // Update last join time to now
-      this.gameState.lastJoinTime = now;
-      
-      log.info(`Loaded PPV state for ${player.name.get()}: ${this.gameState.cookies} cookies, ${this.gameState.totalCookiesEarned} total, ${Object.values(this.gameState.upgrades).reduce((a, b) => a + b, 0)} upgrades`);
+      log.info(`Loaded state for ${player.name.get()}: ${this.gameState.cookies} cookies, ${Object.values(this.gameState.upgrades).reduce((a, b) => a + b, 0)} upgrades`);
       
       // Broadcast state to client after loading (includes upgrade progress)
       this.async.setTimeout(() => this.broadcastStateWithProgress(), 500);
@@ -634,7 +583,6 @@ class Default extends Component<typeof Default> {
       
     } catch (error) {
       log.error(`Failed to load PPV state for ${player.name.get()}: ${error}`);
-      // Use default state on error
       this.gameState = createDefaultGameState();
       this.recalculateCPS();
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
@@ -644,71 +592,18 @@ class Default extends Component<typeof Default> {
   
   // Save player's current state to PPVs
   private savePlayerState(player: Player): void {
-    const log = this.log.inactive("savePlayerState");
+    const log = this.log.active("savePlayerState");
     
     try {
-      const cookiesToSave = Math.floor(this.gameState.cookies);
-      const totalToSave = Math.floor(this.gameState.totalCookiesEarned);
-      const upgradesToSave = this.gameState.upgrades;
-      const upgradeProgressToSave = this.gameState.upgradeProgress || {};
-      const lastJoinTimeToSave = this.gameState.lastJoinTime;
-      const lastSaveTimeToSave = Date.now();
+      // Save using PPV utility
+      const lastSaveTime = this.ppv.save(player, {
+        cookies: this.gameState.cookies,
+        upgrades: this.gameState.upgrades,
+        upgradeProgress: this.gameState.upgradeProgress,
+      });
       
-      // Update gameState with save time
-      this.gameState.lastSaveTime = lastSaveTimeToSave;
-      
-      log.info(`[PPV WRITE] ${PPV_COOKIES} = ${cookiesToSave}`);
-      log.info(`[PPV WRITE] ${PPV_TOTAL_COOKIES} = ${totalToSave}`);
-      log.info(`[PPV WRITE] ${PPV_UPGRADES} = ${JSON.stringify(upgradesToSave)}`);
-      log.info(`[PPV WRITE] ${PPV_UPGRADE_PROGRESS} = ${JSON.stringify(upgradeProgressToSave)}`);
-      log.info(`[PPV WRITE] ${PPV_LAST_JOIN_TIME} = ${lastJoinTimeToSave}`);
-      log.info(`[PPV WRITE] ${PPV_LAST_SAVE_TIME} = ${lastSaveTimeToSave}`);
-      
-      // Save cookies (Number type)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_COOKIES,
-        cookiesToSave
-      );
-      
-      // Save total cookies earned (Number type)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_TOTAL_COOKIES,
-        totalToSave
-      );
-      
-      // Save upgrades (Object type)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_UPGRADES,
-        upgradesToSave
-      );
-      
-      // Save upgrade progress (Object type - production progress 0.0-1.0 for each upgrade)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_UPGRADE_PROGRESS,
-        upgradeProgressToSave
-      );
-      
-      // Save last join time (Number type)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_LAST_JOIN_TIME,
-        lastJoinTimeToSave
-      );
-      
-      // Save last save time (Object type - stores timestamp)
-      this.world.persistentStorage.setPlayerVariable(
-        player,
-        PPV_LAST_SAVE_TIME,
-        { timestamp: lastSaveTimeToSave }
-      );
-      
-      // Note: longestStreakMs and totalTimeOnlineMs are leaderboard-only values, not saved to PPV
-      
-      log.info(`[PPV WRITE COMPLETE] Saved state for ${player.name.get()}`);
+      // Update local state with save time
+      this.gameState.lastSaveTime = lastSaveTime;
       
     } catch (error) {
       log.error(`Failed to save PPV state for ${player.name.get()}: ${error}`);

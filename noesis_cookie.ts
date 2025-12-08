@@ -192,16 +192,16 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🎬 Handlers
   private onCookiePressedEvent(): void {
-    const log = this.log.inactive("onCookiePressedEvent");
-    log.info("Cookie pressed down");
+    const log = this.log.active("onCookiePressedEvent");
+    log.info("Cookie pressed down - triggering animation");
 
     // Trigger press down animation
     this.triggerClickDown();
   }
 
   private onCookieClickedEvent(): void {
-    const log = this.log.inactive("onCookieClickedEvent");
-    log.info("Cookie released");
+    const log = this.log.active("onCookieClickedEvent");
+    log.info("Cookie released - processing click");
 
     // Trigger release animation
     this.triggerClickUp();
@@ -251,17 +251,22 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private triggerClickDown(): void {
+    const log = this.log.active("triggerClickDown");
+    log.info(`noesisGizmo valid: ${!!this.noesisGizmo}`);
+    
     // Reset and trigger the click down animation
     this.dataContext.clickDown = false;
     this.dataContext.clickUp = false;
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
+      log.info("Set dataContext with clickDown=false, clickUp=false");
     }
 
     this.async.setTimeout(() => {
       this.dataContext.clickDown = true;
       if (this.noesisGizmo) {
         this.noesisGizmo.dataContext = this.dataContext;
+        log.info("Set dataContext with clickDown=true (after timeout)");
       }
     }, 1);
   }

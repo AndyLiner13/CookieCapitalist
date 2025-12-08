@@ -4,6 +4,10 @@
   Input Mode: No Interaction
   
   Front wave layer with drop shadow effect.
+  
+  RESPONSIVE NOTE: Spatial UIs have fixed physical size in world space.
+  Scaling for different devices is controlled by the Noesis Gizmo entity scale in Desktop Editor.
+  The wave fills the bottom portion using percentage-based height.
 -->
 
 <Page
@@ -22,7 +26,7 @@
 
   <Grid Background="Transparent">
     
-    <!-- Front wave layer - pure white with shadow -->
+    <!-- Front wave layer - pure white with shadow, anchored to bottom -->
     <Grid x:Name="Wave1"
           VerticalAlignment="Bottom" 
           HorizontalAlignment="Stretch"
@@ -32,7 +36,7 @@
         <TranslateTransform x:Name="WaveTransform1" X="0" Y="0"/>
       </Grid.RenderTransform>
       
-      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1133,0,-1151,-608">
+      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1000,0,-1000,-500">
         <Path.Data>
           <PathGeometry>
             <PathFigure StartPoint="0,40">

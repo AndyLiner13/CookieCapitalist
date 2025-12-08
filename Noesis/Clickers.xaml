@@ -1,9 +1,15 @@
 <!-- 
-  Clickers - Rotating ring of clicking fingers (Screen Overlay)
-  Display Mode: Screen Overlay, Render Order: 2 (behind cookie)
+  Clickers - Rotating ring of clicking fingers (Spatial)
+  Display Mode: Spatial, Render Order: 2 (behind cookie)
   Input Mode: No Interaction (visual only)
   24 fingers with sequential clicking animation, counter-clockwise rotation
   Finger visibility controlled by TypeScript based on purchased clicker upgrades
+  
+  RESPONSIVE NOTE: This is a Spatial UI - its apparent size on screen depends on:
+  1. The Noesis Gizmo entity's physical scale in Desktop Editor
+  2. The distance from the camera
+  To prevent clipping on smaller screens, reduce the Noesis Gizmo entity's scale
+  in the Desktop Editor. The clickers should use the same scale as Cookie for alignment.
 -->
 
 <Page

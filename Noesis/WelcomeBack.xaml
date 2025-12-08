@@ -2,6 +2,8 @@
   WelcomeBack Modal - Displays offline earnings (Screen Overlay)
   Display Mode: Screen Overlay, Render Order: 100 (top layer - covers everything)
   Input Mode: Interactive, blocking
+  
+  RESPONSIVE: Uses MaxWidth with percentage-based sizing
 -->
 
 <Page
@@ -29,11 +31,6 @@
       <!-- Typography -->
       <FontFamily x:Key="HeadingFont">Fonts/#Bangers-Regular</FontFamily>
       <FontFamily x:Key="BodyFont">Fonts/#Anton-Regular</FontFamily>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TitleFontSize">48</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CookiesFontSize">64</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="LabelFontSize">20</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimeFontSize">48</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ButtonFontSize">28</sys:Double>
       
       <!-- Layout -->
       <CornerRadius x:Key="ModalCornerRadius">16</CornerRadius>
@@ -68,13 +65,14 @@
             <SolidColorBrush Color="#CC000000"/>
         </Grid.Background>
     
-    <!-- Center modal card -->
+    <!-- Center modal card - uses percentage width -->
     <Border
             CornerRadius="{StaticResource ModalCornerRadius}"
             Padding="32,40"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Width="340">
+            MaxWidth="380"
+            MinWidth="280">
             <Border.Background>
                 <SolidColorBrush Color="#FF000000" Opacity="0.985"/>
             </Border.Background>
@@ -82,45 +80,50 @@
       <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
         
         <!-- Title -->
-        <TextBlock Text="Welcome Back!"
-                   FontFamily="{StaticResource HeadingFont}"
-                   FontSize="{StaticResource TitleFontSize}"
-                   Foreground="{StaticResource PrimaryTextBrush}"
-                   TextAlignment="Center"
-                   Margin="0,0,0,24"/>
+        <Viewbox MaxHeight="60" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,24">
+          <TextBlock Text="Welcome Back!"
+                     FontFamily="{StaticResource HeadingFont}"
+                     FontSize="48"
+                     Foreground="{StaticResource PrimaryTextBrush}"
+                     TextAlignment="Center"/>
+        </Viewbox>
         
         <!-- Label: While you were away -->
-        <TextBlock Text="While you were away for"
-                   FontFamily="{StaticResource BodyFont}"
-                   FontSize="{StaticResource LabelFontSize}"
-                   Foreground="{StaticResource PrimaryTextBrush}"
-                   TextAlignment="Center"
-                   Margin="0,0,0,8"/>
+        <Viewbox MaxHeight="28" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+          <TextBlock Text="While you were away for"
+                     FontFamily="{StaticResource BodyFont}"
+                     FontSize="20"
+                     Foreground="{StaticResource PrimaryTextBrush}"
+                     TextAlignment="Center"/>
+        </Viewbox>
         
         <!-- Time away display (bound to dataContext.timeAway) -->
-        <TextBlock Text="{Binding timeAway}"
-             d:Text="2d 5h 30m"
-                   FontFamily="{StaticResource BodyFont}"
-                   FontSize="{StaticResource TimeFontSize}"
-                   Foreground="{StaticResource AccentTextBrush}"
-                   TextAlignment="Center"
-                   Margin="0,0,0,32"/>
+        <Viewbox MaxHeight="56" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,32">
+          <TextBlock Text="{Binding timeAway}"
+               d:Text="2d 5h 30m"
+                     FontFamily="{StaticResource BodyFont}"
+                     FontSize="48"
+                     Foreground="{StaticResource AccentTextBrush}"
+                     TextAlignment="Center"/>
+        </Viewbox>
         
         <!-- Label: You earned -->
-        <TextBlock Text="You earned"
-                   FontFamily="{StaticResource BodyFont}"
-                   FontSize="{StaticResource LabelFontSize}"
-                   Foreground="{StaticResource PrimaryTextBrush}"
-                   TextAlignment="Center"
-                   Margin="0,0,0,8"/>
+        <Viewbox MaxHeight="28" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+          <TextBlock Text="You earned"
+                     FontFamily="{StaticResource BodyFont}"
+                     FontSize="20"
+                     Foreground="{StaticResource PrimaryTextBrush}"
+                     TextAlignment="Center"/>
+        </Viewbox>
         
         <!-- Cookies earned display (bound to dataContext.cookiesEarned) -->
         <TextBlock Text="{Binding cookiesEarned}"
              d:Text="15.2K"
                    FontFamily="{StaticResource HeadingFont}"
-                   FontSize="{StaticResource CookiesFontSize}"
+                   FontSize="56"
                    Foreground="{StaticResource AccentTextBrush}"
                    TextAlignment="Center"
+                   HorizontalAlignment="Center"
                    Margin="0,0,0,40">
           <TextBlock.Effect>
             <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Opacity="1" Direction="315"/>
@@ -179,12 +182,14 @@
               <Border Background="{TemplateBinding Background}" 
                       CornerRadius="{StaticResource ButtonCornerRadius}"
                       Padding="48,16">
-                <TextBlock Text="{TemplateBinding Content}"
-                          FontFamily="{StaticResource BodyFont}"
-                          FontSize="{StaticResource ButtonFontSize}"
-                          Foreground="{StaticResource PrimaryTextBrush}"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"/>
+                <Viewbox MaxHeight="36" Stretch="Uniform">
+                  <TextBlock Text="{TemplateBinding Content}"
+                            FontFamily="{StaticResource BodyFont}"
+                            FontSize="28"
+                            Foreground="{StaticResource PrimaryTextBrush}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                </Viewbox>
               </Border>
             </ControlTemplate>
           </Button.Template>

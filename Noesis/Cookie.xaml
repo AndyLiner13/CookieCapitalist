@@ -5,6 +5,12 @@
   
   This XAML is purely visual - it has NO click detection.
   Clicks are detected by raycast + collider in controller_player.ts, which sends LocalUIEvents.cookieClicked.
+  
+  RESPONSIVE NOTE: This is a Spatial UI - its apparent size on screen depends on:
+  1. The Noesis Gizmo entity's physical scale in Desktop Editor
+  2. The distance from the camera
+  To make the cookie smaller/larger on different devices, adjust the Noesis Gizmo entity's
+  scale property in the Desktop Editor, NOT the XAML. Typical scale: 0.7-0.85 for mobile.
 -->
 
 <Page

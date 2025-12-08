@@ -2,6 +2,8 @@
   Shop - Upgrade cards screen (Screen Overlay)
   Display Mode: Screen Overlay, Render Order: 5
   Input Mode: Interactive, nonblocking
+  
+  RESPONSIVE: Uses percentage-based row heights and MinHeight for cards
 -->
 
 <Page
@@ -19,11 +21,12 @@
     <ResourceDictionary>
       <BooleanToVisibilityConverter x:Key="BoolToVis"/>
       
-      <!-- Card Layout Constants -->
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardHeight">100</sys:Double>
+      <!-- Card Layout Constants - using MinHeight instead of fixed Height for responsiveness -->
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardMinHeight">90</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardCornerRadius">8</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">33</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">44</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ImageSize">84</sys:Double>
       <CornerRadius x:Key="CardBorderRadius">8</CornerRadius>
       <CornerRadius x:Key="BarCornerRadius">5</CornerRadius>
       <CornerRadius x:Key="TierBadgeRadius">4</CornerRadius>
@@ -116,25 +119,27 @@
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     <Grid Background="{x:Null}">
       <Grid.RowDefinitions>
+        <!-- Header: fixed 140px for consistent notch clearance (matches Overlay) -->
         <RowDefinition Height="140"/>
         <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
+        <!-- Footer spacer: fixed 124px (matches Overlay navigation) -->
+        <RowDefinition Height="124"/>
       </Grid.RowDefinitions>
       
       <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,96">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,0">
           
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 1: Clicker                                                             -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding clicker.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -188,14 +193,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 2: Grandma                                                             -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding grandma.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -249,14 +254,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 3: Farm                                                                -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding farm.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -310,14 +315,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 4: Factory                                                             -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding factory.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -371,14 +376,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 5: Lab                                                                 -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding lab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -432,14 +437,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 6: Fab                                                                 -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding fab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -493,14 +498,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 7: Planet                                                              -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding planet.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -554,14 +559,14 @@
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
           <!-- Upgrade Card 8: Galaxy                                                              -->
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-          <Border Height="{StaticResource CardHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
+          <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
-                <Image Source="Images/GalaxyImage.png" Stretch="Uniform" VerticalAlignment="Stretch"/>
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+                <Image Source="Images/GalaxyImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding galaxy.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
@@ -617,3 +622,4 @@
     </Grid>
   </Grid>
 </Page>
+
