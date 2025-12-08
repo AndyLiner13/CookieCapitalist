@@ -59,9 +59,9 @@
       <!-- Larger base font sizes so text scales visually with card size on mobile -->
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="NameFontSize">28</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="RateFontSize">20</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">18</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">22</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="PriceFontSize">28</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">22</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">26</sys:Double>
       
       <!-- Card Text Styles -->
       <Style x:Key="CardNameTextStyle" TargetType="TextBlock">
