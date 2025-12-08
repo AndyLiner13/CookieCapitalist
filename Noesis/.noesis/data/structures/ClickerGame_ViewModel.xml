@@ -1,9 +1,0 @@
-<Class Name="ClickerGame_ViewModel">
-  <Property Name="cookieCount" Type="String"/>
-  <Property Name="cookiesPerSecond" Type="String"/>
-  <Property Name="cookiesPerClick" Type="String"/>
-  <Property Name="currentCPS" Type="String"/>
-  <Property Name="totalUpgrades" Type="String"/>
-  <Property Name="onCookieClick" Type="Command"/>
-  <Property Name="upgrades" Type="Collection" SubType="ClickerGame.Upgrade_ViewModel"/>
-</Class>
