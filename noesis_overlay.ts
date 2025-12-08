@@ -46,6 +46,8 @@ const POP_IN_DURATION_MS = 870; // 1500ms for pop-in animation (fixed duration)
 const POP_IN_OVERSHOOT = 1.23; // How much to overshoot before settling (smaller bounce)
 // Scale multiplier per tier (1.23x bigger each level)
 const SCALE_PER_TIER = 1.23;
+// Duration of the final fall segment for multiplier + CPS easing
+const CPS_FALL_DURATION_MS = FLASH_THRESHOLD_MS / 3;
 // #endregion
 
 class Default extends Component<typeof Default> {
@@ -71,6 +73,7 @@ class Default extends Component<typeof Default> {
   // Cached game state for header
   private cookies: number = 0;
   private cookiesPerSecond: number = 0;
+  private displayedCps: number = 0;
   
   // Multiplier state
   private currentMultiplier: number = 1;
@@ -79,6 +82,7 @@ class Default extends Component<typeof Default> {
   private shakeTimerId: number | null = null;
   private popInTimerId: number | null = null;
   private fadeOutTimerId: number | null = null;
+  private cpsFallTimerId: number | null = null;
   
   // Smooth animation state
   private targetShakeX: number = 0;
@@ -91,6 +95,9 @@ class Default extends Component<typeof Default> {
   private isFalling: boolean = false;
   private fallStartShakeY: number = 0;
   private fallStartScale: number = 1;
+  private fallStartCps: number = 0;
+  private fallTargetCps: number = 0;
+  private fallStartTimeMs: number = 0;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -154,7 +161,7 @@ class Default extends Component<typeof Default> {
     this.dataContext = {
       // Header data
       cookieCount: formatCookieDisplay(this.cookies),
-      cookiesPerSecond: formatCPSDisplay(this.cookiesPerSecond),
+      cookiesPerSecond: formatCPSDisplay(this.displayedCps),
       
       // Multiplier display
       multiplierText: "2x",
@@ -374,6 +381,7 @@ class Default extends Component<typeof Default> {
             
             // Broadcast that fall has started - cookie will trigger glow collapse
             this.sendLocalBroadcastEvent(LocalUIEvents.fallAnimationStarted, {});
+            this.startCpsFallAnimation();
             log.info("Fall animation started - broadcasted to cookie");
           }
           
@@ -538,6 +546,7 @@ class Default extends Component<typeof Default> {
     this.isFalling = false;
     this.fallStartShakeY = 0;
     this.fallStartScale = 1;
+    this.stopCpsFallAnimation();
     
     if (this.multiplierTimerId !== null) {
       this.async.clearInterval(this.multiplierTimerId);
@@ -573,6 +582,63 @@ class Default extends Component<typeof Default> {
   // #endregion
 
   // #region 🛠️ Helper Methods
+  private startCpsFallAnimation(): void {
+    const log = this.log.inactive("startCpsFallAnimation");
+
+    if (this.cpsFallTimerId !== null) {
+      this.async.clearInterval(this.cpsFallTimerId);
+      this.cpsFallTimerId = null;
+    }
+
+    const baseCps = this.cookiesPerSecond;
+    const activeMultiplier = this.currentMultiplier > 1 ? this.currentMultiplier : 1;
+    this.fallStartCps = baseCps * activeMultiplier;
+    this.fallTargetCps = baseCps;
+    this.displayedCps = this.fallStartCps;
+    this.fallStartTimeMs = Date.now();
+
+    // No need to animate if start and target are the same
+    if (this.fallStartCps === this.fallTargetCps) {
+      this.updateCpsDisplay();
+      return;
+    }
+
+    this.cpsFallTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() - this.fallStartTimeMs;
+      const t = Math.min(elapsed / CPS_FALL_DURATION_MS, 1);
+
+      // Smooth ease-out towards baseline CPS
+      const eased = 1 - Math.pow(1 - t, 2);
+      this.displayedCps =
+        this.fallStartCps + (this.fallTargetCps - this.fallStartCps) * eased;
+
+      this.updateCpsDisplay();
+
+      if (t >= 1 && this.cpsFallTimerId !== null) {
+        this.async.clearInterval(this.cpsFallTimerId);
+        this.cpsFallTimerId = null;
+        this.displayedCps = this.fallTargetCps;
+        this.updateCpsDisplay();
+        log.info("CPS fall animation complete");
+      }
+    }, 100);
+  }
+
+  private stopCpsFallAnimation(): void {
+    if (this.cpsFallTimerId !== null) {
+      this.async.clearInterval(this.cpsFallTimerId);
+      this.cpsFallTimerId = null;
+    }
+    this.displayedCps = this.cookiesPerSecond;
+    this.updateCpsDisplay();
+  }
+
+  private updateCpsDisplay(): void {
+    if (!this.noesisGizmo) return;
+    this.dataContext.cookiesPerSecond = formatCPSDisplay(this.displayedCps);
+    this.noesisGizmo.dataContext = this.dataContext;
+  }
+
   private updateMultiplierVisibility(): void {
     // Multiplier is only visible on home page AND when active
     const isMultiplierActive = this.currentMultiplier > 1 && Date.now() < this.multiplierEndTime;
@@ -600,9 +666,18 @@ class Default extends Component<typeof Default> {
     const activeMultiplier = this.getActiveMultiplier();
     const effectiveCps = this.cookiesPerSecond * activeMultiplier;
     
+    if (this.cpsFallTimerId === null) {
+      // When not easing, header CPS should track effective CPS directly
+      this.displayedCps = effectiveCps;
+    } else {
+      // While easing back to baseline, keep the target in sync with any
+      // backend CPS changes so we land on the correct final value.
+      this.fallTargetCps = this.cookiesPerSecond;
+    }
+    
     // Only update header values - DON'T recreate commands!
     this.dataContext.cookieCount = formatCookieDisplay(this.cookies);
-    this.dataContext.cookiesPerSecond = formatCPSDisplay(effectiveCps);
+    this.dataContext.cookiesPerSecond = formatCPSDisplay(this.displayedCps);
     
     this.noesisGizmo.dataContext = this.dataContext;
   }
