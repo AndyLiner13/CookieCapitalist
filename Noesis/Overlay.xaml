@@ -48,9 +48,7 @@
   <Grid.RowDefinitions>
     <!-- Header: ~28% of screen height for larger text display -->
     <RowDefinition Height="0.28*"/>
-    <!-- Multiplier area -->
-    <RowDefinition Height="Auto"/>
-    <!-- Middle spacer -->
+    <!-- Middle spacer (includes multiplier overlay) -->
     <RowDefinition Height="*"/>
     <!-- Footer: ~18% of screen height for navigation buttons -->
     <RowDefinition Height="0.18*"/>
@@ -88,7 +86,7 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Multiplier Display (shows above cookie when active)                              -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border Grid.Row="1" Background="{x:Null}" Padding="0,28,0,0" HorizontalAlignment="Center" Width="300"
+  <Border Grid.Row="1" Background="{x:Null}" Padding="0,28,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="300"
           Visibility="{Binding multiplierVisible, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False" ClipToBounds="False">
     <!-- Container for blink animation - opacity applied here, not on TextBlock -->
     <Border Background="{x:Null}" Opacity="{Binding multiplierOpacity}" IsHitTestVisible="False">
@@ -123,7 +121,7 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#01000000" Grid.Row="3" IsHitTestVisible="True">
+  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#01000000" Grid.Row="2" IsHitTestVisible="True">
     <!-- Viewbox scales navigation buttons proportionally -->
     <Viewbox Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,8,16,16" MaxHeight="120">
       <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
