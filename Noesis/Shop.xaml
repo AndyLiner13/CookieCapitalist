@@ -38,7 +38,7 @@
       <Thickness x:Key="TierBadgePadding">6,2</Thickness>
       <Thickness x:Key="TimerMargin">5,0,0,0</Thickness>
       <!-- Shared padding for buy + timer buttons (extra vertical space) -->
-      <Thickness x:Key="TimerPadding">12,6</Thickness>
+      <Thickness x:Key="TimerPadding">16,6</Thickness>
       <!-- Progress text margin now includes vertical spacing to match button padding -->
       <Thickness x:Key="ProgressTextMargin">8,6,0,6</Thickness>
       <Thickness x:Key="ButtonRowMargin">0,5,0,0</Thickness>
