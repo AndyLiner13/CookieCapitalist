@@ -1,0 +1,424 @@
+{
+  "$description": "Quest configuration for Cookie Capitalist - Maps all achievements to be created in Desktop Editor",
+  "$instructions": {
+    "usage": "Use this file to track which quests need to be created in Systems > Quests in Desktop Editor",
+    "scriptId": "Must match exactly when calling player.setAchievementComplete(scriptId)",
+    "type": {
+      "simple": "Boolean quest - marked complete via script only",
+      "tracked": "Linked to persistent variable - auto-completes when threshold reached"
+    },
+    "status": {
+      "pending": "Quest not yet created in Desktop Editor",
+      "created": "Quest created and ready to use",
+      "tested": "Quest created and verified working"
+    }
+  },
+
+  "quests": {
+    "onboarding": {
+      "$description": "Awarded when player completes the tutorial",
+      "$count": 1,
+      "items": [
+        {
+          "scriptId": "quest_onboardingComplete",
+          "name": "Welcome to Cookie Capitalist!",
+          "description": "Complete the onboarding tutorial",
+          "type": "simple",
+          "status": "pending",
+          "reward": {
+            "cookies": 50,
+            "message": "🎓 Tutorial Complete!"
+          }
+        }
+      ]
+    },
+
+    "unlocks": {
+      "$description": "Awarded when player purchases their first of each upgrade type",
+      "$count": 8,
+      "items": [
+        {
+          "scriptId": "quest_unlockClicker",
+          "name": "Click Apprentice",
+          "description": "Purchase your first Clicker",
+          "type": "simple",
+          "upgradeId": "clicker",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🖱️ Clicker Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockGrandma",
+          "name": "Grandma's Helper",
+          "description": "Purchase your first Grandma",
+          "type": "simple",
+          "upgradeId": "grandma",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "👵 Grandma Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockFarm",
+          "name": "Farmer's Start",
+          "description": "Purchase your first Cookie Farm",
+          "type": "simple",
+          "upgradeId": "farm",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🌾 Cookie Farm Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockFactory",
+          "name": "Industrial Revolution",
+          "description": "Purchase your first Cookie Factory",
+          "type": "simple",
+          "upgradeId": "factory",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🏭 Cookie Factory Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockLab",
+          "name": "Mad Scientist",
+          "description": "Purchase your first Cookie Laboratory",
+          "type": "simple",
+          "upgradeId": "lab",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🔬 Cookie Lab Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockFab",
+          "name": "Chip Fabricator",
+          "description": "Purchase your first Cookie Fab Plant",
+          "type": "simple",
+          "upgradeId": "fab",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🔧 Cookie Fab Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockPlanet",
+          "name": "Space Pioneer",
+          "description": "Purchase your first Cookie Planet",
+          "type": "simple",
+          "upgradeId": "planet",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🪐 Cookie Planet Unlocked!" }
+        },
+        {
+          "scriptId": "quest_unlockGalaxy",
+          "name": "Galactic Overlord",
+          "description": "Purchase your first Cookie Galaxy",
+          "type": "simple",
+          "upgradeId": "galaxy",
+          "status": "pending",
+          "reward": { "cookies": 0, "message": "🌌 Cookie Galaxy Unlocked!" }
+        }
+      ]
+    },
+
+    "tiers": {
+      "$description": "Awarded when player reaches tier thresholds (10, 25, 50, 100, 150, 200, 350, 500, 750, 1000) for each upgrade",
+      "$count": 80,
+      "$thresholds": [10, 25, 50, 100, 150, 200, 350, 500, 750, 1000],
+
+      "clicker": {
+        "$upgradeId": "clicker",
+        "$upgradeName": "Clicker",
+        "$emoji": "🖱️",
+        "$note": "Clicker is capped at 24 - only tier_clicker_10 is achievable",
+        "items": [
+          { "scriptId": "quest_tierClicker10", "name": "Click Enthusiast", "description": "Own 10 Clickers", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierClicker25", "name": "Click Expert", "description": "Own 25 Clickers", "threshold": 25, "tier": 3, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker50", "name": "Click Master", "description": "Own 50 Clickers", "threshold": 50, "tier": 4, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker100", "name": "Click Legend", "description": "Own 100 Clickers", "threshold": 100, "tier": 5, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker150", "name": "Click Champion", "description": "Own 150 Clickers", "threshold": 150, "tier": 6, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker200", "name": "Click Virtuoso", "description": "Own 200 Clickers", "threshold": 200, "tier": 7, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker350", "name": "Click Prodigy", "description": "Own 350 Clickers", "threshold": 350, "tier": 8, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker500", "name": "Click Sage", "description": "Own 500 Clickers", "threshold": 500, "tier": 9, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker750", "name": "Click Overlord", "description": "Own 750 Clickers", "threshold": 750, "tier": 10, "status": "pending", "$unreachable": "Clicker max is 24" },
+          { "scriptId": "quest_tierClicker1000", "name": "Click God", "description": "Own 1000 Clickers", "threshold": 1000, "tier": 11, "status": "pending", "$unreachable": "Clicker max is 24" }
+        ]
+      },
+
+      "grandma": {
+        "$upgradeId": "grandma",
+        "$upgradeName": "Grandma",
+        "$emoji": "👵",
+        "items": [
+          { "scriptId": "quest_tierGrandma10", "name": "Grandma's Dozen", "description": "Own 10 Grandmas", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierGrandma25", "name": "Grandma's Kitchen", "description": "Own 25 Grandmas", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierGrandma50", "name": "Grandma's Bakery", "description": "Own 50 Grandmas", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierGrandma100", "name": "Grandma's Empire", "description": "Own 100 Grandmas", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierGrandma150", "name": "Grandma's Legacy", "description": "Own 150 Grandmas", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierGrandma200", "name": "Grandma's Dynasty", "description": "Own 200 Grandmas", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierGrandma350", "name": "Grandma's Dominion", "description": "Own 350 Grandmas", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierGrandma500", "name": "Grandma's Realm", "description": "Own 500 Grandmas", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierGrandma750", "name": "Grandma's Kingdom", "description": "Own 750 Grandmas", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierGrandma1000", "name": "Grandma's Universe", "description": "Own 1000 Grandmas", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "farm": {
+        "$upgradeId": "farm",
+        "$upgradeName": "Cookie Farm",
+        "$emoji": "🌾",
+        "items": [
+          { "scriptId": "quest_tierFarm10", "name": "Small Plantation", "description": "Own 10 Cookie Farms", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierFarm25", "name": "Growing Fields", "description": "Own 25 Cookie Farms", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierFarm50", "name": "Harvest King", "description": "Own 50 Cookie Farms", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierFarm100", "name": "Agricultural Tycoon", "description": "Own 100 Cookie Farms", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierFarm150", "name": "Farming Magnate", "description": "Own 150 Cookie Farms", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierFarm200", "name": "Crop Baron", "description": "Own 200 Cookie Farms", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierFarm350", "name": "Harvest Emperor", "description": "Own 350 Cookie Farms", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierFarm500", "name": "Field Sovereign", "description": "Own 500 Cookie Farms", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierFarm750", "name": "Terra Lord", "description": "Own 750 Cookie Farms", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierFarm1000", "name": "Cookie Harvest God", "description": "Own 1000 Cookie Farms", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "factory": {
+        "$upgradeId": "factory",
+        "$upgradeName": "Cookie Factory",
+        "$emoji": "🏭",
+        "items": [
+          { "scriptId": "quest_tierFactory10", "name": "Assembly Line", "description": "Own 10 Cookie Factories", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierFactory25", "name": "Industrial Park", "description": "Own 25 Cookie Factories", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierFactory50", "name": "Manufacturing Hub", "description": "Own 50 Cookie Factories", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierFactory100", "name": "Industrial Giant", "description": "Own 100 Cookie Factories", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierFactory150", "name": "Production Titan", "description": "Own 150 Cookie Factories", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierFactory200", "name": "Factory Mogul", "description": "Own 200 Cookie Factories", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierFactory350", "name": "Industrial Emperor", "description": "Own 350 Cookie Factories", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierFactory500", "name": "Manufacturing Overlord", "description": "Own 500 Cookie Factories", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierFactory750", "name": "Factory Sovereign", "description": "Own 750 Cookie Factories", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierFactory1000", "name": "Industrial God", "description": "Own 1000 Cookie Factories", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "lab": {
+        "$upgradeId": "lab",
+        "$upgradeName": "Cookie Laboratory",
+        "$emoji": "🔬",
+        "items": [
+          { "scriptId": "quest_tierLab10", "name": "Research Team", "description": "Own 10 Cookie Laboratories", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierLab25", "name": "Science Division", "description": "Own 25 Cookie Laboratories", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierLab50", "name": "Research Campus", "description": "Own 50 Cookie Laboratories", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierLab100", "name": "Science Empire", "description": "Own 100 Cookie Laboratories", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierLab150", "name": "Research Titan", "description": "Own 150 Cookie Laboratories", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierLab200", "name": "Science Mogul", "description": "Own 200 Cookie Laboratories", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierLab350", "name": "Research Emperor", "description": "Own 350 Cookie Laboratories", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierLab500", "name": "Science Overlord", "description": "Own 500 Cookie Laboratories", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierLab750", "name": "Lab Sovereign", "description": "Own 750 Cookie Laboratories", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierLab1000", "name": "Science God", "description": "Own 1000 Cookie Laboratories", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "fab": {
+        "$upgradeId": "fab",
+        "$upgradeName": "Cookie Fab Plant",
+        "$emoji": "🔧",
+        "items": [
+          { "scriptId": "quest_tierFab10", "name": "Chip Startup", "description": "Own 10 Cookie Fab Plants", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierFab25", "name": "Silicon Valley", "description": "Own 25 Cookie Fab Plants", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierFab50", "name": "Fab Complex", "description": "Own 50 Cookie Fab Plants", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierFab100", "name": "Chip Empire", "description": "Own 100 Cookie Fab Plants", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierFab150", "name": "Fabrication Titan", "description": "Own 150 Cookie Fab Plants", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierFab200", "name": "Fab Mogul", "description": "Own 200 Cookie Fab Plants", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierFab350", "name": "Silicon Emperor", "description": "Own 350 Cookie Fab Plants", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierFab500", "name": "Fab Overlord", "description": "Own 500 Cookie Fab Plants", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierFab750", "name": "Chip Sovereign", "description": "Own 750 Cookie Fab Plants", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierFab1000", "name": "Fabrication God", "description": "Own 1000 Cookie Fab Plants", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "planet": {
+        "$upgradeId": "planet",
+        "$upgradeName": "Cookie Planet",
+        "$emoji": "🪐",
+        "items": [
+          { "scriptId": "quest_tierPlanet10", "name": "Solar System", "description": "Own 10 Cookie Planets", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierPlanet25", "name": "Star Cluster", "description": "Own 25 Cookie Planets", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierPlanet50", "name": "Planetary Network", "description": "Own 50 Cookie Planets", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierPlanet100", "name": "Cosmic Empire", "description": "Own 100 Cookie Planets", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierPlanet150", "name": "Space Titan", "description": "Own 150 Cookie Planets", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierPlanet200", "name": "Planetary Mogul", "description": "Own 200 Cookie Planets", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierPlanet350", "name": "Cosmic Emperor", "description": "Own 350 Cookie Planets", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierPlanet500", "name": "Space Overlord", "description": "Own 500 Cookie Planets", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierPlanet750", "name": "Planetary Sovereign", "description": "Own 750 Cookie Planets", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierPlanet1000", "name": "Cosmic God", "description": "Own 1000 Cookie Planets", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      },
+
+      "galaxy": {
+        "$upgradeId": "galaxy",
+        "$upgradeName": "Cookie Galaxy",
+        "$emoji": "🌌",
+        "items": [
+          { "scriptId": "quest_tierGalaxy10", "name": "Local Group", "description": "Own 10 Cookie Galaxies", "threshold": 10, "tier": 2, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy25", "name": "Galaxy Cluster", "description": "Own 25 Cookie Galaxies", "threshold": 25, "tier": 3, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy50", "name": "Supercluster", "description": "Own 50 Cookie Galaxies", "threshold": 50, "tier": 4, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy100", "name": "Galactic Empire", "description": "Own 100 Cookie Galaxies", "threshold": 100, "tier": 5, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy150", "name": "Universe Titan", "description": "Own 150 Cookie Galaxies", "threshold": 150, "tier": 6, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy200", "name": "Galactic Mogul", "description": "Own 200 Cookie Galaxies", "threshold": 200, "tier": 7, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy350", "name": "Universal Emperor", "description": "Own 350 Cookie Galaxies", "threshold": 350, "tier": 8, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy500", "name": "Galaxy Overlord", "description": "Own 500 Cookie Galaxies", "threshold": 500, "tier": 9, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy750", "name": "Universal Sovereign", "description": "Own 750 Cookie Galaxies", "threshold": 750, "tier": 10, "status": "pending" },
+          { "scriptId": "quest_tierGalaxy1000", "name": "Multiverse God", "description": "Own 1000 Cookie Galaxies", "threshold": 1000, "tier": 11, "status": "pending" }
+        ]
+      }
+    },
+
+    "milestones": {
+      "$description": "Awarded when player reaches total lifetime cookies earned thresholds",
+      "$note": "Tracks totalCookiesEarned (lifetime), not current balance",
+      "$count": 15,
+      "items": [
+        {
+          "scriptId": "quest_cookies100",
+          "name": "First Batch",
+          "description": "Earn 100 total cookies",
+          "threshold": 100,
+          "thresholdDisplay": "100",
+          "status": "pending",
+          "reward": { "cookies": 10, "message": "🍪 First Batch Complete!" }
+        },
+        {
+          "scriptId": "quest_cookies1K",
+          "name": "Cookie Jar",
+          "description": "Earn 1,000 total cookies",
+          "threshold": 1000,
+          "thresholdDisplay": "1K",
+          "status": "pending",
+          "reward": { "cookies": 100, "message": "🍪 Cookie Jar Filled!" }
+        },
+        {
+          "scriptId": "quest_cookies10K",
+          "name": "Cookie Box",
+          "description": "Earn 10,000 total cookies",
+          "threshold": 10000,
+          "thresholdDisplay": "10K",
+          "status": "pending",
+          "reward": { "cookies": 500, "message": "📦 Cookie Box Complete!" }
+        },
+        {
+          "scriptId": "quest_cookies100K",
+          "name": "Cookie Crate",
+          "description": "Earn 100,000 total cookies",
+          "threshold": 100000,
+          "thresholdDisplay": "100K",
+          "status": "pending",
+          "reward": { "cookies": 2500, "message": "📦 Cookie Crate Filled!" }
+        },
+        {
+          "scriptId": "quest_cookies1M",
+          "name": "Cookie Millionaire",
+          "description": "Earn 1 million total cookies",
+          "threshold": 1000000,
+          "thresholdDisplay": "1M",
+          "status": "pending",
+          "reward": { "cookies": 10000, "message": "💰 Cookie Millionaire!" }
+        },
+        {
+          "scriptId": "quest_cookies10M",
+          "name": "Cookie Mogul",
+          "description": "Earn 10 million total cookies",
+          "threshold": 10000000,
+          "thresholdDisplay": "10M",
+          "status": "pending",
+          "reward": { "cookies": 50000, "message": "💰 Cookie Mogul!" }
+        },
+        {
+          "scriptId": "quest_cookies100M",
+          "name": "Cookie Tycoon",
+          "description": "Earn 100 million total cookies",
+          "threshold": 100000000,
+          "thresholdDisplay": "100M",
+          "status": "pending",
+          "reward": { "cookies": 250000, "message": "🏆 Cookie Tycoon!" }
+        },
+        {
+          "scriptId": "quest_cookies1B",
+          "name": "Cookie Billionaire",
+          "description": "Earn 1 billion total cookies",
+          "threshold": 1000000000,
+          "thresholdDisplay": "1B",
+          "status": "pending",
+          "reward": { "cookies": 1000000, "message": "💎 Cookie Billionaire!" }
+        },
+        {
+          "scriptId": "quest_cookies10B",
+          "name": "Cookie Empire",
+          "description": "Earn 10 billion total cookies",
+          "threshold": 10000000000,
+          "thresholdDisplay": "10B",
+          "status": "pending",
+          "reward": { "cookies": 5000000, "message": "👑 Cookie Empire!" }
+        },
+        {
+          "scriptId": "quest_cookies100B",
+          "name": "Cookie Dynasty",
+          "description": "Earn 100 billion total cookies",
+          "threshold": 100000000000,
+          "thresholdDisplay": "100B",
+          "status": "pending",
+          "reward": { "cookies": 25000000, "message": "👑 Cookie Dynasty!" }
+        },
+        {
+          "scriptId": "quest_cookies1T",
+          "name": "Cookie Trillionaire",
+          "description": "Earn 1 trillion total cookies",
+          "threshold": 1000000000000,
+          "thresholdDisplay": "1T",
+          "status": "pending",
+          "reward": { "cookies": 100000000, "message": "🌟 Cookie Trillionaire!" }
+        },
+        {
+          "scriptId": "quest_cookies10T",
+          "name": "Cookie Overlord",
+          "description": "Earn 10 trillion total cookies",
+          "threshold": 10000000000000,
+          "thresholdDisplay": "10T",
+          "status": "pending",
+          "reward": { "cookies": 500000000, "message": "🌟 Cookie Overlord!" }
+        },
+        {
+          "scriptId": "quest_cookies100T",
+          "name": "Cookie Sovereign",
+          "description": "Earn 100 trillion total cookies",
+          "threshold": 100000000000000,
+          "thresholdDisplay": "100T",
+          "status": "pending",
+          "reward": { "cookies": 2500000000, "message": "⭐ Cookie Sovereign!" }
+        },
+        {
+          "scriptId": "quest_cookies1Q",
+          "name": "Cookie Deity",
+          "description": "Earn 1 quadrillion total cookies",
+          "threshold": 1000000000000000,
+          "thresholdDisplay": "1Q",
+          "status": "pending",
+          "reward": { "cookies": 10000000000, "message": "🔱 Cookie Deity!" }
+        },
+        {
+          "scriptId": "quest_cookies10Q",
+          "name": "Cookie God",
+          "description": "Earn 10 quadrillion total cookies",
+          "threshold": 10000000000000000,
+          "thresholdDisplay": "10Q",
+          "status": "pending",
+          "reward": { "cookies": 50000000000, "message": "✨ COOKIE GOD! ✨" }
+        }
+      ]
+    }
+  },
+
+  "$summary": {
+    "totalQuests": 104,
+    "breakdown": {
+      "onboarding": 1,
+      "unlocks": 8,
+      "tiers": {
+        "total": 80,
+        "reachable": 71,
+        "unreachable": 9,
+        "$note": "Clicker tiers 25-1000 are unreachable due to max cap of 24"
+      },
+      "milestones": 15
+    }
+  }
+}

@@ -560,9 +560,11 @@ class Default extends Component<typeof Default> {
           type: "welcome_back",
           offlineCookies: Math.abs(offlineCookies),
           timeAwayMs: Math.abs(timeSinceLastSaveMs),
+          cookies: this.gameState.cookies,
+          cps: this.cookiesPerSecond,
         };
         this.sendNetworkBroadcastEvent(UIEvents.toClient, welcomeData);
-        log.info(`[WELCOME BACK] Sent event: ${offlineCookies} cookies, ${timeSinceLastSaveMs}ms since last save`);
+        log.info(`[WELCOME BACK] Sent event: ${offlineCookies} cookies, ${timeSinceLastSaveMs}ms since last save, total=${this.gameState.cookies}, cps=${this.cookiesPerSecond}`);
       }, 1000);
       
       log.info(`Loaded state for ${player.name.get()}: ${this.gameState.cookies} cookies, ${Object.values(this.gameState.upgrades).reduce((a, b) => a + b, 0)} upgrades`);

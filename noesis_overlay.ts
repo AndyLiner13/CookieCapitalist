@@ -75,6 +75,11 @@ class Default extends Component<typeof Default> {
   private cookiesPerSecond: number = 0;
   private displayedCps: number = 0;
   
+  // Onboarding cookie counter state
+  private isOnboardingCookieStep: boolean = false; // True during "cookie_cheer" step (collect 15 cookies)
+  private onboardingCookieTarget: number = 15;
+  private cookieBlinkTimerId: number | null = null;
+  
   // Multiplier state
   private currentMultiplier: number = 1;
   private multiplierEndTime: number = 0;
@@ -145,6 +150,25 @@ class Default extends Component<typeof Default> {
     // Build and set initial data context (commands are set once here)
     this.buildDataContext();
     this.noesisGizmo.dataContext = this.dataContext;
+    
+    // Set milk dataContexts for onboarding control
+    this.setupMilkDataContexts();
+
+    // Listen for onboarding focus events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingFocus,
+      (data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }) => {
+        this.onOnboardingFocus(data);
+      }
+    );
+    
+    // Listen for onboarding cookie collection events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingCookieCollection,
+      (data: { active: boolean; target: number }) => {
+        this.onOnboardingCookieCollection(data);
+      }
+    );
 
     // Broadcast initial page so all gizmos set correct visibility
     this.async.setTimeout(() => {
@@ -162,6 +186,7 @@ class Default extends Component<typeof Default> {
       // Header data
       cookieCount: formatCookieDisplay(this.cookies),
       cookiesPerSecond: formatCPSDisplay(this.displayedCps),
+      cookieCountOpacity: 1, // For onboarding blinking animation
       
       // Multiplier display
       multiplierText: "2x",
@@ -170,6 +195,10 @@ class Default extends Component<typeof Default> {
       multiplierScale: 1,
       shakeX: 0,
       shakeY: 0,
+      
+      // Onboarding dimmed states (false = not dimmed, shown normally)
+      headerOnboardingDimmed: false,
+      footerOnboardingDimmed: false,
       
       // Header click - resets focused interaction mode (exit then re-enter)
       onHeaderClick: () => {
@@ -191,6 +220,128 @@ class Default extends Component<typeof Default> {
         this.navigateToPage("leaderboard");
       },
     };
+  }
+  
+  // Set up milk gizmo dataContexts for onboarding control
+  private milkDataContext = { 
+    onboardingDimmed: false,
+    milkColor: "#FFFFFF" // White by default, darker when dimmed
+  };
+  
+  private setupMilkDataContexts(): void {
+    const log = this.log.inactive("setupMilkDataContexts");
+    
+    if (this.milkBackgroundGizmo) {
+      const gizmo = this.milkBackgroundGizmo.as(NoesisGizmo);
+      if (gizmo) {
+        gizmo.dataContext = this.milkDataContext;
+        log.info("Set milk background dataContext");
+      }
+    }
+    if (this.milkForegroundGizmo) {
+      const gizmo = this.milkForegroundGizmo.as(NoesisGizmo);
+      if (gizmo) {
+        gizmo.dataContext = this.milkDataContext;
+        log.info("Set milk foreground dataContext");
+      }
+    }
+  }
+  
+  // Handle onboarding focus event - dim elements not in focus
+  private onOnboardingFocus(data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }): void {
+    const log = this.log.active("onOnboardingFocus");
+    log.info(`Onboarding focus: header=${data.header}, milk=${data.milk}, footer=${data.footer}`);
+    
+    // Update overlay dataContext (header/footer)
+    this.dataContext.headerOnboardingDimmed = !data.header;
+    this.dataContext.footerOnboardingDimmed = !data.footer;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    // Update milk dataContext - change color to darker shade when dimmed
+    this.milkDataContext.onboardingDimmed = !data.milk;
+    this.milkDataContext.milkColor = data.milk ? "#FFFFFF" : "#333333"; // White when focused, dark gray when dimmed
+    
+    // Force re-assign to trigger Noesis update
+    if (this.milkBackgroundGizmo) {
+      const gizmo = this.milkBackgroundGizmo.as(NoesisGizmo);
+      if (gizmo) gizmo.dataContext = this.milkDataContext;
+    }
+    if (this.milkForegroundGizmo) {
+      const gizmo = this.milkForegroundGizmo.as(NoesisGizmo);
+      if (gizmo) gizmo.dataContext = this.milkDataContext;
+    }
+  }
+  
+  // Handle onboarding cookie collection - show "X/15 Cookies!" and blink
+  private onOnboardingCookieCollection(data: { active: boolean; target: number }): void {
+    const log = this.log.active("onOnboardingCookieCollection");
+    log.info(`Onboarding cookie collection: active=${data.active}, target=${data.target}`);
+    
+    this.isOnboardingCookieStep = data.active;
+    this.onboardingCookieTarget = data.target;
+    
+    if (data.active) {
+      // Start blinking animation
+      this.startCookieCounterBlink();
+      // Update cookie display format immediately and push to UI
+      this.updateCookieDisplay();
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    } else {
+      // Stop blinking animation
+      this.stopCookieCounterBlink();
+      // Restore normal cookie display format
+      this.updateCookieDisplay();
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }
+  }
+  
+  // Start cookie counter blinking animation (similar to multiplier)
+  private startCookieCounterBlink(): void {
+    const log = this.log.inactive("startCookieCounterBlink");
+    
+    if (this.cookieBlinkTimerId !== null) {
+      this.async.clearInterval(this.cookieBlinkTimerId);
+    }
+    
+    const BLINK_INTERVAL_MS = 50; // 20 FPS for smooth animation
+    const PULSE_MIN_OPACITY = 0.3;
+    
+    this.cookieBlinkTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() % 1000; // 1 second cycle
+      const progress = elapsed / 1000;
+      const wave = Math.sin(progress * Math.PI * 2) * 0.5 + 0.5; // 0 to 1 sine wave
+      
+      this.dataContext.cookieCountOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * wave;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, BLINK_INTERVAL_MS);
+    
+    log.info("Cookie counter blink started");
+  }
+  
+  // Stop cookie counter blinking animation
+  private stopCookieCounterBlink(): void {
+    const log = this.log.inactive("stopCookieCounterBlink");
+    
+    if (this.cookieBlinkTimerId !== null) {
+      this.async.clearInterval(this.cookieBlinkTimerId);
+      this.cookieBlinkTimerId = null;
+    }
+    
+    this.dataContext.cookieCountOpacity = 1;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    log.info("Cookie counter blink stopped");
   }
   
   // Reset focused interaction mode (exit then re-enter) to clear drag artifacts
@@ -668,11 +819,22 @@ class Default extends Component<typeof Default> {
       this.fallTargetCps = this.cookiesPerSecond;
     }
     
-    // Only update header values - DON'T recreate commands!
-    this.dataContext.cookieCount = formatCookieDisplay(this.cookies);
+    // Update display values
+    this.updateCookieDisplay();
     this.dataContext.cookiesPerSecond = formatCPSDisplay(this.displayedCps);
     
     this.noesisGizmo.dataContext = this.dataContext;
+  }
+  
+  // Update cookie count display - uses special format during onboarding
+  private updateCookieDisplay(): void {
+    if (this.isOnboardingCookieStep) {
+      // Show "X/15 Cookies!" format during onboarding cookie collection
+      this.dataContext.cookieCount = `${this.cookies}/${this.onboardingCookieTarget} Cookies!`;
+    } else {
+      // Normal format
+      this.dataContext.cookieCount = formatCookieDisplay(this.cookies);
+    }
   }
   
   // Returns the active streak multiplier, or 1 if streak has expired

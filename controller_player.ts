@@ -35,6 +35,8 @@ class Default extends hz.Component<typeof Default> {
   private isMobile: boolean = false; // Cached device type
   private isNavInputBlocked: boolean = false; // Temporarily blocks input when nav buttons are pressed
   private currentPage: string = "home"; // Track current page to block gestures/clicks on non-home pages
+  private isDunkEnabled: boolean = true; // Blocks dunk gesture during onboarding until swipe tutorial
+  private isCookieClickEnabled: boolean = true; // Blocks cookie clicks during onboarding until cookie tap step
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -92,10 +94,36 @@ class Default extends hz.Component<typeof Default> {
       LocalUIEvents.changePage,
       (data: { page: string }) => this.handlePageChange(data)
     );
+    
+    // Listen for onboarding dunk control (enables/disables swipe gesture)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingDunkEnabled,
+      (data: { enabled: boolean }) => this.handleOnboardingDunkEnabled(data)
+    );
+    
+    // Listen for onboarding cookie click control (enables/disables cookie clicking)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingCookieClickEnabled,
+      (data: { enabled: boolean }) => this.handleOnboardingCookieClickEnabled(data)
+    );
   }
   // #endregion
   
   // #region 🎬 Handlers
+  // Handle onboarding dunk control
+  private handleOnboardingDunkEnabled(data: { enabled: boolean }): void {
+    const log = this.log.active("handleOnboardingDunkEnabled");
+    this.isDunkEnabled = data.enabled;
+    log.info(`Dunk enabled: ${this.isDunkEnabled}`);
+  }
+  
+  // Handle onboarding cookie click control
+  private handleOnboardingCookieClickEnabled(data: { enabled: boolean }): void {
+    const log = this.log.active("handleOnboardingCookieClickEnabled");
+    this.isCookieClickEnabled = data.enabled;
+    log.info(`Cookie click enabled: ${this.isCookieClickEnabled}`);
+  }
+  
   // Report device type to backend once when first state update arrives
   private reportDeviceType(data: UIEventPayload, player: hz.Player): void {
     const log = this.log.inactive("reportDeviceType");
@@ -216,8 +244,8 @@ class Default extends hz.Component<typeof Default> {
       
       // Detect swipe down gesture
       this.gestures.onSwipe.connectLocalEvent(({ swipeDirection }) => {
-        // Block gestures when mobile-only warning is shown, nav button was pressed, or on non-home pages
-        if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
+        // Block gestures when mobile-only warning is shown, nav button was pressed, on non-home pages, or dunk disabled during onboarding
+        if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home" || !this.isDunkEnabled) {
           return;
         }
         
@@ -284,8 +312,8 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Block input when mobile-only warning is shown, nav button was pressed, or on non-home pages
-    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
+    // Block input when mobile-only warning is shown, nav button was pressed, on non-home pages, or cookie click disabled during onboarding
+    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home" || !this.isCookieClickEnabled) {
       return;
     }
 
@@ -308,8 +336,8 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
-    // Block input when mobile-only warning is shown, nav button was pressed, or on non-home pages
-    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home") {
+    // Block input when mobile-only warning is shown, nav button was pressed, on non-home pages, or cookie click disabled during onboarding
+    if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home" || !this.isCookieClickEnabled) {
       return;
     }
     

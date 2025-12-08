@@ -57,34 +57,45 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Header - Cookie Count (Shared across all pages)                                  -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" 
-          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-          Style="{StaticResource InvisibleButtonStyle}" Command="{Binding onHeaderClick}">
-    <b:Interaction.Triggers>
-      <!-- Reset focused interaction when mouse/touch starts in header -->
-      <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-        <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
-      </b:EventTrigger>
-      <!-- Also reset when mouse/touch is released in header (supports drag from cookie into header) -->
-      <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-        <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
-      </b:EventTrigger>
-    </b:Interaction.Triggers>
-    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False">
-<Border.Background>
-<SolidColorBrush Color="#80000000" Opacity="0"/>
-</Border.Background>
-      <!-- Viewbox scales content proportionally based on available space -->
-      <Viewbox Stretch="Uniform" StretchDirection="Both" Margin="16,64,16,12">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="False" Width="600">
-          <!-- Cookie count -->
-          <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="56" Foreground="#ffffff" TextAlignment="Center" ClipToBounds="False"/>
-          <!-- CPS display -->
-          <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="32" Foreground="#ffffff" TextAlignment="Center" Margin="0,0,0,0" ClipToBounds="False"/>
-        </StackPanel>
-      </Viewbox>
+  <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+            Style="{StaticResource InvisibleButtonStyle}" Command="{Binding onHeaderClick}">
+      <b:Interaction.Triggers>
+        <!-- Reset focused interaction when mouse/touch starts in header -->
+        <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+          <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
+        </b:EventTrigger>
+        <!-- Also reset when mouse/touch is released in header (supports drag from cookie into header) -->
+        <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+          <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
+        </b:EventTrigger>
+      </b:Interaction.Triggers>
+      <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False">
+        <Border.Background>
+          <SolidColorBrush Color="#80000000" Opacity="0"/>
+        </Border.Background>
+        <!-- Viewbox scales content proportionally based on available space -->
+        <Viewbox Stretch="Uniform" StretchDirection="Both" Margin="16,64,16,12">
+          <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="False" Width="600">
+            <!-- Cookie count - with blink animation during onboarding -->
+            <Border Background="{x:Null}" Opacity="{Binding cookieCountOpacity}">
+              <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="56" Foreground="#ffffff" TextAlignment="Center" ClipToBounds="False"/>
+            </Border>
+            <!-- CPS display -->
+            <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="32" Foreground="#ffffff" TextAlignment="Center" Margin="0,0,0,0" ClipToBounds="False"/>
+          </StackPanel>
+        </Viewbox>
+      </Border>
+    </Button>
+    <!-- Onboarding dimmed overlay for header -->
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"
+            Visibility="{Binding headerOnboardingDimmed, Converter={StaticResource BoolToVis}}">
+      <Border.Background>
+        <SolidColorBrush Color="#000000" Opacity="0.85"/>
+      </Border.Background>
     </Border>
-  </Button>
+  </Grid>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Multiplier Display (shows above cookie when active)                              -->
@@ -124,17 +135,18 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#01000000" Grid.Row="2" IsHitTestVisible="True">
-    <!-- Viewbox scales navigation buttons proportionally -->
-    <Viewbox Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,8,16,16" MaxHeight="120">
-      <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="24"/>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="24"/>
-          <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+  <Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#01000000" IsHitTestVisible="True">
+      <!-- Viewbox scales navigation buttons proportionally -->
+      <Viewbox Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,8,16,16" MaxHeight="120">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
       
       <!-- Left Tab (Shop) - behavior mirrors shop buy buttons -->
       <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Command="{Binding onShopClick}">
@@ -282,5 +294,13 @@
       </Grid>
     </Viewbox>
   </Border>
+  <!-- Onboarding dimmed overlay for footer -->
+  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False"
+          Visibility="{Binding footerOnboardingDimmed, Converter={StaticResource BoolToVis}}">
+    <Border.Background>
+      <SolidColorBrush Color="#000000" Opacity="0.85"/>
+    </Border.Background>
+  </Border>
+</Grid>
 </Grid>
 </Page>

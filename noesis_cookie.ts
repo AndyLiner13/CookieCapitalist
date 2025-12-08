@@ -124,6 +124,14 @@ class Default extends hz.Component<typeof Default> {
       LocalUIEvents.fallAnimationStarted,
       () => this.onFallAnimationStarted()
     );
+    
+    // Listen for onboarding focus events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingFocus,
+      (data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }) => {
+        this.onOnboardingFocus(data);
+      }
+    );
 
     log.info("Cookie UI initialized");
   }
@@ -141,6 +149,8 @@ class Default extends hz.Component<typeof Default> {
       dunkAnimate: false,
       PopupFontSize: this.props.popupFontSize,
       PopupColor: this.props.popupColor,
+      // Onboarding dimmed state
+      onboardingDimmed: false,
       // 4 glow rings - sizes configurable via props
       Glow1Opacity: 0,
       Glow1Size: this.props.glow1Size,
@@ -283,6 +293,17 @@ class Default extends hz.Component<typeof Default> {
         log.info("Set dataContext with clickDown=true (after timeout)");
       }
     }, 1);
+  }
+  
+  // Handle onboarding focus event - dim cookie when not in focus
+  private onOnboardingFocus(data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }): void {
+    const log = this.log.active("onOnboardingFocus");
+    log.info(`Onboarding focus: cookie=${data.cookie}`);
+    
+    this.dataContext.onboardingDimmed = !data.cookie;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
   }
   
   private onFallAnimationStarted(): void {

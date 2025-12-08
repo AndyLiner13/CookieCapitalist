@@ -108,9 +108,24 @@ export const LocalUIEvents = {
   // Navigation input block - temporarily disables focused interaction input
   // Used when overlay buttons are pressed to prevent drag line artifacts
   navInputBlock: new LocalEvent<{ block: boolean; restoreDelayMs?: number }>("local_nav_input_block"),
+  
+  // Onboarding focus state - dims UI elements not in focus during tutorial
+  onboardingFocus: new LocalEvent<{
+    header: boolean;
+    cookie: boolean;
+    milk: boolean;
+    footer: boolean;
+  }>("local_onboarding_focus"),
+  
+  // Onboarding dunk control - enables/disables dunk gesture during onboarding
+  onboardingDunkEnabled: new LocalEvent<{ enabled: boolean }>("local_onboarding_dunk_enabled"),
+  
+  // Onboarding cookie click control - enables/disables cookie clicking during onboarding
+  onboardingCookieClickEnabled: new LocalEvent<{ enabled: boolean }>("local_onboarding_cookie_click_enabled"),
+  
+  // Onboarding cookie collection - tells overlay to show "X/15 Cookies!" and blink
+  onboardingCookieCollection: new LocalEvent<{ active: boolean; target: number }>("local_onboarding_cookie_collection"),
 };
-// #endregion
-
 // #region ⚙️ Game Constants
 // All upgrade types in the game
 // Production model: Each owned upgrade produces cookiesPerCycle every productionTimeMs

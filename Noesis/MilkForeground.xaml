@@ -21,7 +21,10 @@
   d:DesignHeight="852">
 
   <Page.Resources>
-    <SineEase x:Key="SineEase" EasingMode="EaseInOut"/>
+    <ResourceDictionary>
+      <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+      <SineEase x:Key="SineEase" EasingMode="EaseInOut"/>
+    </ResourceDictionary>
   </Page.Resources>
 
   <Grid Background="Transparent">
@@ -36,7 +39,7 @@
         <TranslateTransform x:Name="WaveTransform1" X="0" Y="0"/>
       </Grid.RenderTransform>
       
-      <Path Fill="White" Stretch="Fill" IsHitTestVisible="False" Margin="-1000,0,-1000,-500">
+      <Path Fill="{Binding milkColor}" Stretch="Fill" IsHitTestVisible="False" Margin="-1000,0,-1000,-500">
         <Path.Data>
           <PathGeometry>
             <PathFigure StartPoint="0,40">
@@ -80,6 +83,5 @@
         </BeginStoryboard>
       </EventTrigger>
     </Grid.Triggers>
-    
   </Grid>
 </Page>
