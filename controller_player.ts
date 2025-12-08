@@ -87,7 +87,7 @@ class Default extends hz.Component<typeof Default> {
   // #region 🎬 Handlers
   // Report device type to backend once when first state update arrives
   private reportDeviceType(data: UIEventPayload, player: hz.Player): void {
-    const log = this.log.active("reportDeviceType");
+    const log = this.log.inactive("reportDeviceType");
 
     if (data.type !== "state_update") {
       return;
@@ -117,7 +117,7 @@ class Default extends hz.Component<typeof Default> {
   
   // Update input blocking state based on backend's mobileOnly setting
   private handleInputBlockingState(data: UIEventPayload): void {
-    const log = this.log.active("handleInputBlockingState");
+    const log = this.log.inactive("handleInputBlockingState");
     
     if (data.type !== "state_update") {
       return;

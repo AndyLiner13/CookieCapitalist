@@ -35,12 +35,7 @@ import {
 
 // #region 🏷️ Type Definitions
 // Leaderboard configuration - must match the leaderboard names created in Systems > Leaderboards
-const LEADERBOARD_TOTAL_COOKIES = "TotalCookies";    // Lifetime total - never decreases
-const LEADERBOARD_CURRENT_COOKIES = "CurrentCookies"; // Current balance - can decrease when buying
-const LEADERBOARD_CPS = "CookiesPerSecond";          // Cookies per second (base, no multiplier)
-const LEADERBOARD_LONGEST_STREAK = "LongestStreak";  // Longest multiplier streak in seconds
-const LEADERBOARD_TIME_ONLINE = "TotalTimeOnline";   // Total time spent in game in seconds
-const LEADERBOARD_UPDATE_THROTTLE_MS = 5000; // Update every 5 seconds max
+const LEADERBOARD_CPS = "CookiesPerSecond"; // Cookies per second (base, no multiplier)
 
 // Clamp score to valid leaderboard range (leaderboards only support 32-bit signed integers)
 // Max value is ~2.1 billion (2^31 - 1)
@@ -86,16 +81,13 @@ class Default extends Component<typeof Default> {
   private lastBroadcastTime: number = 0;
   private static readonly BROADCAST_THROTTLE_MS = 100;
   
-  // Leaderboard throttle
-  private lastLeaderboardUpdate: number = 0;
-  private lastTotalCookiesScore: number = 0;
-  private lastCurrentCookiesScore: number = 0;
+  // Leaderboard tracking
   private lastCPSScore: number = 0;
-  private lastLongestStreakScore: number = 0;
-  private lastTimeOnlineScore: number = 0;
   
   // Session tracking
   private sessionStartTime: number = 0; // When current session started
+  private longestStreakMs: number = 0; // Longest session streak (leaderboard-only tracking)
+  private totalTimeOnlineMs: number = 0; // Total time online across sessions (leaderboard-only tracking)
   
   // Active player reference
   private activePlayer: Player | null = null;
@@ -106,10 +98,6 @@ class Default extends Component<typeof Default> {
   // Auto-save interval ID
   private autoSaveTimerId: number | null = null;
   private static readonly AUTO_SAVE_INTERVAL_MS = 30000; // Save every 30 seconds
-  
-  // Leaderboard-only tracking (not persisted to PPV)
-  private longestStreakMs: number = 0; // Current session's longest streak
-  private totalTimeOnlineMs: number = 0; // Accumulated from previous sessions (loaded from leaderboard indirectly)
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -226,7 +214,7 @@ class Default extends Component<typeof Default> {
   
   // Reset all player stats to 0 and save to PPVs
   private resetPlayerStats(player: Player): void {
-    const log = this.log.active("resetPlayerStats");
+    const log = this.log.inactive("resetPlayerStats");
     
     // Reset game state to defaults
     this.gameState = createDefaultGameState();
@@ -242,7 +230,7 @@ class Default extends Component<typeof Default> {
   }
   
   private onPlayerExit(player: Player): void {
-    const log = this.log.active("onPlayerExit");
+    const log = this.log.inactive("onPlayerExit");
     log.info(`Player exited: ${player.name.get()}`);
     
     // Add session time to total time online (leaderboard-only tracking)
@@ -314,10 +302,6 @@ class Default extends Component<typeof Default> {
       case "sync_progress":
         this.handleSyncProgress(data.progress as { [key: string]: number });
         break;
-        
-      case "streak_ended":
-        this.handleStreakEnded(data.durationMs as number);
-        break;
     }
   }
   
@@ -327,25 +311,6 @@ class Default extends Component<typeof Default> {
     if (progress && typeof progress === "object") {
       this.gameState.upgradeProgress = progress;
       log.info(`Synced upgrade progress: ${JSON.stringify(progress)}`);
-    }
-  }
-  
-  private handleStreakEnded(durationMs: number): void {
-    const log = this.log.active("handleStreakEnded");
-    
-    if (typeof durationMs !== "number" || durationMs <= 0) {
-      return;
-    }
-    
-    // Update longest streak if this one is longer (leaderboard-only tracking)
-    if (durationMs > this.longestStreakMs) {
-      this.longestStreakMs = durationMs;
-      log.info(`[STREAK] New longest streak: ${durationMs}ms (${(durationMs / 1000).toFixed(1)}s)`);
-      
-      // Trigger leaderboard update for new record
-      this.updateLeaderboard();
-    } else {
-      log.info(`[STREAK] Streak ended: ${durationMs}ms (record: ${this.longestStreakMs}ms)`);
     }
   }
   
@@ -405,6 +370,9 @@ class Default extends Component<typeof Default> {
     
     log.info(`Purchased ${config.name}. Cost: ${cost}, Now own: ${owned + 1}, Balance: ${this.gameState.cookies}, CPS: ${this.cookiesPerSecond}`);
     this.broadcastStateUpdate();
+    
+    // Force immediate leaderboard update after purchase (no throttle)
+    this.updateLeaderboard();
   }
   
   private throttledBroadcastStateUpdate(): void {
@@ -445,9 +413,6 @@ class Default extends Component<typeof Default> {
     
     this.sendNetworkBroadcastEvent(UIEvents.toClient, stateData);
     log.info(`State broadcast: ${this.gameState.cookies} cookies`);
-    
-    // Update leaderboard (throttled)
-    this.updateLeaderboard();
   }
   
   // Broadcast state with upgrade progress (used after loading to restore client progress)
@@ -468,7 +433,7 @@ class Default extends Component<typeof Default> {
     log.info(`State with progress broadcast: ${this.gameState.cookies} cookies, progress: ${JSON.stringify(this.gameState.upgradeProgress)}`);
   }
   
-  // Update leaderboard scores for the active player (throttled)
+  // Update CPS leaderboard for the active player
   private updateLeaderboard(): void {
     const log = this.log.inactive("updateLeaderboard");
     
@@ -477,114 +442,30 @@ class Default extends Component<typeof Default> {
       return;
     }
     
-    const now = Date.now();
-    const timeSinceLastUpdate = now - this.lastLeaderboardUpdate;
+    // Clamp CPS to valid leaderboard range (max ~2.1 billion, whole numbers only)
+    const cpsScore = clampLeaderboardScore(Math.floor(this.cookiesPerSecond));
     
-    // Only update if enough time has passed
-    if (timeSinceLastUpdate < LEADERBOARD_UPDATE_THROTTLE_MS) {
-      log.info("[LEADERBOARD] Throttled - too soon");
-      return;
-    }
+    log.info(`[LEADERBOARD] Check: cps=${cpsScore} (raw: ${this.cookiesPerSecond})`);
     
-    // Clamp scores to valid leaderboard range (max ~2.1 billion)
-    const totalCookies = clampLeaderboardScore(this.gameState.totalCookiesEarned);
-    const currentCookies = clampLeaderboardScore(this.gameState.cookies);
-    const cpsScore = clampLeaderboardScore(Math.floor(this.cookiesPerSecond * 10)); // Store as CPS * 10 for 1 decimal precision
-    const longestStreakScore = clampLeaderboardScore(Math.floor(this.longestStreakMs / 1000)); // Convert to seconds
-    
-    // Calculate total time online including current session
-    let totalTimeOnline = this.totalTimeOnlineMs;
-    if (this.sessionStartTime > 0) {
-      totalTimeOnline += now - this.sessionStartTime;
-    }
-    const timeOnlineScore = clampLeaderboardScore(Math.floor(totalTimeOnline / 1000)); // Convert to seconds
-    
-    log.info(`[LEADERBOARD] Check: total=${totalCookies}, current=${currentCookies}, cps=${cpsScore}, streak=${longestStreakScore}s, timeOnline=${timeOnlineScore}s`);
-    
-    // Check if scores have changed
-    const totalChanged = totalCookies > this.lastTotalCookiesScore;
-    const currentChanged = currentCookies !== this.lastCurrentCookiesScore;
-    const cpsChanged = cpsScore !== this.lastCPSScore;
-    const streakChanged = longestStreakScore > this.lastLongestStreakScore;
-    const timeChanged = timeOnlineScore > this.lastTimeOnlineScore;
-    
-    if (!totalChanged && !currentChanged && !cpsChanged && !streakChanged && !timeChanged) {
-      log.info("[LEADERBOARD] Skipped - no score changes");
+    // Only update if CPS has changed
+    if (cpsScore === this.lastCPSScore) {
+      log.info("[LEADERBOARD] Skipped - CPS unchanged");
       return;
     }
     
     try {
-      // Update TotalCookies leaderboard (lifetime, never decreases)
-      if (totalChanged) {
-        this.world.leaderboards.setScoreForPlayer(
-          LEADERBOARD_TOTAL_COOKIES,
-          this.activePlayer,
-          totalCookies,
-          false // Don't override if player has higher existing score
-        );
-        this.lastTotalCookiesScore = totalCookies;
-        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_TOTAL_COOKIES}: ${totalCookies}`);
-      }
-      
-      // Update CurrentCookies leaderboard (current balance, can decrease)
-      if (currentChanged) {
-        this.world.leaderboards.setScoreForPlayer(
-          LEADERBOARD_CURRENT_COOKIES,
-          this.activePlayer,
-          currentCookies,
-          true // Always override - current balance can go up or down
-        );
-        this.lastCurrentCookiesScore = currentCookies;
-        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_CURRENT_COOKIES}: ${currentCookies}`);
-      }
-      
-      // Update CPS leaderboard (can go up or down based on upgrades)
-      if (cpsChanged) {
-        this.world.leaderboards.setScoreForPlayer(
-          LEADERBOARD_CPS,
-          this.activePlayer,
-          cpsScore,
-          true // Always override - CPS can change
-        );
-        this.lastCPSScore = cpsScore;
-        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_CPS}: ${cpsScore / 10} CPS`);
-      }
-      
-      // Update LongestStreak leaderboard (only increases)
-      if (streakChanged) {
-        this.world.leaderboards.setScoreForPlayer(
-          LEADERBOARD_LONGEST_STREAK,
-          this.activePlayer,
-          longestStreakScore,
-          false // Don't override if player has higher existing score
-        );
-        this.lastLongestStreakScore = longestStreakScore;
-        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_LONGEST_STREAK}: ${longestStreakScore}s`);
-      }
-      
-      // Update TotalTimeOnline leaderboard (only increases)
-      if (timeChanged) {
-        this.world.leaderboards.setScoreForPlayer(
-          LEADERBOARD_TIME_ONLINE,
-          this.activePlayer,
-          timeOnlineScore,
-          false // Don't override if player has higher existing score
-        );
-        this.lastTimeOnlineScore = timeOnlineScore;
-        log.info(`[LEADERBOARD] Updated ${LEADERBOARD_TIME_ONLINE}: ${timeOnlineScore}s`);
-      }
-      
-      this.lastLeaderboardUpdate = now;
-      log.info(`[LEADERBOARD] Success! ${this.activePlayer.name.get()}`);
+      // Update CPS leaderboard (always override - CPS can go up or down)
+      this.world.leaderboards.setScoreForPlayer(
+        LEADERBOARD_CPS,
+        this.activePlayer,
+        cpsScore,
+        true // Always override - CPS can change based on upgrades
+      );
+      this.lastCPSScore = cpsScore;
+      log.info(`[LEADERBOARD] Updated ${LEADERBOARD_CPS}: ${cpsScore} CPS for ${this.activePlayer.name.get()}`);
     } catch (error) {
       log.error(`[LEADERBOARD] Failed: ${error}`);
     }
-  }
-  
-  // Force leaderboard update (bypass throttle)
-  private forceLeaderboardUpdate(): void {
-    this.lastLeaderboardUpdate = 0;
-    this.updateLeaderboard();
   }
   
   // #region 💾 PPV (Persistent Player Variables)
@@ -740,6 +621,9 @@ class Default extends Component<typeof Default> {
       // Broadcast state to client after loading (includes upgrade progress)
       this.async.setTimeout(() => this.broadcastStateWithProgress(), 500);
       
+      // Update leaderboard with loaded CPS value
+      this.async.setTimeout(() => this.updateLeaderboard(), 1000);
+      
       // Do an immediate save after 5 seconds to capture any early changes
       this.async.setTimeout(() => {
         if (this.activePlayer) {
@@ -754,6 +638,7 @@ class Default extends Component<typeof Default> {
       this.gameState = createDefaultGameState();
       this.recalculateCPS();
       this.async.setTimeout(() => this.broadcastStateUpdate(), 500);
+      this.async.setTimeout(() => this.updateLeaderboard(), 1000);
     }
   }
   
@@ -858,7 +743,7 @@ class Default extends Component<typeof Default> {
   
   // Handle device type report from local player script
   private handleDeviceTypeReport(data: GameEventPayload): void {
-    const log = this.log.active("handleDeviceTypeReport");
+    const log = this.log.inactive("handleDeviceTypeReport");
     
     if (data.type !== "device_type_report") {
       return;
@@ -879,7 +764,7 @@ class Default extends Component<typeof Default> {
   
   // Update MobileOnly overlay visibility based on player device and backend setting
   private updateMobileOnlyVisibility(): void {
-    const log = this.log.active("updateMobileOnlyVisibility");
+    const log = this.log.inactive("updateMobileOnlyVisibility");
     
     if (!this.props.mobileOnlyGizmo) {
       log.info("[MOBILE ONLY] mobileOnlyGizmo prop not set - skipping");

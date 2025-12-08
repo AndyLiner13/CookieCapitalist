@@ -24,7 +24,7 @@ class Default extends Component<typeof Default> {
 
 	// #region 🔄 Lifecycle Events
 	start(): void {
-		const log = this.log.active("start");
+		const log = this.log.inactive("start");
 
 		this.noesisGizmo = this.entity.as(NoesisGizmo);
 		if (!this.noesisGizmo) {
@@ -66,7 +66,7 @@ class Default extends Component<typeof Default> {
 
 	// #region 🎬 Handlers
 	private handleWelcomeBackData(data: UIEventPayload): void {
-		const log = this.log.active("handleWelcomeBackData");
+		const log = this.log.inactive("handleWelcomeBackData");
 
 		if (data.type !== "welcome_back") {
 			return;
@@ -88,7 +88,7 @@ class Default extends Component<typeof Default> {
 	}
 
 	private onCollect(): void {
-		const log = this.log.active("onCollect");
+		const log = this.log.inactive("onCollect");
 
 		this.updateDataContext({ isVisible: false });
 		log.info("WelcomeBack modal dismissed by player");

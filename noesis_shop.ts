@@ -301,7 +301,7 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🎬 Handlers
   private purchaseUpgrade(upgradeId: string): void {
-    const log = this.log.active("purchaseUpgrade");
+    const log = this.log.inactive("purchaseUpgrade");
     log.info(`Purchasing upgrade: ${upgradeId}`);
 
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {

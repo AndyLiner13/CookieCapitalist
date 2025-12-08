@@ -172,7 +172,7 @@ class Default extends Component<typeof Default> {
   }
 
   private navigateToPage(page: PageType): void {
-    const log = this.log.active("navigateToPage");
+    const log = this.log.inactive("navigateToPage");
 
     if (this.currentPage === page) {
       log.info(`Already on ${page} page`);
@@ -242,7 +242,7 @@ class Default extends Component<typeof Default> {
   }
   
   private onDunkMultiplier(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {
-    const log = this.log.active("onDunkMultiplier");
+    const log = this.log.inactive("onDunkMultiplier");
     
     const wasActive = this.currentMultiplier > 1;
     const isNewOrUpgraded = !wasActive || (!data.isRefresh && data.multiplier > this.currentMultiplier);
@@ -390,7 +390,7 @@ class Default extends Component<typeof Default> {
   }
   
   private triggerPopInAnimation(isFirstActivation: boolean = false): void {
-    const log = this.log.active("triggerPopInAnimation");
+    const log = this.log.inactive("triggerPopInAnimation");
     log.info("Starting pop-in animation");
     
     // Clear any existing pop-in animation
@@ -541,7 +541,7 @@ class Default extends Component<typeof Default> {
   // Fades out the multiplier text with fall animation over 1500ms
   // This is called when the timer hits 0, starting the fall from 50% to 0% opacity
   private fadeOutMultiplier(): void {
-    const log = this.log.active("fadeOutMultiplier");
+    const log = this.log.inactive("fadeOutMultiplier");
     
     // Legacy method no longer used – fall is now driven directly
     // from the main multiplier timer's third segment.

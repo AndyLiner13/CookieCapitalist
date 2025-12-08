@@ -267,9 +267,7 @@ class Default extends hz.Component<typeof Default> {
   }
   
   private onFallAnimationStarted(): void {
-    const log = this.log.active("onFallAnimationStarted");
-    
-    // Calculate and report streak duration if there was an active streak
+		const log = this.log.inactive("onFallAnimationStarted");    // Calculate and report streak duration if there was an active streak
     if (this.streakStartTime > 0) {
       const streakDuration = Date.now() - this.streakStartTime;
       log.info(`Streak ended! Duration: ${streakDuration}ms (${(streakDuration / 1000).toFixed(1)}s)`);
@@ -314,7 +312,7 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private onSwipeDown(): void {
-    const log = this.log.active("onSwipeDown");
+    const log = this.log.inactive("onSwipeDown");
 
     // Only trigger dunk when this gizmo is visible
     if (!this.entity.visible.get()) {
@@ -327,9 +325,7 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private triggerDunkAnimation(): void {
-    const log = this.log.active("triggerDunkAnimation");
-
-    if (this.isDunking) {
+		const log = this.log.inactive("triggerDunkAnimation");    if (this.isDunking) {
       log.info("Already dunking, ignoring");
       return;
     }
@@ -419,9 +415,7 @@ class Default extends hz.Component<typeof Default> {
   
   // Checks if user has clicked enough to upgrade multiplier
   private checkMultiplierUpgrade(): void {
-    const log = this.log.active("checkMultiplierUpgrade");
-    
-    if (this.currentMultiplier >= MAX_MULTIPLIER) {
+		const log = this.log.inactive("checkMultiplierUpgrade");    if (this.currentMultiplier >= MAX_MULTIPLIER) {
       return; // Already at max
     }
     
@@ -463,9 +457,7 @@ class Default extends hz.Component<typeof Default> {
   }
   
   private startClickRateChecker(): void {
-    const log = this.log.active("startClickRateChecker");
-    
-    // Clear existing timer if any
+		const log = this.log.inactive("startClickRateChecker");    // Clear existing timer if any
     if (this.clickRateCheckTimerId !== null) {
       this.async.clearInterval(this.clickRateCheckTimerId);
     }
