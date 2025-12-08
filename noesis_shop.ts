@@ -310,8 +310,13 @@ class Default extends hz.Component<typeof Default> {
       upgradeId: upgradeId,
     });
   }
-  // Note: We no longer reset focused interaction on each purchase so
-  // rapid buy clicks behave like cookie clicks without extra delay.
+  
+  // Resets focused interaction mode (exit then re-enter) to clear drag artifacts
+  private resetFocusedInteraction(): void {
+    const player = this.world.getLocalPlayer();
+    player.exitFocusedInteractionMode();
+    player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+  }
   
   private onStreakMultiplierUpdate(data: { multiplier: number; durationMs: number; isRefresh?: boolean }): void {
     const log = this.log.inactive("onStreakMultiplierUpdate");
