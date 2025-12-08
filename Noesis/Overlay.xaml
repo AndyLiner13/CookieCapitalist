@@ -5,7 +5,8 @@
   Contains: Cookie count/CPS header at top, navigation tabs at bottom
   NOTE: Main Grid is hit-test invisible, only header/footer borders capture clicks
   
-  RESPONSIVE: Uses percentage-based row heights and scalable font sizes
+  RESPONSIVE: Uses percentage-based row heights (16% header, 14% footer) and 
+  Viewbox wrappers to scale content proportionally on all screen resolutions.
 -->
 
 <Page
@@ -45,14 +46,14 @@
 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}" ClipToBounds="False">
 
   <Grid.RowDefinitions>
-    <!-- Header: fixed 140px for consistent notch clearance -->
-    <RowDefinition Height="140"/>
+    <!-- Header: ~28% of screen height for larger text display -->
+    <RowDefinition Height="0.28*"/>
     <!-- Multiplier area -->
     <RowDefinition Height="Auto"/>
     <!-- Middle spacer -->
     <RowDefinition Height="*"/>
-    <!-- Footer: fixed 124px for navigation buttons -->
-    <RowDefinition Height="124"/>
+    <!-- Footer: ~18% of screen height for navigation buttons -->
+    <RowDefinition Height="0.18*"/>
   </Grid.RowDefinitions>
 
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
@@ -71,13 +72,16 @@
         <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
       </b:EventTrigger>
     </b:Interaction.Triggers>
-    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#80000000" Padding="16,54,16,16" ClipToBounds="False">
-      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="False">
-        <!-- Cookie count -->
-        <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="36" Foreground="#ffffff" TextAlignment="Center" ClipToBounds="False"/>
-        <!-- CPS display -->
-        <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="18" Foreground="#ffffff" TextAlignment="Center" Margin="0,0,0,0" ClipToBounds="False"/>
-      </StackPanel>
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#80000000" ClipToBounds="False">
+      <!-- Viewbox scales content proportionally based on available space -->
+      <Viewbox Stretch="Uniform" StretchDirection="Both" Margin="16,64,16,12">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="False" Width="600">
+          <!-- Cookie count -->
+          <TextBlock Text="{Binding cookieCount}" FontFamily="Fonts/#Anton-Regular" FontSize="56" Foreground="#ffffff" TextAlignment="Center" ClipToBounds="False"/>
+          <!-- CPS display -->
+          <TextBlock Text="{Binding cookiesPerSecond}" FontFamily="Fonts/#Anton-Regular" FontSize="32" Foreground="#ffffff" TextAlignment="Center" Margin="0,0,0,0" ClipToBounds="False"/>
+        </StackPanel>
+      </Viewbox>
     </Border>
   </Button>
 
@@ -119,15 +123,17 @@
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
   <!-- Region: Footer - Navigation Tabs                                                         -->
   <!-- ═════════════════════════════════════════════════════════════════════════════════════════ -->
-  <Border HorizontalAlignment="Stretch" Background="#01000000" Grid.Row="3" IsHitTestVisible="True">
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="24"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="24"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
+  <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#01000000" Grid.Row="3" IsHitTestVisible="True">
+    <!-- Viewbox scales navigation buttons proportionally -->
+    <Viewbox Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16,8,16,16" MaxHeight="120">
+      <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="24"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="24"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
       
       <!-- Left Tab (Shop) - behavior mirrors shop buy buttons -->
       <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Command="{Binding onShopClick}">
@@ -272,7 +278,8 @@
         </b:Interaction.Triggers>
         <Image Source="Images/RightTab.png" Width="93" Height="92" Stretch="Uniform"/>
       </Button>
-    </Grid>
+      </Grid>
+    </Viewbox>
   </Border>
 </Grid>
 </Page>

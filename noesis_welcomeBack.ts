@@ -100,6 +100,13 @@ class Default extends Component<typeof Default> {
 			cookiesEarned: formatNumber(offlineCookies),
 		});
 
+		// Enable forced interaction mode to prevent player from dismissing the modal
+		// disableFocusExitButton prevents the player from exiting via the exit button
+		log.info("Enabling forced interaction mode for WelcomeBack modal...");
+		this.world.getLocalPlayer().enterFocusedInteractionMode({
+			disableFocusExitButton: true,
+		});
+
 		log.info(`Showing WelcomeBack modal: ${offlineCookies} cookies over ${timeAwayFormatted}`);
 	}
 
@@ -108,14 +115,16 @@ class Default extends Component<typeof Default> {
 
 		this.updateDataContext({ isVisible: false });
 		
-		// Enable focused interaction mode now that player has dismissed the modal
-		// This allows cookie clicking and gesture detection
-		log.info("Enabling focused interaction mode for cookie clicking...");
-		this.world.getLocalPlayer().enterFocusedInteractionMode({
+		// Exit forced interaction mode first, then re-enter with normal settings
+		// This resets the focus state and allows cookie clicking and gesture detection
+		log.info("Resetting focused interaction mode...");
+		const player = this.world.getLocalPlayer();
+		player.exitFocusedInteractionMode();
+		player.enterFocusedInteractionMode({
 			disableFocusExitButton: true,
 		});
 		
-		log.info("WelcomeBack modal dismissed by player, focused interaction enabled");
+		log.info("WelcomeBack modal dismissed by player, focused interaction reset");
 	}
 	// #endregion
 
