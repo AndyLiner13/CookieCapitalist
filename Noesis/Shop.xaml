@@ -3,7 +3,11 @@
   Display Mode: Screen Overlay, Render Order: 5
   Input Mode: Interactive, nonblocking
   
-  RESPONSIVE: Uses percentage-based row heights and MinHeight for cards
+  RESPONSIVE: Uses percentage-based sizing for cards
+  - Image column: 30% of card width
+  - Content column: 70% of card width  
+  - Progress bar: 45% of content height
+  - Buy button: 55% of content height
 -->
 
 <Page
@@ -21,12 +25,9 @@
     <ResourceDictionary>
       <BooleanToVisibilityConverter x:Key="BoolToVis"/>
       
-      <!-- Card Layout Constants - using MinHeight instead of fixed Height for responsiveness -->
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardMinHeight">90</sys:Double>
+      <!-- Card Layout Constants - percentage-based for responsiveness -->
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardMinHeight">130</sys:Double>
       <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="CardCornerRadius">8</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ProgressBarHeight">33</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="BuyButtonHeight">44</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="ImageSize">84</sys:Double>
       <CornerRadius x:Key="CardBorderRadius">8</CornerRadius>
       <CornerRadius x:Key="BarCornerRadius">5</CornerRadius>
       <CornerRadius x:Key="TierBadgeRadius">4</CornerRadius>
@@ -36,8 +37,10 @@
       <Thickness x:Key="TierBadgeMargin">0,0,0,2</Thickness>
       <Thickness x:Key="TierBadgePadding">6,2</Thickness>
       <Thickness x:Key="TimerMargin">5,0,0,0</Thickness>
-      <Thickness x:Key="TimerPadding">12,0</Thickness>
-      <Thickness x:Key="ProgressTextMargin">8,0,0,0</Thickness>
+      <!-- Shared padding for buy + timer buttons (extra vertical space) -->
+      <Thickness x:Key="TimerPadding">12,6</Thickness>
+      <!-- Progress text margin now includes vertical spacing to match button padding -->
+      <Thickness x:Key="ProgressTextMargin">8,6,0,6</Thickness>
       <Thickness x:Key="ButtonRowMargin">0,5,0,0</Thickness>
       
       <!-- Card Colors -->
@@ -53,11 +56,12 @@
       
       <!-- Card Typography -->
       <FontFamily x:Key="CardFontFamily">Fonts/#Anton-Regular</FontFamily>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="NameFontSize">20</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="RateFontSize">16</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">14</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="PriceFontSize">20</sys:Double>
-      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">18</sys:Double>
+      <!-- Larger base font sizes so text scales visually with card size on mobile -->
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="NameFontSize">28</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="RateFontSize">20</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TierFontSize">18</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="PriceFontSize">28</sys:Double>
+      <sys:Double xmlns:sys="clr-namespace:System;assembly=mscorlib" x:Key="TimerFontSize">22</sys:Double>
       
       <!-- Card Text Styles -->
       <Style x:Key="CardNameTextStyle" TargetType="TextBlock">
@@ -102,6 +106,7 @@
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="Template">
           <Setter.Value>
             <ControlTemplate TargetType="Button">
@@ -133,7 +138,7 @@
         </b:EventTrigger>
       </b:Interaction.Triggers>
 
-      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8" Grid.RowSpan="2">
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,0">
           
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
@@ -142,19 +147,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/ClickerImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding clicker.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding clicker.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -164,19 +177,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding clicker.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="ClickerBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="ClickerBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -189,11 +204,11 @@
                       <TextBlock Text="{Binding clicker.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding clicker.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding clicker.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -203,19 +218,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/GrandmaImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding grandma.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding grandma.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -225,19 +248,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding grandma.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="GrandmaBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="GrandmaBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -250,11 +275,11 @@
                       <TextBlock Text="{Binding grandma.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding grandma.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding grandma.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -264,19 +289,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/FarmImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding farm.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding farm.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -286,19 +319,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding farm.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="FarmBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FarmBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -311,11 +346,11 @@
                       <TextBlock Text="{Binding farm.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding farm.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding farm.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -325,19 +360,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/FactoryImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding factory.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding factory.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -347,19 +390,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding factory.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="FactoryBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FactoryBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -372,11 +417,11 @@
                       <TextBlock Text="{Binding factory.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding factory.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding factory.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -386,19 +431,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/LabImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding lab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding lab.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -408,19 +461,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding lab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="LabBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="LabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -433,11 +488,11 @@
                       <TextBlock Text="{Binding lab.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding lab.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding lab.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -447,19 +502,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/FabImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding fab.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding fab.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -469,19 +532,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding fab.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="FabBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="FabBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -494,11 +559,11 @@
                       <TextBlock Text="{Binding fab.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding fab.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding fab.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -508,19 +573,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/PlanetImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding planet.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding planet.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -530,19 +603,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding planet.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="PlanetBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="PlanetBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -555,11 +630,11 @@
                       <TextBlock Text="{Binding planet.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding planet.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding planet.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
@@ -569,19 +644,27 @@
           <Border MinHeight="{StaticResource CardMinHeight}" CornerRadius="{StaticResource CardBorderRadius}" Background="{StaticResource CardBackgroundBrush}" Padding="{StaticResource CardPadding}" Margin="{StaticResource CardMargin}" HorizontalAlignment="Stretch">
             <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <!-- Image: 30% of card width -->
+                <ColumnDefinition Width="0.3*"/>
+                <!-- Content: 70% of card width -->
+                <ColumnDefinition Width="0.7*"/>
               </Grid.ColumnDefinitions>
-              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}" Width="{StaticResource ImageSize}" Height="{StaticResource ImageSize}">
+              <Grid Grid.Column="0" Margin="{StaticResource ImageMargin}">
                 <Image Source="Images/GalaxyImage.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <Border Background="{StaticResource TierBadgeBackgroundBrush}" CornerRadius="{StaticResource TierBadgeRadius}" Padding="{StaticResource TierBadgePadding}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{StaticResource TierBadgeMargin}">
                   <TextBlock Text="{Binding galaxy.tierProgress}" Style="{StaticResource CardTierTextStyle}"/>
                 </Border>
               </Grid>
-              <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+              <Grid Grid.Column="1" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                  <!-- Progress bar: 45% of content height -->
+                  <RowDefinition Height="0.45*"/>
+                  <!-- Button row: 55% of content height -->
+                  <RowDefinition Height="0.55*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
                   <Grid>
-                    <Border Height="{StaticResource ProgressBarHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource ProgressFillBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0,0.5" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
                       <Border.RenderTransform><ScaleTransform ScaleX="{Binding galaxy.progress}" ScaleY="1"/></Border.RenderTransform>
                     </Border>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource ProgressTextMargin}">
@@ -591,19 +674,21 @@
                     </StackPanel>
                   </Grid>
                 </Border>
-                <Grid Margin="{StaticResource ButtonRowMargin}">
+                <Grid Grid.Row="1" Margin="{StaticResource ButtonRowMargin}">
                   <Grid.ColumnDefinitions>
+                    <!-- Buy button: fills available space -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Timer: auto-sized -->
                     <ColumnDefinition Width="Auto"/>
                   </Grid.ColumnDefinitions>
-                  <Button Grid.Column="0" Height="{StaticResource BuyButtonHeight}" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding galaxy.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch">
+                  <Button Grid.Column="0" Style="{StaticResource InvisibleButtonStyle}" Command="{Binding galaxy.buyCommand}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Button.RenderTransform><ScaleTransform x:Name="GalaxyBuyScale" ScaleX="1" ScaleY="1"/></Button.RenderTransform>
                     <b:Interaction.Triggers>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonDown"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="0.9" Duration="0:0:0.05"/><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="0.9" Duration="0:0:0.05"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="PreviewMouseLeftButtonUp"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"><DoubleAnimation.EasingFunction><QuadraticEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction></DoubleAnimation></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                       <b:EventTrigger EventName="MouseLeave"><b:ControlStoryboardAction><b:ControlStoryboardAction.Storyboard><Storyboard><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.1"/><DoubleAnimation Storyboard.TargetName="GalaxyBuyScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.1"/></Storyboard></b:ControlStoryboardAction.Storyboard></b:ControlStoryboardAction></b:EventTrigger>
                     </b:Interaction.Triggers>
-                    <Border Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch">
+                    <Border CornerRadius="{StaticResource BarCornerRadius}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{StaticResource TimerPadding}">
                       <Border.Style>
                         <Style TargetType="Border">
                           <Setter Property="Background" Value="{StaticResource BuyButtonAffordBrush}"/>
@@ -616,11 +701,11 @@
                       <TextBlock Text="{Binding galaxy.price}" Style="{StaticResource CardPriceTextStyle}"/>
                     </Border>
                   </Button>
-                  <Border Grid.Column="1" Height="{StaticResource BuyButtonHeight}" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Center" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
+                  <Border Grid.Column="1" CornerRadius="{StaticResource BarCornerRadius}" Background="{StaticResource BarBackgroundBrush}" Margin="{StaticResource TimerMargin}" Padding="{StaticResource TimerPadding}" VerticalAlignment="Stretch" Visibility="{Binding galaxy.isProducing, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="{Binding galaxy.timeRemaining}" Style="{StaticResource CardTimerTextStyle}"/>
                   </Border>
                 </Grid>
-              </StackPanel>
+              </Grid>
             </Grid>
           </Border>
           
