@@ -119,11 +119,11 @@
   <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     <Grid Background="{x:Null}">
       <Grid.RowDefinitions>
-        <!-- Header: fixed 140px for consistent notch clearance (matches Overlay) -->
-        <RowDefinition Height="140"/>
+        <!-- Header: ~28% of screen height (matches Overlay) -->
+        <RowDefinition Height="0.28*"/>
         <RowDefinition Height="*"/>
-        <!-- Footer spacer: fixed 124px (matches Overlay navigation) -->
-        <RowDefinition Height="124"/>
+        <!-- Footer spacer: ~18% of screen height (matches Overlay navigation) -->
+        <RowDefinition Height="0.18*"/>
       </Grid.RowDefinitions>
 
       <b:Interaction.Triggers>
@@ -133,7 +133,7 @@
         </b:EventTrigger>
       </b:Interaction.Triggers>
 
-      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8" Grid.RowSpan="2">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,0">
           
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->

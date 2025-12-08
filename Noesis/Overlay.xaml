@@ -70,7 +70,10 @@
         <b:InvokeCommandAction Command="{Binding onHeaderClick}"/>
       </b:EventTrigger>
     </b:Interaction.Triggers>
-    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#80000000" ClipToBounds="False">
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="False">
+<Border.Background>
+<SolidColorBrush Color="#80000000" Opacity="0"/>
+</Border.Background>
       <!-- Viewbox scales content proportionally based on available space -->
       <Viewbox Stretch="Uniform" StretchDirection="Both" Margin="16,64,16,12">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="False" Width="600">
