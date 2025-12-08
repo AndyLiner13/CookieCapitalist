@@ -12,8 +12,8 @@
 
 import * as hz from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
-import { Logger } from "./util_logger";
-import { PageType, LocalUIEvents } from "./util_gameData";
+import { Logger } from "../../util_logger";
+import { PageType, LocalUIEvents } from "../../util_gameData";
 
 // #region 🏷️ Type Definitions
 const RAIN_COOKIE_COUNT = 250;
@@ -70,12 +70,6 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       LocalUIEvents.cookieClicked,
       () => this.queueRainCookies(1)
-    );
-    
-    // Listen for batch completion events (triggers proportional rain cookies)
-    this.connectLocalBroadcastEvent(
-      LocalUIEvents.batchComplete,
-      (data: { cookies: number }) => this.queueRainCookies(data.cookies)
     );
 
     // Listen for page change events

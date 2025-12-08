@@ -358,6 +358,9 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
 
+    // Force click-up animation to complete any in-progress click before dunk starts
+    this.triggerClickUp();
+    
     this.isDunking = true;
     
     // No active multiplier - start fresh at 2x

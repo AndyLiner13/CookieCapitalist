@@ -90,9 +90,11 @@ class Default extends hz.Component<typeof Default> {
       (data: { multiplier: number; durationMs: number; isRefresh?: boolean }) => this.onStreakMultiplierUpdate(data)
     );
 
-    // Start production timer tick
-    this.lastTickTime = Date.now();
-    this.async.setInterval(() => this.productionTick(), Default.TICK_RATE_MS);
+    // Start production timer tick after a short delay to ensure all listeners are registered
+    this.async.setTimeout(() => {
+      this.lastTickTime = Date.now();
+      this.async.setInterval(() => this.productionTick(), Default.TICK_RATE_MS);
+    }, 500);
     
     // Start progress sync interval (sends production progress to backend for saving)
     this.async.setInterval(() => this.syncProgressToBackend(), Default.PROGRESS_SYNC_INTERVAL_MS);
@@ -153,7 +155,8 @@ class Default extends hz.Component<typeof Default> {
       fab: upgradeData["fab"],
       planet: upgradeData["planet"],
       galaxy: upgradeData["galaxy"],
-      onShopInteraction: () => this.resetFocusedInteraction(),
+      // Capture clicks anywhere in the shop UI without changing focus state.
+      onShopInteraction: () => {},
     };
 
     log.info("Shop dataContext initialized");
@@ -233,10 +236,6 @@ class Default extends hz.Component<typeof Default> {
         this.sendNetworkBroadcastEvent(GameEvents.toServer, {
           type: "production_complete",
           upgradeId: config.id,
-          cookies: cookiesEarned,
-        });
-
-        this.sendLocalBroadcastEvent(LocalUIEvents.batchComplete, {
           cookies: cookiesEarned,
         });
 

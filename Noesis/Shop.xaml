@@ -133,7 +133,7 @@
         </b:EventTrigger>
       </b:Interaction.Triggers>
 
-      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Padding="0,8,0,8">
         <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Margin="11,0,11,0">
           
           <!-- ═══════════════════════════════════════════════════════════════════════════════════ -->

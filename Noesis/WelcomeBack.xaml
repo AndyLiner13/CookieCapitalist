@@ -56,153 +56,153 @@
     </ResourceDictionary>
   </Page.Resources>
 
-    <!-- Full-screen container (always present for proper page sizing) -->
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
+  <!-- Full-screen container (always present for proper page sizing) -->
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{x:Null}">
     
     <!-- Semi-transparent overlay + modal, visibility controlled by TypeScript (isVisible) -->
     <Grid Visibility="{Binding isVisible, Converter={StaticResource BoolToVis}}">
-        <Grid.Background>
-            <SolidColorBrush Color="#CC000000"/>
-        </Grid.Background>
-    
-    <!-- Center modal card - uses percentage width -->
-    <Border
-            CornerRadius="{StaticResource ModalCornerRadius}"
-            Padding="32,40"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            MaxWidth="380"
-            MinWidth="280">
-            <Border.Background>
-                <SolidColorBrush Color="#FF000000" Opacity="0.985"/>
-            </Border.Background>
+      <Grid.Background>
+        <SolidColorBrush Color="#CC000000"/>
+      </Grid.Background>
       
-      <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+      <!-- Center modal card - uses percentage width -->
+      <Border
+        CornerRadius="{StaticResource ModalCornerRadius}"
+        Padding="32,40"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        MaxWidth="380"
+        MinWidth="280">
+        <Border.Background>
+          <SolidColorBrush Color="#FF000000" Opacity="0.985"/>
+        </Border.Background>
         
-        <!-- Title -->
-        <Viewbox MaxHeight="60" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,24">
-          <TextBlock Text="Welcome Back!"
-                     FontFamily="{StaticResource HeadingFont}"
-                     FontSize="48"
-                     Foreground="{StaticResource PrimaryTextBrush}"
-                     TextAlignment="Center"/>
-        </Viewbox>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+          
+          <!-- Title -->
+          <Viewbox MaxHeight="60" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,24">
+            <TextBlock Text="Welcome Back!"
+                       FontFamily="{StaticResource HeadingFont}"
+                       FontSize="48"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       TextAlignment="Center"/>
+          </Viewbox>
+          
+          <!-- Label: While you were away -->
+          <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+            <TextBlock Text="While you were away for"
+                       FontFamily="{StaticResource BodyFont}"
+                       FontSize="24"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       TextAlignment="Center"/>
+          </Viewbox>
+          
+          <!-- Time away display (bound to dataContext.timeAway) -->
+          <Viewbox MaxHeight="56" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,32">
+            <TextBlock Text="{Binding timeAway}"
+                       d:Text="2d 5h 30m"
+                       FontFamily="{StaticResource BodyFont}"
+                       FontSize="48"
+                       Foreground="{StaticResource AccentTextBrush}"
+                       TextAlignment="Center"/>
+          </Viewbox>
+          
+          <!-- Label: You earned -->
+          <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
+            <TextBlock Text="You earned"
+                       FontFamily="{StaticResource BodyFont}"
+                       FontSize="24"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       TextAlignment="Center"/>
+          </Viewbox>
+          
+          <!-- Cookies earned display (bound to dataContext.cookiesEarned) -->
+          <Viewbox MaxHeight="64" Stretch="Uniform" HorizontalAlignment="Center" Margin="24,0,24,40">
+            <TextBlock Text="{Binding cookiesEarned}"
+                       d:Text="15.2K"
+                       FontFamily="{StaticResource HeadingFont}"
+                       FontSize="56"
+                       Foreground="{StaticResource AccentTextBrush}"
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center">
+              <TextBlock.Effect>
+                <!-- Centered glow to avoid right-edge artifact -->
+                <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="0" Opacity="0.8" Direction="0"/>
+              </TextBlock.Effect>
+            </TextBlock>
+          </Viewbox>
+          
+          <!-- Collect button with press animation -->
+          <Button Content="Collect"
+                  Style="{StaticResource CollectButtonStyle}"
+                  Command="{Binding onCollect}"
+                  HorizontalAlignment="Center"
+                  RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+              <ScaleTransform x:Name="CollectButtonScale" ScaleX="1" ScaleY="1"/>
+            </Button.RenderTransform>
+            <b:Interaction.Triggers>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                       Storyboard.TargetProperty="ScaleX"
+                                       To="0.9" Duration="0:0:0.05"/>
+                      <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                       Storyboard.TargetProperty="ScaleY"
+                                       To="0.9" Duration="0:0:0.05"/>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+              <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                <b:ControlStoryboardAction>
+                  <b:ControlStoryboardAction.Storyboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                       Storyboard.TargetProperty="ScaleX"
+                                       To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                      <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
+                                       Storyboard.TargetProperty="ScaleY"
+                                       To="1" Duration="0:0:0.15">
+                        <DoubleAnimation.EasingFunction>
+                          <QuadraticEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </b:ControlStoryboardAction.Storyboard>
+                </b:ControlStoryboardAction>
+              </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Button.Template>
+              <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}" 
+                        CornerRadius="{StaticResource ButtonCornerRadius}"
+                        Padding="48,16">
+                  <Viewbox MaxHeight="36" Stretch="Uniform">
+                    <TextBlock Text="{TemplateBinding Content}"
+                              FontFamily="{StaticResource BodyFont}"
+                              FontSize="28"
+                              Foreground="{StaticResource PrimaryTextBrush}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                  </Viewbox>
+                </Border>
+              </ControlTemplate>
+            </Button.Template>
+          </Button>
+          
+        </StackPanel>
         
-        <!-- Label: While you were away -->
-        <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
-          <TextBlock Text="While you were away for"
-                     FontFamily="{StaticResource BodyFont}"
-                     FontSize="24"
-                     Foreground="{StaticResource PrimaryTextBrush}"
-                     TextAlignment="Center"/>
-        </Viewbox>
-        
-        <!-- Time away display (bound to dataContext.timeAway) -->
-        <Viewbox MaxHeight="56" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,32">
-          <TextBlock Text="{Binding timeAway}"
-               d:Text="2d 5h 30m"
-                     FontFamily="{StaticResource BodyFont}"
-                     FontSize="48"
-                     Foreground="{StaticResource AccentTextBrush}"
-                     TextAlignment="Center"/>
-        </Viewbox>
-        
-        <!-- Label: You earned -->
-        <Viewbox MaxHeight="36" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,8">
-          <TextBlock Text="You earned"
-                     FontFamily="{StaticResource BodyFont}"
-                     FontSize="24"
-                     Foreground="{StaticResource PrimaryTextBrush}"
-                     TextAlignment="Center"/>
-        </Viewbox>
-        
-        <!-- Cookies earned display (bound to dataContext.cookiesEarned) -->
-        <Viewbox MaxHeight="64" Stretch="Uniform" HorizontalAlignment="Center" Margin="24,0,24,40">
-          <TextBlock Text="{Binding cookiesEarned}"
-               d:Text="15.2K"
-                     FontFamily="{StaticResource HeadingFont}"
-                     FontSize="56"
-                     Foreground="{StaticResource AccentTextBrush}"
-                     TextAlignment="Center"
-                     HorizontalAlignment="Center">
-            <TextBlock.Effect>
-              <!-- Centered glow to avoid right-edge artifact -->
-              <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="0" Opacity="0.8" Direction="0"/>
-            </TextBlock.Effect>
-          </TextBlock>
-        </Viewbox>
-        
-        <!-- Collect button with press animation -->
-        <Button Content="Collect"
-                Style="{StaticResource CollectButtonStyle}"
-                Command="{Binding onCollect}"
-                HorizontalAlignment="Center"
-                RenderTransformOrigin="0.5,0.5">
-          <Button.RenderTransform>
-            <ScaleTransform x:Name="CollectButtonScale" ScaleX="1" ScaleY="1"/>
-          </Button.RenderTransform>
-          <b:Interaction.Triggers>
-            <b:EventTrigger EventName="PreviewMouseLeftButtonDown">
-              <b:ControlStoryboardAction>
-                <b:ControlStoryboardAction.Storyboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     To="0.9" Duration="0:0:0.05"/>
-                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     To="0.9" Duration="0:0:0.05"/>
-                  </Storyboard>
-                </b:ControlStoryboardAction.Storyboard>
-              </b:ControlStoryboardAction>
-            </b:EventTrigger>
-            <b:EventTrigger EventName="PreviewMouseLeftButtonUp">
-              <b:ControlStoryboardAction>
-                <b:ControlStoryboardAction.Storyboard>
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
-                                     Storyboard.TargetProperty="ScaleX"
-                                     To="1" Duration="0:0:0.15">
-                      <DoubleAnimation.EasingFunction>
-                        <QuadraticEase EasingMode="EaseOut"/>
-                      </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="CollectButtonScale"
-                                     Storyboard.TargetProperty="ScaleY"
-                                     To="1" Duration="0:0:0.15">
-                      <DoubleAnimation.EasingFunction>
-                        <QuadraticEase EasingMode="EaseOut"/>
-                      </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                  </Storyboard>
-                </b:ControlStoryboardAction.Storyboard>
-              </b:ControlStoryboardAction>
-            </b:EventTrigger>
-          </b:Interaction.Triggers>
-          <Button.Template>
-            <ControlTemplate TargetType="Button">
-              <Border Background="{TemplateBinding Background}" 
-                      CornerRadius="{StaticResource ButtonCornerRadius}"
-                      Padding="48,16">
-                <Viewbox MaxHeight="36" Stretch="Uniform">
-                  <TextBlock Text="{TemplateBinding Content}"
-                            FontFamily="{StaticResource BodyFont}"
-                            FontSize="28"
-                            Foreground="{StaticResource PrimaryTextBrush}"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"/>
-                </Viewbox>
-              </Border>
-            </ControlTemplate>
-          </Button.Template>
-        </Button>
-        
-      </StackPanel>
+      </Border>
       
-    </Border>
+    </Grid>
     
-  </Grid>
-  
   </Grid>
   
 </Page>

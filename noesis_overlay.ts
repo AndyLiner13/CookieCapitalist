@@ -173,42 +173,35 @@ class Default extends Component<typeof Default> {
       
       // Header click - resets focused interaction mode (exit then re-enter)
       onHeaderClick: () => {
-        const player = this.world.getLocalPlayer();
-        player.exitFocusedInteractionMode();
-        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+        this.resetFocusedInteraction();
       },
       
       // Navigation commands (set once, never recreated)
-      // All pages: Reset focused interaction on click to clear drag artifacts
+      // Reset focused interaction on each click to clear drag artifacts (like header/shop buttons)
       onShopClick: () => {
-        const player = this.world.getLocalPlayer();
-        player.exitFocusedInteractionMode();
-        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+        this.resetFocusedInteraction();
         this.navigateToPage("shop");
       },
       onHomeClick: () => {
-        const player = this.world.getLocalPlayer();
-        player.exitFocusedInteractionMode();
-        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+        this.resetFocusedInteraction();
         this.navigateToPage("home");
       },
       onLeaderboardClick: () => {
-        const player = this.world.getLocalPlayer();
-        player.exitFocusedInteractionMode();
-        player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+        this.resetFocusedInteraction();
         this.navigateToPage("leaderboard");
       },
     };
   }
+  
+  // Reset focused interaction mode (exit then re-enter) to clear drag artifacts
+  private resetFocusedInteraction(): void {
+    const player = this.world.getLocalPlayer();
+    player.exitFocusedInteractionMode();
+    player.enterFocusedInteractionMode({ disableFocusExitButton: true });
+  }
 
   private navigateToPage(page: PageType): void {
     const log = this.log.inactive("navigateToPage");
-
-    if (this.currentPage === page) {
-      log.info(`Already on ${page} page`);
-      return;
-    }
-
     log.info(`Navigating from ${this.currentPage} to ${page}`);
     this.currentPage = page;
 

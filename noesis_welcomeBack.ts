@@ -75,6 +75,13 @@ class Default extends Component<typeof Default> {
 		// Only show WelcomeBack modal on mobile devices
 		// Non-mobile users will see the MobileOnly warning instead
 		const localPlayer = this.world.getLocalPlayer();
+		
+		// Skip if this is the server player (deviceType is not available)
+		if (localPlayer === this.world.getServerPlayer()) {
+			log.info("Skipping WelcomeBack modal - this is the server player");
+			return;
+		}
+		
 		const deviceType = localPlayer.deviceType.get();
 		if (deviceType !== PlayerDeviceType.Mobile) {
 			log.info(`Skipping WelcomeBack modal - device is ${deviceType}, not Mobile`);
