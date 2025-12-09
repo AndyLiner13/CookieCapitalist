@@ -6,7 +6,6 @@ __pycache__/
 
 # Node modules
 node_modules/
-sfx/
 
 # IDE
 .idea/
@@ -22,6 +21,8 @@ package-lock.json
 tsconfig.json
 .vscode/
 .github/
+types/
+sfx/
 
 # Temporary files
 .backups/

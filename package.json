@@ -1,4 +1,12 @@
 {
+  "name": "cookie-capitalist",
+  "version": "0.1.0",
+  "description": "Cookie Capitalist – a Meta Horizon Worlds clicker game built with TypeScript and Noesis UI.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndyLiner13/CookieCapitalist.git"
+  },
   "devDependencies": {
     "typescript": "4.7.4"
   }
