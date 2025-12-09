@@ -438,7 +438,7 @@
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
           Visibility="{Binding showSwipeAnimation, Converter={StaticResource BoolToVis}}"
           IsHitTestVisible="False"
-          Margin="100,-60,0,0">
+          Margin="20,0,0,0">
       <Border x:Name="SwipeIcon" RenderTransformOrigin="0.5,0.5" Width="80" Height="80">
         <Border.RenderTransform>
           <TranslateTransform x:Name="SwipeTranslate" Y="0"/>
@@ -473,5 +473,19 @@
         </Border>
       </Border>
     </Grid>
+    
+    <!-- Onboarding encouragement text - "Keep clicking!" / "Faster!" -->
+    <TextBlock Text="{Binding encouragementText}"
+               Visibility="{Binding showEncouragementText, Converter={StaticResource BoolToVis}}"
+               IsHitTestVisible="False"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontFamily="Fonts/#Bangers"
+               FontSize="42"
+               Foreground="#FFFFFF">
+      <TextBlock.Effect>
+        <DropShadowEffect Color="#000000" BlurRadius="8" ShadowDepth="3" Opacity="0.9"/>
+      </TextBlock.Effect>
+    </TextBlock>
   </Grid>
 </Page>

@@ -50,7 +50,7 @@ export type PageType = "home" | "shop" | "leaderboard";
 // Network event payload types (these use index signatures for SerializableState compatibility)
 export type GameEventPayload = {
   [key: string]: SerializableState;
-  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save" | "device_type_report" | "sync_progress" | "streak_ended";
+  type: "cookie_clicked" | "buy_upgrade" | "request_state" | "production_complete" | "request_save" | "device_type_report" | "sync_progress" | "streak_ended" | "onboarding_complete";
 };
 
 export type UIEventPayload = {
@@ -115,6 +115,7 @@ export const LocalUIEvents = {
     cookie: boolean;
     milk: boolean;
     footer: boolean;
+    shopButtonBlink: boolean;
   }>("local_onboarding_focus"),
   
   // Onboarding dunk control - enables/disables dunk gesture during onboarding
@@ -128,6 +129,21 @@ export const LocalUIEvents = {
   
   // Onboarding swipe animation - tells Cookie UI to show swipe down animation
   onboardingSwipeAnimation: new LocalEvent<{ show: boolean }>("local_onboarding_swipe_animation"),
+  
+  // Onboarding encouragement text - tells Cookie UI to show "Keep clicking!" / "Faster!"
+  onboardingEncouragement: new LocalEvent<{ show: boolean; text: string }>("local_onboarding_encouragement"),
+  
+  // Onboarding shop open - notifies when shop page is opened
+  onboardingShopOpened: new LocalEvent<{}>("local_onboarding_shop_opened"),
+  
+  // Onboarding upgrade purchased - notifies when an upgrade is bought during onboarding
+  onboardingUpgradePurchased: new LocalEvent<{ upgradeId: string }>("local_onboarding_upgrade_purchased"),
+  
+  // Onboarding clicker spotlight - dims all upgrades except clicker
+  onboardingSpotlightClicker: new LocalEvent<{ active: boolean }>("local_onboarding_spotlight_clicker"),
+  
+  // Onboarding shop dim - dims entire shop during explanation steps
+  onboardingShopDim: new LocalEvent<{ active: boolean }>("local_onboarding_shop_dim"),
 };
 // #region ⚙️ Game Constants
 // All upgrade types in the game

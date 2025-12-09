@@ -10,6 +10,7 @@
 import * as hz from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
+import { Default as SfxManager } from "./controller_sfx";
 import {
   PageType,
   GameEvents,
@@ -50,6 +51,10 @@ class Default extends hz.Component<typeof Default> {
   // Streak multiplier tracking
   private streakMultiplier: number = 1;
   private streakEndTime: number = 0;
+  
+  // Onboarding spotlight state
+  private isClickerSpotlighted: boolean = false;
+  private isShopDimmed: boolean = false;
   // #endregion
 
   // #region 🔄 Lifecycle Events
@@ -88,6 +93,18 @@ class Default extends hz.Component<typeof Default> {
     this.connectLocalBroadcastEvent(
       LocalUIEvents.dunkMultiplier,
       (data: { multiplier: number; durationMs: number; isRefresh?: boolean }) => this.onStreakMultiplierUpdate(data)
+    );
+    
+    // Listen for onboarding clicker spotlight
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingSpotlightClicker,
+      (data: { active: boolean }) => this.onClickerSpotlight(data.active)
+    );
+    
+    // Listen for onboarding shop dim (dims entire shop during explanation steps)
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingShopDim,
+      (data: { active: boolean }) => this.onShopDim(data.active)
     );
 
     // Start production timer tick after a short delay to ensure all listeners are registered
@@ -143,6 +160,7 @@ class Default extends hz.Component<typeof Default> {
         tier: tier,
         tierProgress: tierProgress,
         speedMultiplier: `${speedMultiplier}x`,
+        dimmed: false, // Will be updated by spotlight state
       };
     }
 
@@ -198,6 +216,9 @@ class Default extends hz.Component<typeof Default> {
         upgradeObj.speedMultiplier = `${speedMultiplier}x`;
       }
     }
+
+    // Re-apply dimming state after updating core data
+    this.updateDimStates();
 
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
@@ -297,6 +318,51 @@ class Default extends hz.Component<typeof Default> {
 
     log.info(`Shop visibility: ${isVisible}`);
   }
+  
+  private onClickerSpotlight(active: boolean): void {
+    const log = this.log.active("onClickerSpotlight");
+    
+    this.isClickerSpotlighted = active;
+    log.info(`Clicker spotlight: ${active}`);
+    
+    // Update all upgrade cards based on new spotlight state
+    this.updateDimStates();
+
+    // Push update to UI
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  
+  private onShopDim(active: boolean): void {
+    const log = this.log.active("onShopDim");
+    log.info(`Shop dim: ${active}`);
+    
+    // Dim ALL upgrade cards (including clicker) during explanation steps
+    this.isShopDimmed = active;
+    this.updateDimStates();
+
+    // Push update to UI
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  // #endregion
+
+  // #region 🛠️ Helper Methods
+  private updateDimStates(): void {
+    // Combine global shop dim + clicker spotlight rules
+    for (const config of UPGRADE_CONFIGS) {
+      const upgradeObj = this.dataContext[config.id] as any;
+      if (!upgradeObj) {
+        continue;
+      }
+
+      const spotlightDim = this.isClickerSpotlighted && config.id !== "clicker";
+      const dim = this.isShopDimmed || spotlightDim;
+      upgradeObj.dimmed = dim;
+    }
+  }
   // #endregion
 
   // #region 🎬 Handlers
@@ -304,8 +370,45 @@ class Default extends hz.Component<typeof Default> {
     const log = this.log.inactive("purchaseUpgrade");
     log.info(`Purchasing upgrade: ${upgradeId}`);
 
+    // Check if player can afford the upgrade
+    const config = UPGRADE_CONFIGS.find((c) => c.id === upgradeId);
+    if (!config) {
+      log.warn(`Unknown upgrade: ${upgradeId}`);
+      return;
+    }
+
+    const owned = this.upgrades[upgradeId] || 0;
+    const cost = calculateUpgradeCost(config.baseCost, owned);
+
+    // Check if player has enough cookies
+    if (this.cookies < cost) {
+      log.info(`Cannot afford ${config.name} - need ${cost}, have ${this.cookies}`);
+      // Play error SFX
+      const sfx = SfxManager.getInstance();
+      sfx?.playError();
+      return;
+    }
+
+    // Check clicker max limit
+    if (upgradeId === "clicker" && owned >= 24) {
+      log.info("Clicker at max limit (24)");
+      // Play error SFX
+      const sfx = SfxManager.getInstance();
+      sfx?.playError();
+      return;
+    }
+
+    // Play buy SFX (purchase is valid)
+    const sfx = SfxManager.getInstance();
+    sfx?.playBuy();
+
     this.sendNetworkBroadcastEvent(GameEvents.toServer, {
       type: "buy_upgrade",
+      upgradeId: upgradeId,
+    });
+    
+    // Notify onboarding that an upgrade was purchased
+    this.sendLocalBroadcastEvent(LocalUIEvents.onboardingUpgradePurchased, {
       upgradeId: upgradeId,
     });
   }

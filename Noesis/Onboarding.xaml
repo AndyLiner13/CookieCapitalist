@@ -91,6 +91,60 @@
             </Grid>
             
             <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+            <!-- ENCOURAGEMENT TEXT (Multiplier Challenge)                                      -->
+            <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,120,0,0"
+                  Visibility="{Binding showEncouragementText, Converter={StaticResource BoolToVis}}">
+              
+              <Border x:Name="EncouragementContainer" RenderTransformOrigin="0.5,0.5"
+                      CornerRadius="24"
+                      Padding="40,20"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+                <Border.Background>
+                  <SolidColorBrush Color="#FFD700"/>
+                </Border.Background>
+                <Border.RenderTransform>
+                  <ScaleTransform x:Name="EncouragementScale" ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+                <Border.Triggers>
+                  <EventTrigger RoutedEvent="Border.Loaded">
+                    <BeginStoryboard>
+                      <Storyboard RepeatBehavior="Forever">
+                        <DoubleAnimation Storyboard.TargetName="EncouragementScale"
+                                         Storyboard.TargetProperty="ScaleX"
+                                         From="1" To="1.1" Duration="0:0:0.6"
+                                         AutoReverse="True">
+                          <DoubleAnimation.EasingFunction>
+                            <SineEase EasingMode="EaseInOut"/>
+                          </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="EncouragementScale"
+                                         Storyboard.TargetProperty="ScaleY"
+                                         From="1" To="1.1" Duration="0:0:0.6"
+                                         AutoReverse="True">
+                          <DoubleAnimation.EasingFunction>
+                            <SineEase EasingMode="EaseInOut"/>
+                          </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                      </Storyboard>
+                    </BeginStoryboard>
+                  </EventTrigger>
+                </Border.Triggers>
+                <Border.Effect>
+                  <DropShadowEffect Color="#000000" BlurRadius="12" ShadowDepth="3" Opacity="0.4"/>
+                </Border.Effect>
+                
+                <TextBlock Text="{Binding encouragementText}"
+                           FontFamily="Fonts/#Bangers-Regular"
+                           FontSize="48"
+                           Foreground="#000000"
+                           TextAlignment="Center"/>
+              </Border>
+              
+            </Grid>
+            
+            <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
             <!-- MASCOT + CHAT BUBBLE                                                           -->
             <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
             <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,120">
@@ -131,7 +185,7 @@
                       VerticalAlignment="Top"
                       Width="120" 
                       Height="120">
-                <Image Source="Images/Coogie.png" Stretch="Uniform"/>
+                <Image Source="Images/MascotImage.png" Stretch="Uniform"/>
               </Border>
               
             </Grid>

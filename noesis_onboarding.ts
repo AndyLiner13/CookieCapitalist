@@ -17,7 +17,8 @@
 import { Component, PlayerDeviceType } from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
-import { UIEvents, UIEventPayload, LocalUIEvents } from "./util_gameData";
+import { UIEvents, UIEventPayload, LocalUIEvents, GameEvents } from "./util_gameData";
+import { Default as SfxManager } from "./controller_sfx";
 
 // #region 🏷️ Type Definitions
 // Focus state for each UI element
@@ -41,6 +42,11 @@ interface OnboardingStep {
 	waitForMultiplier?: number;
 	waitForMultiplierEnd?: boolean;
 	waitForSwipeDown?: boolean;
+	waitForShopOpen?: boolean;
+	waitForUpgrade?: string; // Wait for specific upgrade to be purchased
+	// Shop-specific flags
+	shopStep?: boolean; // True if this step occurs in the shop page
+	spotlightClicker?: boolean; // True if should spotlight only the clicker upgrade
 }
 
 // Helper to create focus state (all false by default)
@@ -89,7 +95,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 		chatText: "Now tap the cookie to earn your first cookie!",
 		showChatBubble: true,
 		showTapPrompt: false,
-		focus: { header: false, cookie: true, milk: false, footer: false },
+		focus: { header: true, cookie: true, milk: false, footer: false },
 		showSwipeAnimation: false,
 		waitForCookies: 1,
 	},
@@ -108,7 +114,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 		chatText: "",
 		showChatBubble: false, // No mascot during swipe tutorial
 		showTapPrompt: false,
-		focus: { header: false, cookie: true, milk: true, footer: false },
+		focus: { header: true, cookie: true, milk: true, footer: false },
 		showSwipeAnimation: true,
 		waitForSwipeDown: true,
 	},
@@ -120,49 +126,96 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 		focus: { header: true, cookie: true, milk: true, footer: false },
 		showSwipeAnimation: false,
 	},
-	// Multiplier challenge
+	// Multiplier challenge - tap fast to reach 8x
 	{
 		id: "multiplier_challenge",
-		chatText: "Now tap as FAST as you can to reach 16x multiplier! Go go go!",
+		chatText: "Now tap as FAST as you can to reach 8x multiplier! Go go go!",
 		showChatBubble: true,
 		showTapPrompt: false,
-		focus: { header: true, cookie: true, milk: false, footer: false },
+		focus: { header: true, cookie: true, milk: true, footer: false },
 		showSwipeAnimation: false,
-		waitForMultiplier: 16,
+		waitForMultiplier: 8,
 	},
+	// Admiration after multiplier
 	{
-		id: "multiplier_wait",
-		chatText: "Incredible speed! 🔥 Now let the multiplier expire to see your earnings!",
+		id: "multiplier_success",
+		chatText: "WOW! 🔥 Look at all those cookies! You're a natural!",
+		showChatBubble: true,
+		showTapPrompt: true,
+		focus: { header: true, cookie: false, milk: false, footer: false },
+		showSwipeAnimation: false,
+	},
+	// Shop introduction
+	{
+		id: "shop_spotlight",
+		chatText: "Now let's put those cookies to work! Tap the Shop button!",
 		showChatBubble: true,
 		showTapPrompt: false,
-		focus: { header: true, cookie: true, milk: false, footer: false },
-		showSwipeAnimation: false,
-		waitForMultiplierEnd: true,
-	},
-	// Admiration and shop
-	{
-		id: "admiration",
-		chatText: "Wow! You're a natural cookie tapper! 🌟 I'm impressed!",
-		showChatBubble: true,
-		showTapPrompt: true,
-		focus: noFocus,
-		showSwipeAnimation: false,
-	},
-	{
-		id: "shop_intro",
-		chatText: "One more thing - check out the Shop to buy upgrades that earn cookies automatically!",
-		showChatBubble: true,
-		showTapPrompt: true,
 		focus: { header: false, cookie: false, milk: false, footer: true },
 		showSwipeAnimation: false,
+		waitForShopOpen: true,
 	},
+	// Shop onboarding - Overview
 	{
-		id: "complete",
-		chatText: "You're all set! Now go build your cookie empire! 🍪",
+		id: "shop_overview",
+		chatText: "Welcome to the Shop! Here you can buy upgrades that earn cookies automatically!",
 		showChatBubble: true,
 		showTapPrompt: true,
 		focus: focusAll,
 		showSwipeAnimation: false,
+		shopStep: true,
+	},
+	// Shop onboarding - Timer explanation
+	{
+		id: "shop_timer",
+		chatText: "Each upgrade has a timer. When it fills up, you earn cookies automatically!",
+		showChatBubble: true,
+		showTapPrompt: true,
+		focus: focusAll,
+		showSwipeAnimation: false,
+		shopStep: true,
+	},
+	// Shop onboarding - Progress bar
+	{
+		id: "shop_progress",
+		chatText: "The progress bar shows how close you are to the next payout!",
+		showChatBubble: true,
+		showTapPrompt: true,
+		focus: focusAll,
+		showSwipeAnimation: false,
+		shopStep: true,
+	},
+	// Shop onboarding - Level up explanation
+	{
+		id: "shop_levelup",
+		chatText: "Level up upgrades to DOUBLE their production rate! 📈",
+		showChatBubble: true,
+		showTapPrompt: true,
+		focus: focusAll,
+		showSwipeAnimation: false,
+		shopStep: true,
+	},
+	// Shop onboarding - Buy clicker
+	{
+		id: "shop_buy_clicker",
+		chatText: "Try it out! Buy the Clicker upgrade to start earning cookies automatically!",
+		showChatBubble: true,
+		showTapPrompt: false,
+		focus: focusAll,
+		showSwipeAnimation: false,
+		shopStep: true,
+		waitForUpgrade: "clicker",
+		spotlightClicker: true,
+	},
+	// Completion
+	{
+		id: "complete",
+		chatText: "🎉 You're all set! Now go build your cookie empire! 🍪",
+		showChatBubble: true,
+		showTapPrompt: true,
+		focus: focusAll,
+		showSwipeAnimation: false,
+		shopStep: true,
 	},
 ];
 // #endregion
@@ -185,6 +238,14 @@ class Default extends Component<typeof Default> {
 	private currentCookies: number = 0;
 	private currentMultiplier: number = 1;
 	private hasSwipedDown: boolean = false;
+	private purchasedUpgradeId: string = ""; // Last purchased upgrade ID
+	private isTapBlocked: boolean = false; // Temporarily blocks tap-to-continue after multiplier step
+	private static readonly MULTIPLIER_ADVANCE_DELAY_MS = 3000; // Delay before allowing tap after multiplier step (prevents accidental clicks)
+	
+	// Encouragement text for multiplier challenge
+	private encouragementInterval: number | null = null;
+	private lastMultiplierUpdateTime: number = 0; // Track when multiplier last increased
+	private static readonly MULTIPLIER_STALE_MS = 2000; // Show "Faster!" after 2 seconds without multiplier increase
 	// #endregion
 
 	// #region 🔄 Lifecycle Events
@@ -217,6 +278,16 @@ class Default extends Component<typeof Default> {
 		this.connectLocalBroadcastEvent(LocalUIEvents.swipeDown, () => {
 			this.handleSwipeDown();
 		});
+		
+		// Listen for shop opened events (for shop onboarding)
+		this.connectLocalBroadcastEvent(LocalUIEvents.onboardingShopOpened, () => {
+			this.handleShopOpened();
+		});
+		
+		// Listen for upgrade purchased events (for shop onboarding)
+		this.connectLocalBroadcastEvent(LocalUIEvents.onboardingUpgradePurchased, (data) => {
+			this.handleUpgradePurchased(data);
+		});
 
 		log.info("Onboarding controller initialized and listening for events");
 	}
@@ -233,6 +304,8 @@ class Default extends Component<typeof Default> {
 			chatText: "",
 			showSwipeAnimation: false,
 			allowTapAnywhere: true, // When false, clicks pass through to cookie
+			showEncouragementText: false,
+			encouragementText: "",
 			
 			onTapToContinue: () => this.onTapToContinue(),
 		};
@@ -286,13 +359,16 @@ class Default extends Component<typeof Default> {
 			cookie: step.focus.cookie,
 			milk: step.focus.milk,
 			footer: step.focus.footer,
+			shopButtonBlink: step.waitForShopOpen === true, // Blink shop button when waiting for shop to open
 		});
 
 		// Determine if step requires interaction with game elements (not tap anywhere)
 		const hasWaitCondition = step.waitForCookies !== undefined ||
 			step.waitForMultiplier !== undefined ||
 			step.waitForMultiplierEnd ||
-			step.waitForSwipeDown;
+			step.waitForSwipeDown ||
+			step.waitForShopOpen ||
+			step.waitForUpgrade !== undefined;
 
 		// Enable cookie clicks when we reach a step that requires cookie interaction
 		const isCookieStep = step.waitForCookies !== undefined || step.waitForMultiplier !== undefined;
@@ -309,29 +385,31 @@ class Default extends Component<typeof Default> {
 		});
 		log.info(`Cookie collection display: ${isCookieCollectionStep}`);
 
-		// Enable dunk gesture only when we reach the swipe tutorial step
-		const isDunkStep = step.waitForSwipeDown === true;
+		// Enable dunk gesture for swipe step and multiplier challenge (need to keep dunking)
+		const isDunkStep = step.waitForSwipeDown === true || step.waitForMultiplier !== undefined;
 		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingDunkEnabled, {
 			enabled: isDunkStep,
 		});
 		log.info(`Dunk enabled: ${isDunkStep}`);
-
-		// Hide the Noesis entity during any game interaction step (cookie, multiplier, swipe)
-		// This prevents it from blocking focused interaction input
-		// The swipe animation will be shown on the Cookie UI instead
-		const shouldHideEntity = step.waitForCookies !== undefined || 
-			step.waitForMultiplier !== undefined || 
-			step.waitForSwipeDown;
-		if (this.noesisGizmo) {
-			this.noesisGizmo.setLocalEntityVisibility(!shouldHideEntity);
-			log.info(`Onboarding entity visibility: ${!shouldHideEntity}`);
-		}
 		
 		// Broadcast swipe animation state to Cookie UI
 		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingSwipeAnimation, {
 			show: step.showSwipeAnimation === true,
 		});
 		log.info(`Swipe animation on Cookie UI: ${step.showSwipeAnimation === true}`);
+		
+		// Broadcast shop dim state to Shop UI (dim entire shop during explanation steps, except when buying clicker)
+		const shouldDimShop = step.shopStep === true && step.spotlightClicker !== true;
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingShopDim, {
+			active: shouldDimShop,
+		});
+		log.info(`Shop dim: ${shouldDimShop}`);
+		
+		// Broadcast clicker spotlight state to Shop UI
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingSpotlightClicker, {
+			active: step.spotlightClicker === true,
+		});
+		log.info(`Clicker spotlight: ${step.spotlightClicker === true}`);
 		
 		// Reset focused interaction when entering a cookie step (first cookie tap step)
 		// This ensures a clean interaction state before the user starts clicking the cookie
@@ -340,18 +418,53 @@ class Default extends Component<typeof Default> {
 			log.info("Reset focused interaction for cookie step");
 		}
 
+		// Show encouragement text during multiplier challenge step
+		const isMultiplierChallenge = step.id === "multiplier_challenge";
+		if (isMultiplierChallenge) {
+			this.startEncouragementText();
+		} else {
+			this.stopEncouragementText();
+		}
+		
+		// Hide the onboarding overlay completely during cookie/swipe interaction steps
+		// This prevents the blocking Screen Overlay from interfering with Focused Interaction raycasts
+		// The dimming effect is still active via onboardingFocus events sent above
+		// IMPORTANT: Must use setLocalEntityVisibility because "Interactive, blocking" mode
+		// blocks input at the entity level, not the XAML level
+		const shouldHideOverlay = step.waitForCookies !== undefined || 
+			step.waitForMultiplier !== undefined ||
+			step.waitForSwipeDown;
+		
+		// Hide the actual NoesisUI entity during interaction steps
+		if (this.noesisGizmo) {
+			this.noesisGizmo.setLocalEntityVisibility(!shouldHideOverlay);
+			log.info(`Onboarding entity visibility: ${!shouldHideOverlay}`);
+		}
+		
 		this.updateDataContext({
-			isVisible: true,
+			isVisible: !shouldHideOverlay, // Also hide in dataContext for consistency
 			showChatBubble: step.showChatBubble,
 			showTapPrompt: step.showTapPrompt,
 			chatText: step.chatText,
 			showSwipeAnimation: step.showSwipeAnimation,
 			allowTapAnywhere: !hasWaitCondition, // Disable tap capture when waiting for cookie/swipe
+			showEncouragementText: isMultiplierChallenge,
 		});
 	}
 	
 	private advanceStep(): void {
 		const log = this.log.active("advanceStep");
+
+		// Check if we're advancing FROM a multiplier step - block tap input temporarily
+		const previousStep = ONBOARDING_STEPS[this.currentStep];
+		if (previousStep?.waitForMultiplier !== undefined) {
+			log.info(`Advancing from multiplier step - blocking tap for ${Default.MULTIPLIER_ADVANCE_DELAY_MS}ms`);
+			this.isTapBlocked = true;
+			this.async.setTimeout(() => {
+				this.isTapBlocked = false;
+				log.info("Tap block lifted");
+			}, Default.MULTIPLIER_ADVANCE_DELAY_MS);
+		}
 
 		this.currentStep++;
 		log.info(`Advancing to step ${this.currentStep}`);
@@ -400,6 +513,22 @@ class Default extends Component<typeof Default> {
 			}
 			return false;
 		}
+		
+		// Check shop open
+		if (step.waitForShopOpen) {
+			// This is checked directly in handleShopOpened
+			log.info("Shop open condition met");
+			return true;
+		}
+		
+		// Check upgrade purchase
+		if (step.waitForUpgrade !== undefined) {
+			if (this.purchasedUpgradeId === step.waitForUpgrade) {
+				log.info(`Upgrade condition met: ${this.purchasedUpgradeId}`);
+				return true;
+			}
+			return false;
+		}
 
 		return false;
 	}
@@ -410,12 +539,23 @@ class Default extends Component<typeof Default> {
 		this.isOnboardingActive = false;
 		this.hasCompletedOnboarding = true;
 		
-		// Show the entity again (in case it was hidden during game interaction steps)
+		// Stop encouragement text if running
+		this.stopEncouragementText();
+		
+		// Show the entity again (was hidden during game interaction steps)
 		if (this.noesisGizmo) {
 			this.noesisGizmo.setLocalEntityVisibility(true);
 		}
 		
 		this.updateDataContext({ isVisible: false });
+		
+		// Clear any remaining shop dimming and clicker spotlight
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingShopDim, {
+			active: false,
+		});
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingSpotlightClicker, {
+			active: false,
+		});
 		
 		// Broadcast focus=all to un-dim all UI elements
 		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingFocus, {
@@ -423,6 +563,7 @@ class Default extends Component<typeof Default> {
 			cookie: true,
 			milk: true,
 			footer: true,
+			shopButtonBlink: false,
 		});
 		
 		// Re-enable cookie clicks and dunk gesture after onboarding completes
@@ -432,6 +573,12 @@ class Default extends Component<typeof Default> {
 		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingDunkEnabled, {
 			enabled: true,
 		});
+		
+		// Notify server that onboarding is complete (for quest reward)
+		this.sendNetworkBroadcastEvent(GameEvents.toServer, {
+			type: "onboarding_complete",
+		});
+		log.info("Sent onboarding_complete event to server");
 
 		// Exit forced interaction mode and reset with normal settings
 		const player = this.world.getLocalPlayer();
@@ -487,6 +634,14 @@ class Default extends Component<typeof Default> {
 				// Mark as pending to prevent duplicate detection
 				this.isOnboardingPending = true;
 				
+				// Enable focused interaction mode immediately for new players
+				// (WelcomeBack modal is skipped for new players, so we need to enable it here)
+				const player = this.world.getLocalPlayer();
+				player.enterFocusedInteractionMode({
+					disableFocusExitButton: true,
+				});
+				log.info("Enabled focused interaction mode for new player");
+				
 				// Immediately disable dunk gesture and cookie clicks while waiting for onboarding to start
 				this.sendLocalBroadcastEvent(LocalUIEvents.onboardingDunkEnabled, {
 					enabled: false,
@@ -507,6 +662,11 @@ class Default extends Component<typeof Default> {
 
 		if (!this.isOnboardingActive) return;
 
+		// Track when multiplier increases (for encouragement text)
+		if (data.multiplier > this.currentMultiplier) {
+			this.lastMultiplierUpdateTime = Date.now();
+		}
+		
 		this.currentMultiplier = data.multiplier;
 		log.info(`Dunk multiplier: ${this.currentMultiplier}`);
 
@@ -539,11 +699,44 @@ class Default extends Component<typeof Default> {
 			this.advanceStep();
 		}
 	}
+	
+	private handleShopOpened(): void {
+		const log = this.log.active("handleShopOpened");
+
+		if (!this.isOnboardingActive) return;
+
+		log.info("Shop opened!");
+
+		// Check if wait condition is now met
+		if (this.checkWaitCondition()) {
+			this.advanceStep();
+		}
+	}
+	
+	private handleUpgradePurchased(data: { upgradeId: string }): void {
+		const log = this.log.active("handleUpgradePurchased");
+
+		if (!this.isOnboardingActive) return;
+
+		log.info(`Upgrade purchased: ${data.upgradeId}`);
+		this.purchasedUpgradeId = data.upgradeId;
+
+		// Check if wait condition is now met
+		if (this.checkWaitCondition()) {
+			this.advanceStep();
+		}
+	}
 
 	private onTapToContinue(): void {
 		const log = this.log.active("onTapToContinue");
 
 		if (!this.isOnboardingActive) return;
+		
+		// Block tap input temporarily after multiplier step to prevent accidental clicks
+		if (this.isTapBlocked) {
+			log.info("Tap blocked (cooldown after multiplier step)");
+			return;
+		}
 
 		const step = ONBOARDING_STEPS[this.currentStep];
 		if (!step) return;
@@ -552,9 +745,17 @@ class Default extends Component<typeof Default> {
 		if (step.waitForCookies !== undefined || 
 			step.waitForMultiplier !== undefined || 
 			step.waitForMultiplierEnd || 
-			step.waitForSwipeDown) {
+			step.waitForSwipeDown ||
+			step.waitForShopOpen ||
+			step.waitForUpgrade !== undefined) {
 			log.info("Step has wait condition, ignoring tap");
 			return;
+		}
+
+		// Play navigation SFX for tap-to-continue
+		const sfx = SfxManager.getInstance();
+		if (sfx) {
+			sfx.playNavigation();
 		}
 
 		// Reset forced interaction on every tap during intro steps (before cookie clicking)
@@ -585,6 +786,50 @@ class Default extends Component<typeof Default> {
 		}
 
 		log.info(`DataContext updated: ${JSON.stringify(updates)}`);
+	}
+	
+	private startEncouragementText(): void {
+		const log = this.log.active("startEncouragementText");
+		
+		// Clear any existing interval
+		this.stopEncouragementText();
+		
+		// Initialize tracking - start with "Keep clicking!"
+		this.lastMultiplierUpdateTime = Date.now();
+		this.sendLocalBroadcastEvent(LocalUIEvents.onboardingEncouragement, {
+			show: true,
+			text: "Keep clicking!",
+		});
+		
+		// Check every 500ms if we need to show "Faster!"
+		this.encouragementInterval = this.async.setInterval(() => {
+			const timeSinceLastIncrease = Date.now() - this.lastMultiplierUpdateTime;
+			const isStale = timeSinceLastIncrease > Default.MULTIPLIER_STALE_MS;
+			
+			this.sendLocalBroadcastEvent(LocalUIEvents.onboardingEncouragement, {
+				show: true,
+				text: isStale ? "Faster!" : "Keep clicking!",
+			});
+		}, 500);
+		
+		log.info("Started encouragement text");
+	}
+	
+	private stopEncouragementText(): void {
+		const log = this.log.inactive("stopEncouragementText");
+		
+		if (this.encouragementInterval !== null) {
+			this.async.clearInterval(this.encouragementInterval);
+			this.encouragementInterval = null;
+			
+			// Hide encouragement text on Cookie UI
+			this.sendLocalBroadcastEvent(LocalUIEvents.onboardingEncouragement, {
+				show: false,
+				text: "",
+			});
+			
+			log.info("Stopped encouragement text");
+		}
 	}
 	// #endregion
 }

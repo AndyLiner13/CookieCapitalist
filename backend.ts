@@ -49,6 +49,7 @@ class Default extends Component<typeof Default> {
   // #region ⚙️ Props
   static propsDefinition = {
     playerController: { type: PropTypes.Entity },
+    sfxManager: { type: PropTypes.Entity },
     mobileOnlyGizmo: { type: PropTypes.Entity },
     resetStats: { type: PropTypes.Boolean, default: false }, // When enabled, resets all player stats to 0 on join
     mobileOnly: { type: PropTypes.Boolean, default: false }, // When enabled, shows warning for non-mobile users
@@ -176,6 +177,7 @@ class Default extends Component<typeof Default> {
     this.activePlayer = player;
     this.playerIsMobile = null; // Reset device type - will be reported by controller
     this.assignPlayerController(player);
+    this.assignSfxManager(player);
     
     // Start session timer
     this.sessionStartTime = Date.now();
@@ -198,12 +200,25 @@ class Default extends Component<typeof Default> {
     
     const controller = this.props.playerController;
     if (!controller) {
-      log.error("playerController prop is not set!");
+      log.warn("Player controller entity not configured");
       return;
     }
     
     controller.owner.set(player);
     log.info(`Assigned player controller ownership to ${player.name.get()}`);
+  }
+  
+  private assignSfxManager(player: Player): void {
+    const log = this.log.inactive("assignSfxManager");
+    
+    const sfxManager = this.props.sfxManager;
+    if (!sfxManager) {
+      log.warn("SFX Manager entity not configured");
+      return;
+    }
+    
+    sfxManager.owner.set(player);
+    log.info(`Assigned SFX Manager ownership to ${player.name.get()}`);
   }
   
   // Note: MobileOnly overlay visibility is now handled by noesis_mobileOnly.ts
@@ -471,7 +486,8 @@ class Default extends Component<typeof Default> {
   
   // #region 🎯 Quest System
   // Quest IDs must match those created in Systems > Quests in Desktop Editor
-  private static readonly QUEST_COOKIES_15 = "quest_cookies15";
+  // All IDs must be under 20 characters
+  private static readonly QUEST_COOKIES_15 = "q_cookies15";
   
   // Check and complete cookie milestone quests
   private checkCookieQuests(): void {

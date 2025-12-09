@@ -13,6 +13,7 @@ import { Component, PropTypes, Entity, Vec3, Quaternion, Player } from "horizon/
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import LocalCamera from "horizon/camera";
 import { Logger } from "./util_logger";
+import { Default as SfxManager } from "./controller_sfx";
 import {
   PageType,
   UIEvents,
@@ -79,6 +80,10 @@ class Default extends Component<typeof Default> {
   private isOnboardingCookieStep: boolean = false; // True during "cookie_cheer" step (collect 15 cookies)
   private onboardingCookieTarget: number = 15;
   private cookieBlinkTimerId: number | null = null;
+  
+  // Onboarding shop button blink state
+  private isShopButtonBlinking: boolean = false;
+  private shopButtonBlinkTimerId: number | null = null;
   
   // Multiplier state
   private currentMultiplier: number = 1;
@@ -157,7 +162,7 @@ class Default extends Component<typeof Default> {
     // Listen for onboarding focus events
     this.connectLocalBroadcastEvent(
       LocalUIEvents.onboardingFocus,
-      (data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }) => {
+      (data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean; shopButtonBlink: boolean }) => {
         this.onOnboardingFocus(data);
       }
     );
@@ -199,6 +204,7 @@ class Default extends Component<typeof Default> {
       // Onboarding dimmed states (false = not dimmed, shown normally)
       headerOnboardingDimmed: false,
       footerOnboardingDimmed: false,
+      shopButtonOpacity: 1, // For onboarding shop button blink
       
       // Header click - resets focused interaction mode (exit then re-enter)
       onHeaderClick: () => {
@@ -209,7 +215,13 @@ class Default extends Component<typeof Default> {
       // Reset focused interaction on each click to clear drag artifacts (like header/shop buttons)
       onShopClick: () => {
         this.resetFocusedInteraction();
+        // Stop shop button blink when clicked
+        if (this.isShopButtonBlinking) {
+          this.stopShopButtonBlink();
+        }
         this.navigateToPage("shop");
+        // Notify onboarding that shop was opened
+        this.sendLocalBroadcastEvent(LocalUIEvents.onboardingShopOpened, {});
       },
       onHomeClick: () => {
         this.resetFocusedInteraction();
@@ -248,13 +260,21 @@ class Default extends Component<typeof Default> {
   }
   
   // Handle onboarding focus event - dim elements not in focus
-  private onOnboardingFocus(data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean }): void {
+  private onOnboardingFocus(data: { header: boolean; cookie: boolean; milk: boolean; footer: boolean; shopButtonBlink: boolean }): void {
     const log = this.log.active("onOnboardingFocus");
-    log.info(`Onboarding focus: header=${data.header}, milk=${data.milk}, footer=${data.footer}`);
+    log.info(`Onboarding focus: header=${data.header}, milk=${data.milk}, footer=${data.footer}, shopButtonBlink=${data.shopButtonBlink}`);
     
     // Update overlay dataContext (header/footer)
     this.dataContext.headerOnboardingDimmed = !data.header;
     this.dataContext.footerOnboardingDimmed = !data.footer;
+    
+    // Handle shop button blink
+    if (data.shopButtonBlink) {
+      this.startShopButtonBlink();
+    } else {
+      this.stopShopButtonBlink();
+    }
+    
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
@@ -344,6 +364,50 @@ class Default extends Component<typeof Default> {
     log.info("Cookie counter blink stopped");
   }
   
+  // Start shop button blinking animation (similar to cookie counter)
+  private startShopButtonBlink(): void {
+    const log = this.log.active("startShopButtonBlink");
+    
+    if (this.shopButtonBlinkTimerId !== null) {
+      log.info("Shop button already blinking");
+      return;
+    }
+    
+    const PULSE_MIN_OPACITY = 0.5;
+    const BLINK_INTERVAL_MS = 50; // 50ms = smooth 20 FPS animation
+    
+    this.shopButtonBlinkTimerId = this.async.setInterval(() => {
+      const elapsed = Date.now() % 1000; // 1 second cycle
+      const progress = elapsed / 1000;
+      const wave = Math.sin(progress * Math.PI * 2) * 0.5 + 0.5; // 0 to 1 sine wave
+      
+      this.dataContext.shopButtonOpacity = PULSE_MIN_OPACITY + (1 - PULSE_MIN_OPACITY) * wave;
+      
+      if (this.noesisGizmo) {
+        this.noesisGizmo.dataContext = this.dataContext;
+      }
+    }, BLINK_INTERVAL_MS);
+    
+    log.info("Shop button blink started");
+  }
+  
+  // Stop shop button blinking animation
+  private stopShopButtonBlink(): void {
+    const log = this.log.active("stopShopButtonBlink");
+    
+    if (this.shopButtonBlinkTimerId !== null) {
+      this.async.clearInterval(this.shopButtonBlinkTimerId);
+      this.shopButtonBlinkTimerId = null;
+    }
+    
+    this.dataContext.shopButtonOpacity = 1;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+    
+    log.info("Shop button blink stopped");
+  }
+  
   // Reset focused interaction mode (exit then re-enter) to clear drag artifacts
   private resetFocusedInteraction(): void {
     const player = this.world.getLocalPlayer();
@@ -354,6 +418,11 @@ class Default extends Component<typeof Default> {
   private navigateToPage(page: PageType): void {
     const log = this.log.inactive("navigateToPage");
     log.info(`Navigating from ${this.currentPage} to ${page}`);
+    
+    // Play navigation SFX
+    const sfx = SfxManager.getInstance();
+    sfx?.playNavigation();
+    
     this.currentPage = page;
 
     // Broadcast page change to CoreGame and other overlays (Clickers, Background)
@@ -426,6 +495,13 @@ class Default extends Component<typeof Default> {
     this.multiplierEndTime = Date.now() + data.durationMs;
     
     log.info(`Multiplier ${data.isRefresh ? 'refreshed' : 'activated'}: ${data.multiplier}x for ${data.durationMs}ms`);
+    
+    // Play multiplier SFX for initial 2x activation only (not refreshes)
+    // if (isFirstActivation && !data.isRefresh) {
+    //   const sfx = SfxManager.getInstance();
+    //   sfx?.playMultiplier(1);
+    // }
+    // TODO: Add playMultiplier method to controller_sfx.ts
     
     // Clear existing timers for active streak logic
     if (this.multiplierTimerId !== null) {

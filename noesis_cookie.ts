@@ -10,6 +10,7 @@
 import * as hz from "horizon/core";
 import { NoesisGizmo, IUiViewModelObject } from "horizon/noesis";
 import { Logger } from "./util_logger";
+import { Default as SfxManager } from "./controller_sfx";
 import {
   PageType,
   GameEvents,
@@ -140,6 +141,14 @@ class Default extends hz.Component<typeof Default> {
         this.onOnboardingSwipeAnimation(data);
       }
     );
+    
+    // Listen for onboarding encouragement text events
+    this.connectLocalBroadcastEvent(
+      LocalUIEvents.onboardingEncouragement,
+      (data: { show: boolean; text: string }) => {
+        this.onOnboardingEncouragement(data);
+      }
+    );
 
     log.info("Cookie UI initialized");
   }
@@ -161,6 +170,9 @@ class Default extends hz.Component<typeof Default> {
       onboardingDimmed: false,
       // Onboarding swipe animation
       showSwipeAnimation: false,
+      // Onboarding encouragement text
+      showEncouragementText: false,
+      encouragementText: "",
       // 4 glow rings - sizes configurable via props
       Glow1Opacity: 0,
       Glow1Size: this.props.glow1Size,
@@ -236,6 +248,15 @@ class Default extends hz.Component<typeof Default> {
     }
 
     log.info("Cookie released - processing click");
+
+    // Play cookie click SFX
+    const sfx = SfxManager.getInstance();
+    log.info(`SfxManager instance: ${sfx ? 'found' : 'null'}`);
+    if (sfx) {
+      sfx.playCookieClick();
+    } else {
+      log.error("SfxManager not initialized!");
+    }
 
     // Trigger release animation
     this.triggerClickUp();
@@ -322,6 +343,18 @@ class Default extends hz.Component<typeof Default> {
     log.info(`Onboarding swipe animation: show=${data.show}`);
     
     this.dataContext.showSwipeAnimation = data.show;
+    if (this.noesisGizmo) {
+      this.noesisGizmo.dataContext = this.dataContext;
+    }
+  }
+  
+  // Handle onboarding encouragement text event - show "Keep clicking!" / "Faster!"
+  private onOnboardingEncouragement(data: { show: boolean; text: string }): void {
+    const log = this.log.active("onOnboardingEncouragement");
+    log.info(`Onboarding encouragement: show=${data.show}, text="${data.text}"`);
+    
+    this.dataContext.showEncouragementText = data.show;
+    this.dataContext.encouragementText = data.text;
     if (this.noesisGizmo) {
       this.noesisGizmo.dataContext = this.dataContext;
     }
@@ -422,6 +455,26 @@ class Default extends hz.Component<typeof Default> {
         this.noesisGizmo.dataContext = this.dataContext;
       }
 
+      // Play swipe SFX when dunk animation begins
+      const sfxAtStart = SfxManager.getInstance();
+      if (sfxAtStart) {
+        sfxAtStart.playSwipe();
+        log.info("Swipe SFX played at dunk animation start");
+      } else {
+        log.warn("SfxManager not initialized - swipe SFX skipped");
+      }
+
+      // Play dunk SFX halfway through animation (850ms)
+      this.async.setTimeout(() => {
+        const sfx = SfxManager.getInstance();
+        if (sfx) {
+          sfx.playDunk();
+          log.info("Dunk SFX played at animation midpoint");
+        } else {
+          log.warn("SfxManager not initialized - dunk SFX skipped");
+        }
+      }, 850);
+
       // After dunk animation completes (1700ms), show multiplier and glow
       this.async.setTimeout(() => {
         this.dataContext.dunkAnimate = false;
@@ -433,6 +486,10 @@ class Default extends hz.Component<typeof Default> {
         // NOW set the multiplier end time - timer starts AFTER dunk animation
         const initialTimeout = this.getTimeoutForMultiplier(this.currentMultiplier);
         this.multiplierEndTime = Date.now() + initialTimeout;
+        
+        // Play multiplier SFX for initial 2x activation
+        // const sfx = SfxManager.getInstance();
+        // sfx?.playMultiplier(1); // TODO: Add playMultiplier method to controller_sfx.ts
         
         // NOW show the multiplier and glow after animation completes
         // Start click rate checker (5-second window starts now)
@@ -492,6 +549,17 @@ class Default extends hz.Component<typeof Default> {
       // Upgrade multiplier!
       const previousMultiplier = this.currentMultiplier;
       this.currentMultiplier *= 2;
+      
+      // Play multiplier SFX based on new tier
+      // const sfx = SfxManager.getInstance();
+      // if (this.currentMultiplier === 4) {
+      //   sfx?.playMultiplier(2);
+      // } else if (this.currentMultiplier === 8) {
+      //   sfx?.playMultiplier(3);
+      // } else if (this.currentMultiplier === 16) {
+      //   sfx?.playMultiplier(4);
+      // }
+      // TODO: Add playMultiplier method to controller_sfx.ts
       
       // Start streak timer if this is the first upgrade (1x -> 2x)
       if (previousMultiplier === 1) {

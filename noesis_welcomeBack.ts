@@ -90,8 +90,16 @@ class Default extends Component<typeof Default> {
 
 		const offlineCookies = (data.offlineCookies as number) || 0;
 		const timeAwayMs = (data.timeAwayMs as number) || 0;
+		const cookies = (data.cookies as number) || 0;
+		const cps = (data.cps as number) || 0;
 
-		// Always show modal (even with 0 cookies for testing)
+		// Skip WelcomeBack modal for new players (0 cookies, 0 cps)
+		// Onboarding will handle their experience instead
+		if (cookies === 0 && cps === 0) {
+			log.info("Skipping WelcomeBack modal - new player detected (0 cookies, 0 cps), onboarding will handle");
+			return;
+		}
+
 		const timeAwayFormatted = this.formatTimeAway(timeAwayMs);
 
 		this.updateDataContext({
@@ -114,6 +122,11 @@ class Default extends Component<typeof Default> {
 		const log = this.log.active("onCollect");
 
 		this.updateDataContext({ isVisible: false });
+		
+		// Hide the entity to stop blocking input (in case it's in blocking mode)
+		if (this.noesisGizmo) {
+			this.noesisGizmo.setLocalEntityVisibility(false);
+		}
 		
 		// Exit forced interaction mode first, then re-enter with normal settings
 		// This resets the focus state and allows cookie clicking and gesture detection

@@ -209,6 +209,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding clicker.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -280,6 +285,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding grandma.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -351,6 +361,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding farm.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -422,6 +437,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding factory.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -493,6 +513,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding lab.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -564,6 +589,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding fab.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -635,6 +665,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding planet.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           
@@ -706,6 +741,11 @@
                   </Border>
                 </Grid>
               </Grid>
+              <!-- Onboarding dim overlay for this card -->
+              <Border Grid.ColumnSpan="2" CornerRadius="{StaticResource CardBorderRadius}" IsHitTestVisible="False"
+                      Visibility="{Binding galaxy.dimmed, Converter={StaticResource BoolToVis}}">
+                <Border.Background><SolidColorBrush Color="#000000" Opacity="0.75"/></Border.Background>
+              </Border>
             </Grid>
           </Border>
           

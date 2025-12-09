@@ -41,7 +41,7 @@ class Default extends hz.Component<typeof Default> {
 
   // #region 🔄 Lifecycle Events
   start(): void {
-    const log = this.log.inactive("start");
+    const log = this.log.active("start");
 
     const localPlayer = this.world.getLocalPlayer();
     const serverPlayer = this.world.getServerPlayer();
@@ -58,9 +58,11 @@ class Default extends hz.Component<typeof Default> {
     this.entity.owner.set(localPlayer);
     log.info("Entity ownership transferred to local player");
 
-    // NOTE: Focused interaction mode is NOT enabled on start.
-    // It will be enabled when the user clicks the Collect button in the WelcomeBack modal.
-    // This prevents drag line artifacts from appearing on the overlay buttons.
+    // Enable focused interaction mode immediately so cookie clicks work
+    localPlayer.enterFocusedInteractionMode({
+      disableFocusExitButton: true,
+    });
+    log.info("Focused interaction mode enabled");
     
     // Position camera to face the cookie
     this.positionCameraAtCookie();
@@ -156,7 +158,7 @@ class Default extends hz.Component<typeof Default> {
   
   // Update input blocking state based on backend's mobileOnly setting
   private handleInputBlockingState(data: UIEventPayload): void {
-    const log = this.log.inactive("handleInputBlockingState");
+    const log = this.log.active("handleInputBlockingState");
     
     if (data.type !== "state_update") {
       return;
@@ -173,10 +175,10 @@ class Default extends hz.Component<typeof Default> {
       return;
     }
     
-    // Don't block input - allow Web/VR users to still play even with MobileOnly overlay shown
-    // The overlay is just a warning, not a hard block
-    this.isInputBlocked = false;
-    log.info(`[INPUT BLOCKING] Disabled (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
+    // When mobileOnly is true, block NON-mobile users (Web/VR) - mobile users can play
+    // When mobileOnly is false, allow all users
+    this.isInputBlocked = mobileOnlyFlag && !this.isMobile;
+    log.info(`[INPUT BLOCKING] ${this.isInputBlocked ? 'Enabled' : 'Disabled'} (mobileOnly=${mobileOnlyFlag}, isMobile=${this.isMobile})`);
   }
   
   // Track page changes to conditionally block input on non-home pages
@@ -262,7 +264,7 @@ class Default extends hz.Component<typeof Default> {
   }
 
   private setupRaycastCookieClick(): void {
-    const log = this.log.inactive("setupRaycastCookieClick");
+    const log = this.log.active("setupRaycastCookieClick");
 
     if (!this.props.raycastGizmo) {
       log.warn("raycastGizmo prop not set - cookie tap handling disabled");
@@ -309,15 +311,18 @@ class Default extends hz.Component<typeof Default> {
 
   private handleInteractionStart(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
     if (!this.raycastGizmo || !this.cookieCollider) {
+      log.warn("Raycast or collider not set");
       return;
     }
     
     // Block input when mobile-only warning is shown, nav button was pressed, on non-home pages, or cookie click disabled during onboarding
     if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home" || !this.isCookieClickEnabled) {
+      log.info(`Input blocked: isInputBlocked=${this.isInputBlocked}, isNavInputBlocked=${this.isNavInputBlocked}, currentPage=${this.currentPage}, isCookieClickEnabled=${this.isCookieClickEnabled}`);
       return;
     }
 
     const interactions = interactionInfo || [];
+    log.info(`Processing ${interactions.length} interactions`);
     
     for (const interaction of interactions) {
       if (interaction.interactionIndex !== 0) continue;
@@ -331,6 +336,8 @@ class Default extends hz.Component<typeof Default> {
         log.info("Cookie pressed down");
         this.isCookiePressed = true;
         this.sendLocalBroadcastEvent(LocalUIEvents.cookiePressed, {});
+      } else {
+        log.info(`Raycast miss or wrong target: hit=${hit ? 'yes' : 'no'}`);
       }
     }
   }
@@ -338,10 +345,11 @@ class Default extends hz.Component<typeof Default> {
   private handleInteractionEnd(interactionInfo: hz.InteractionInfo[], log: { info: (msg: string) => void; warn: (msg: string) => void }): void {
     // Block input when mobile-only warning is shown, nav button was pressed, on non-home pages, or cookie click disabled during onboarding
     if (this.isInputBlocked || this.isNavInputBlocked || this.currentPage !== "home" || !this.isCookieClickEnabled) {
+      log.info(`End blocked: isInputBlocked=${this.isInputBlocked}, isNavInputBlocked=${this.isNavInputBlocked}, currentPage=${this.currentPage}, isCookieClickEnabled=${this.isCookieClickEnabled}`);
       return;
     }
     
-    // If cookie was pressed, release it regardless of where the finger ended
+    log.info(`handleInteractionEnd: isCookiePressed=${this.isCookiePressed}`);    // If cookie was pressed, release it regardless of where the finger ended
     // This handles the case where user swipes away (e.g., dunk gesture)
     if (this.isCookiePressed) {
       log.info("Cookie released (was pressed)");

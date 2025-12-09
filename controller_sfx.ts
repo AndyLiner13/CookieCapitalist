@@ -1,8 +1,8 @@
-// Desktop Editor Setup: Attach to Empty Object entity. Use Default (server) execution mode.
+// Desktop Editor Setup: Attach to Empty Object entity. Use Local execution mode.
 
 // #region 📋 README
-// SFX Manager - Centralized sound effect handler for Cookie Clicker.
-// This manager handles all game sound effects and provides a single point
+// SFX Controller - Centralized sound effect handler for Cookie Clicker.
+// This controller handles all game sound effects and provides a single point
 // of configuration for audio assets.
 // 
 // All SFX are configured via entity props (drag-and-drop in Desktop Editor).
@@ -24,22 +24,26 @@ export class Default extends hz.Component<typeof Default> {
     // Purchase sound (for buying upgrades)
     buySfx: { type: hz.PropTypes.Entity },
     
-    // Cookie click sound
-    cookieClickSfx: { type: hz.PropTypes.Entity },
+    // Cookie click sounds (5 variants for random selection)
+    cookieClickSfx1: { type: hz.PropTypes.Entity },
+    cookieClickSfx2: { type: hz.PropTypes.Entity },
+    cookieClickSfx3: { type: hz.PropTypes.Entity },
+    cookieClickSfx4: { type: hz.PropTypes.Entity },
+    cookieClickSfx5: { type: hz.PropTypes.Entity },
+    
+    // Dunk sound (cookie dunking in milk)
+    dunkSfx: { type: hz.PropTypes.Entity },
+    
+    // Swipe sound (gesture at start of dunk animation)
+    swipeSfx: { type: hz.PropTypes.Entity },
     
     // Error sound (insufficient cookies)
     errorSfx: { type: hz.PropTypes.Entity },
-    
-    // Multiplier sounds (one for each tier)
-    multiplier1Sfx: { type: hz.PropTypes.Entity },
-    multiplier2Sfx: { type: hz.PropTypes.Entity },
-    multiplier3Sfx: { type: hz.PropTypes.Entity },
-    multiplier4Sfx: { type: hz.PropTypes.Entity },
   };
   // #endregion
 
   // #region 📊 State
-  private log = new Logger("manager_sfx");
+  private log = new Logger("controller_sfx");
   
   // Singleton reference for easy access from other scripts
   private static instance: Default | null = null;
@@ -48,7 +52,7 @@ export class Default extends hz.Component<typeof Default> {
   // #region 🔄 Lifecycle Events
   preStart() {
     const log = this.log.active("preStart");
-    log.info("SFX Manager initializing");
+    log.info("SFX Controller initializing");
     
     // Set singleton instance
     Default.instance = this;
@@ -56,14 +60,14 @@ export class Default extends hz.Component<typeof Default> {
 
   start() {
     const log = this.log.active("start");
-    log.info("SFX Manager ready");
+    log.info("SFX Controller ready");
   }
   // #endregion
 
   // #region 🔌 Public API
   /**
-   * Get the singleton instance of the SFX manager
-   * @returns The SFX manager instance, or null if not initialized
+   * Get the singleton instance of the SFX controller
+   * @returns The SFX controller instance, or null if not initialized
    */
   public static getInstance(): Default | null {
     return Default.instance;
@@ -88,12 +92,47 @@ export class Default extends hz.Component<typeof Default> {
   }
 
   /**
-   * Play cookie click SFX
+   * Play cookie click SFX (randomly selects from 5 variants)
    * @param player - Optional. If provided, only plays for this player
    */
   public playCookieClick(player?: hz.Player): void {
-    const log = this.log.inactive("playCookieClick");
-    this.playSfx(this.props.cookieClickSfx, "Cookie Click", player, log);
+    const log = this.log.active("playCookieClick");
+    
+    // Collect all configured cookie click sounds
+    const cookieClickSounds = [
+      this.props.cookieClickSfx1,
+      this.props.cookieClickSfx2,
+      this.props.cookieClickSfx3,
+      this.props.cookieClickSfx4,
+      this.props.cookieClickSfx5,
+    ].filter(sfx => sfx !== null && sfx !== undefined);
+    
+    // If no sounds configured, warn and return
+    if (cookieClickSounds.length === 0) {
+      log.warn("No cookie click sounds configured");
+      return;
+    }
+    
+    // Randomly select one of the configured sounds
+    const randomIndex = Math.floor(Math.random() * cookieClickSounds.length);
+    const selectedSfx = cookieClickSounds[randomIndex];
+    
+    this.playSfx(selectedSfx, `Cookie Click #${randomIndex + 1}`, player, log);
+  }
+
+  // Play swipe SFX (gesture starting dunk animation)
+  public playSwipe(player?: hz.Player): void {
+    const log = this.log.active("playSwipe");
+    this.playSfx(this.props.swipeSfx, "Swipe", player, log);
+  }
+
+  /**
+   * Play dunk SFX (cookie dunking in milk)
+   * @param player - Optional. If provided, only plays for this player
+   */
+  public playDunk(player?: hz.Player): void {
+    const log = this.log.active("playDunk");
+    this.playSfx(this.props.dunkSfx, "Dunk", player, log);
   }
 
   /**
@@ -103,42 +142,6 @@ export class Default extends hz.Component<typeof Default> {
   public playError(player?: hz.Player): void {
     const log = this.log.active("playError");
     this.playSfx(this.props.errorSfx, "Error", player, log);
-  }
-
-  /**
-   * Play multiplier SFX based on tier (1-4)
-   * @param tier - The multiplier tier (1, 2, 3, or 4)
-   * @param player - Optional. If provided, only plays for this player
-   */
-  public playMultiplier(tier: number, player?: hz.Player): void {
-    const log = this.log.active("playMultiplier");
-    
-    let sfxEntity: hz.Entity | null | undefined = null;
-    let sfxName = "";
-    
-    switch (tier) {
-      case 1:
-        sfxEntity = this.props.multiplier1Sfx;
-        sfxName = "Multiplier 1";
-        break;
-      case 2:
-        sfxEntity = this.props.multiplier2Sfx;
-        sfxName = "Multiplier 2";
-        break;
-      case 3:
-        sfxEntity = this.props.multiplier3Sfx;
-        sfxName = "Multiplier 3";
-        break;
-      case 4:
-        sfxEntity = this.props.multiplier4Sfx;
-        sfxName = "Multiplier 4";
-        break;
-      default:
-        log.warn(`Invalid multiplier tier: ${tier}. Must be 1-4.`);
-        return;
-    }
-    
-    this.playSfx(sfxEntity, sfxName, player, log);
   }
   // #endregion
 
@@ -167,12 +170,10 @@ export class Default extends hz.Component<typeof Default> {
       return;
     }
 
-    const audioOptions: hz.AudioOptions | undefined = player
-      ? { fade: 0, players: [player] }
-      : undefined;
-
-    audioGizmo.play(audioOptions);
-    log.info(`${sfxName} played${player ? ` for player ${player.name.get()}` : " for all"}`);
+    // For global sounds, we need to ensure they play for all players
+    // Use empty options to play globally
+    audioGizmo.play();
+    log.info(`${sfxName} played globally`);
   }
   // #endregion
 }
