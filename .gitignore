@@ -23,7 +23,6 @@ tsconfig.json
 .github/
 types/
 sfx/
-hw-mcp-tools/
 
 # Temporary files
 .backups/

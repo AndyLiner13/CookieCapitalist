@@ -1,0 +1,12 @@
+[submodule "hw-mcp-tools/documentation/hw-docs"]
+	path = hw-mcp-tools/documentation/hw-docs
+	url = https://github.com/AndyLiner13/hw-docs
+[submodule "hw-mcp-tools/documentation/noesis-docs"]
+	path = hw-mcp-tools/documentation/noesis-docs
+	url = https://github.com/AndyLiner13/noesis-docs
+[submodule "hw-mcp-tools/properties.js"]
+	path = hw-mcp-tools/properties.js
+	url = https://github.com/AndyLiner13/properties.js
+[submodule "hw-mcp-tools"]
+	path = hw-mcp-tools
+	url = https://github.com/AndyLiner13/hw-mcp-tools
