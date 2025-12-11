@@ -1,0 +1,6 @@
+[submodule "hw-docs"]
+	path = hw-docs
+	url = https://github.com/AndyLiner13/hw-docs.git
+[submodule "noesis-docs"]
+	path = noesis-docs
+	url = https://github.com/AndyLiner13/noesis-docs.git
