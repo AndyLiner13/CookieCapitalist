@@ -1,7 +1,10 @@
 # Python virtual environments
 .venv/
+**/.venv/
 venv/
+**/venv/
 __pycache__/
+**/__pycache__/
 *.pyc
 
 # Node modules
@@ -19,7 +22,6 @@ Thumbs.db
 # Workspace files
 package-lock.json
 tsconfig.json
-types/
 sfx/
 
 # Temporary files

@@ -11,7 +11,7 @@
     "**.eslintrc.js": true,
     "**/__pycache__": true,
     "**/.venv": true,
-    "**/requirements.txt": true,
+    "**/requirements.txt": false,
     "LICENSE": true
   },
   "files.associations": {

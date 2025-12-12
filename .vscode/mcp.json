@@ -6,7 +6,7 @@
                 "C:/Users/conta/AppData/LocalLow/Meta/Horizon Worlds/2053655582112290/scripts/hw-mcp-tools/mcp_server.py"
             ],
             "env": {
-                "DEBUG": "true"
+                "DEBUG": "false"
             }
         }
     }
