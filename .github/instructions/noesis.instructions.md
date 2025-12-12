@@ -1,5 +1,5 @@
 ---
-applyTo: '**/Noesis/**'
+applyTo: '**/{Noesis/**,noesis_*.ts}'
 ---
 
 # NoesisGUI Integration
@@ -9,15 +9,16 @@ NoesisGUI is a XAML-based UI framework for Horizon Worlds. Horizon (3D runtime/T
 ## Project Structure
 ```
 Noesis/
-├── ProjectName.noesis    # Project definition (required)
-├── MainPage.xaml         # Entry point
+├── CookieCapitalist.noesis    # Project definition (required)
+├── Overlay.xaml               # StartupDocument (entry point)
+├── *.xaml                     # Additional pages/components
 ├── Fonts/                # Font files
 └── Images/               # Image assets
 ```
 
 ## Documentation
-- [Horizon integration](../../hw-mcp-tools/documentation/hw-docs/Desktop%20editor/NoesisUI/)
-- [NoesisGUI API reference](../../hw-mcp-tools/documentation/noesis-docs/)
+- [Horizon integration](../../hw-docs/Desktop%20Editor/NoesisUI/)
+- [NoesisGUI API reference](../../noesis-docs/)
 
 ## Critical Requirements
 - **Execution Mode**: Must use `Shared` (Default/Local won't work properly)

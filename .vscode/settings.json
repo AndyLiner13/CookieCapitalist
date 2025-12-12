@@ -2,8 +2,8 @@
   "typescript.tsdk": "./node_modules/typescript/lib",
   "files.exclude": {
     "**/.editor": true,
-    "**/.gitignore": false,
-    "**/.gitmodules": false,
+    "**/.gitignore": true,
+    "**/.gitmodules": true,
     "**/node_modules": true,
     "**/package.json": true,
     "**/package-lock.json": true,
@@ -11,7 +11,7 @@
     "**.eslintrc.js": true,
     "**/__pycache__": true,
     "**/.venv": true,
-    "**/requirements.txt": false,
+    "**/requirements.txt": true,
     "LICENSE": true
   },
   "files.associations": {
