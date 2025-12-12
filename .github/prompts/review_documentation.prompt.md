@@ -1,0 +1,1 @@
+Please follow the [Documentation Instructions](../instructions/documentation.instructions.md) and thoroughly read all relevant documentation, then address the issue once you understand everything that there is to know about the task at hand.

@@ -19,8 +19,6 @@ Thumbs.db
 # Workspace files
 package-lock.json
 tsconfig.json
-.vscode/
-.github/
 types/
 sfx/
 

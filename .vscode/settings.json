@@ -1,0 +1,21 @@
+{
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "files.exclude": {
+    "**/.editor": true,
+    "**/.gitignore": false,
+    "**/.gitmodules": false,
+    "**/node_modules": true,
+    "**/package.json": true,
+    "**/package-lock.json": true,
+    "**/tsconfig.json": true,
+    "**.eslintrc.js": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/requirements.txt": true,
+    "LICENSE": true
+  },
+  "files.associations": {
+    "**/.github/instructions/entities/*.instructions.md": "instructions"
+  },
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
