@@ -4,7 +4,7 @@ applyTo: 'noesis_mobileOnly.ts'
 
 # MobileOnly Modal Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`MobileOnly Modal`](MobileOnly Modal.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`MobileOnly Modal`](MobileOnly%20Modal.instructions.md)
 
 ## Metadata
 

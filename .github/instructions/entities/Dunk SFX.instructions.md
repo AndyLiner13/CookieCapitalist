@@ -4,7 +4,7 @@ applyTo: 'Dunk SFX.ts'
 
 # Dunk SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX Manager.instructions.md) / [`Dunk SFX`](Dunk SFX.instructions.md)
+**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Dunk SFX`](Dunk%20SFX.instructions.md)
 
 ## Metadata
 

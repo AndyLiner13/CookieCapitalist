@@ -4,7 +4,7 @@ applyTo: 'Click SFX.ts'
 
 # Click SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX Manager.instructions.md) / [`Click SFX`](Click SFX.instructions.md)
+**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Click SFX`](Click%20SFX.instructions.md)
 
 ## Metadata
 

@@ -4,7 +4,7 @@ applyTo: 'noesis_clickers.ts'
 
 # Clickers Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Clickers`](Clickers.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Clickers`](Clickers.instructions.md)
 
 ## Metadata
 

@@ -4,7 +4,7 @@ applyTo: 'Milk Foreground.ts'
 
 # Milk Foreground Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Milk Foreground`](Milk Foreground.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Milk Foreground`](Milk%20Foreground.instructions.md)
 
 ## Metadata
 

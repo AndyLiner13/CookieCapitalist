@@ -4,7 +4,7 @@ applyTo: 'controller_player.ts'
 
 # Player Controller Entity
 
-**Hierarchy**: `root` / [`Player Controller`](Player Controller.instructions.md)
+**Hierarchy**: `root` / [`Player Controller`](Player%20Controller.instructions.md)
 
 ## Metadata
 

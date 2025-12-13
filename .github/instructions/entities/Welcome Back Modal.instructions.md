@@ -4,7 +4,7 @@ applyTo: 'noesis_welcomeBack.ts'
 
 # Welcome Back Modal Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Welcome Back Modal`](Welcome Back Modal.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Welcome Back Modal`](Welcome%20Back%20Modal.instructions.md)
 
 ## Metadata
 

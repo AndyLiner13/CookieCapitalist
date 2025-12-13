@@ -4,7 +4,7 @@ applyTo: 'Click Detector.ts'
 
 # Click Detector Entity
 
-**Hierarchy**: `root` / [`Click Detector`](Click Detector.instructions.md)
+**Hierarchy**: `root` / [`Click Detector`](Click%20Detector.instructions.md)
 
 ## Metadata
 

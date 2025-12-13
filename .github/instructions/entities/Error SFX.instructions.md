@@ -4,7 +4,7 @@ applyTo: 'Error SFX.ts'
 
 # Error SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX Manager.instructions.md) / [`Error SFX`](Error SFX.instructions.md)
+**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Error SFX`](Error%20SFX.instructions.md)
 
 ## Metadata
 

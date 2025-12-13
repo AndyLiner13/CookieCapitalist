@@ -4,7 +4,7 @@ applyTo: 'Click Collider.ts'
 
 # Click Collider Entity
 
-**Hierarchy**: `root` / [`Click Collider`](Click Collider.instructions.md)
+**Hierarchy**: `root` / [`Click Collider`](Click%20Collider.instructions.md)
 
 ## Metadata
 

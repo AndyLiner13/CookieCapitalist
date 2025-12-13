@@ -4,7 +4,7 @@ applyTo: '[Audio Graph] SFX_BoxingGlove_Punch.ts'
 
 # [Audio Graph] SFX_BoxingGlove_Punch Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX Manager.instructions.md) / [`[Audio Graph] SFX_BoxingGlove_Punch`]([Audio Graph] SFX_BoxingGlove_Punch.instructions.md)
+**Hierarchy**: `root` / [`[Audio Graph] SFX_BoxingGlove_Punch`](%5BAudio%20Graph%5D%20SFX_BoxingGlove_Punch.instructions.md)
 
 ## Metadata
 
@@ -35,12 +35,12 @@ thead { display: none; }
 | **[Preview](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `Play` |
 | **[Play on Start](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `false` |
 | **[Play and Forget](../../../hw-docs/Performance/Performance%20best%20practices/CPU%20and%20TypeScript%20optimization%20and%20best%20practices.md#L170)** | `false` |
-| **[Volume](../../../types/horizon_core.d.ts#L2165)** | `0.8` |
+| **[Volume](../../../types/horizon_core.d.ts#L2165)** | `0.4` |
 | **[Volume Randomness](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `0` |
 | **[Pitch](../../../types/horizon_core.d.ts#L2187)** | `0` |
 | **[Pitch Randomness](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `0` |
 | **[Global](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `false` |
-| **[Minimum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `1` |
+| **[Minimum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `1.5` |
 | **[Maximum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `100` |
 | **[Send Audio Complete](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `false` |
 

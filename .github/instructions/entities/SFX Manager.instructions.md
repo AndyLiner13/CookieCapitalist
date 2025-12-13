@@ -4,7 +4,7 @@ applyTo: 'controller_sfx.ts'
 
 # SFX Manager Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX Manager.instructions.md)
+**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md)
 
 ## Metadata
 

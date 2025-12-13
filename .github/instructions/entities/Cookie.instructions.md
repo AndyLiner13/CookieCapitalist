@@ -4,7 +4,7 @@ applyTo: 'noesis_cookie.ts'
 
 # Cookie Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Cookie`](Cookie.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Cookie`](Cookie.instructions.md)
 
 ## Metadata
 

@@ -4,7 +4,7 @@ applyTo: 'noesis_shop.ts'
 
 # Shop Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Shop`](Shop.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Shop`](Shop.instructions.md)
 
 ## Metadata
 

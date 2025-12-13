@@ -4,7 +4,7 @@ applyTo: 'backend.ts'
 
 # Noesis Gizmos Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md)
 
 ## Metadata
 

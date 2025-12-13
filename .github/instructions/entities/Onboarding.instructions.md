@@ -4,7 +4,7 @@ applyTo: 'noesis_onboarding.ts'
 
 # Onboarding Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis Gizmos.instructions.md) / [`Onboarding`](Onboarding.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Onboarding`](Onboarding.instructions.md)
 
 ## Metadata
 
