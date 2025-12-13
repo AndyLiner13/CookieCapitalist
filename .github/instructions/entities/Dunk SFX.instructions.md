@@ -4,7 +4,7 @@ applyTo: 'Dunk SFX.ts'
 
 # Dunk SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Dunk SFX`](Dunk%20SFX.instructions.md)
+**Hierarchy**: `root` / [`Dunk SFX`](Dunk%20SFX.instructions.md)
 
 ## Metadata
 
@@ -40,7 +40,7 @@ thead { display: none; }
 | **[Pitch](../../../types/horizon_core.d.ts#L2187)** | `0` |
 | **[Pitch Randomness](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `0` |
 | **[Global](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `false` |
-| **[Minimum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `1` |
+| **[Minimum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `1.5` |
 | **[Maximum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `100` |
 | **[Send Audio Complete](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `false` |
 

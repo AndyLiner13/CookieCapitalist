@@ -4,7 +4,7 @@ applyTo: 'Buy SFX.ts'
 
 # Buy SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Buy SFX`](Buy%20SFX.instructions.md)
+**Hierarchy**: `root` / [`Buy SFX`](Buy%20SFX.instructions.md)
 
 ## Metadata
 

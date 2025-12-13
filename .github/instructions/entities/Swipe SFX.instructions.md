@@ -4,7 +4,7 @@ applyTo: 'Swipe SFX.ts'
 
 # Swipe SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Swipe SFX`](Swipe%20SFX.instructions.md)
+**Hierarchy**: `root` / [`Swipe SFX`](Swipe%20SFX.instructions.md)
 
 ## Metadata
 

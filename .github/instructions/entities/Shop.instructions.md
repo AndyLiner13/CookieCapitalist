@@ -4,7 +4,7 @@ applyTo: 'noesis_shop.ts'
 
 # Shop Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Shop`](Shop.instructions.md)
+**Hierarchy**: `root` / [`Shop`](Shop.instructions.md)
 
 ## Metadata
 
@@ -39,10 +39,10 @@ thead { display: none; }
 ## [Noesis UI settings](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Noesis` |
-| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Shop.xaml` |
+| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`Shop.xaml`](../../../Noesis/Shop.xaml) |
 | **[Display Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `ScreenOverlay` |
-| **[Input Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Interactive, Blocking` |
+| **[Input Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `No Interaction` |
 | **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `3` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)

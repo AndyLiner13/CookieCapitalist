@@ -4,7 +4,7 @@ applyTo: 'noesis_onboarding.ts'
 
 # Onboarding Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Onboarding`](Onboarding.instructions.md)
+**Hierarchy**: `root` / [`Onboarding`](Onboarding.instructions.md)
 
 ## Metadata
 
@@ -39,8 +39,8 @@ thead { display: none; }
 ## [Noesis UI settings](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Noesis` |
-| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Onboarding.xaml` |
+| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`Onboarding.xaml`](../../../Noesis/Onboarding.xaml) |
 | **[Display Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `ScreenOverlay` |
 | **[Input Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Interactive, Blocking` |
 | **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `10` |

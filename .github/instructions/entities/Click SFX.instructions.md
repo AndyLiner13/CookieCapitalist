@@ -4,7 +4,7 @@ applyTo: 'Click SFX.ts'
 
 # Click SFX Entity
 
-**Hierarchy**: `root` / [`SFX Manager`](SFX%20Manager.instructions.md) / [`Click SFX`](Click%20SFX.instructions.md)
+**Hierarchy**: `root` / [`Click SFX`](Click%20SFX.instructions.md)
 
 ## Metadata
 
@@ -41,7 +41,7 @@ thead { display: none; }
 | **[Pitch Randomness](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `0` |
 | **[Global](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `false` |
 | **[Minimum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `1` |
-| **[Maximum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `20000` |
+| **[Maximum Distance](../../../hw-docs/Gizmos/Sound%20recorder%20gizmo.md#L17)** | `100` |
 | **[Send Audio Complete](../../../hw-docs/Desktop%20editor/Help%20and%20reference/Meta%20Horizon%20Worlds%20Audio%20Ingestion.md#L94)** | `false` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)

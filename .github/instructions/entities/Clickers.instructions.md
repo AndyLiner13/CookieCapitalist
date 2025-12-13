@@ -4,7 +4,7 @@ applyTo: 'noesis_clickers.ts'
 
 # Clickers Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Clickers`](Clickers.instructions.md)
+**Hierarchy**: `root` / [`Clickers`](Clickers.instructions.md)
 
 ## Metadata
 
@@ -39,8 +39,8 @@ thead { display: none; }
 ## [Noesis UI settings](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Noesis` |
-| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Clickers.xaml` |
+| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`Clickers.xaml`](../../../Noesis/Clickers.xaml) |
 | **[Display Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `SpatialDefault` |
 | **[Width](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `1024` |
 | **[Height](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `1024` |

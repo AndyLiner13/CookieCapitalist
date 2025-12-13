@@ -4,7 +4,7 @@ applyTo: '[Spawn Point].ts'
 
 # [Spawn Point] Entity
 
-**Hierarchy**: `root` / [`[Spawn Point]`]([Spawn Point].instructions.md)
+**Hierarchy**: `root` / [`[Spawn Point]`](%5BSpawn%20Point%5D.instructions.md)
 
 ## Metadata
 
@@ -32,6 +32,7 @@ thead { display: none; }
 ## [Behavior](../../../hw-docs/Gizmos/Spawn%20point%20gizmo.md)
 | |  |
 |---|--:|
+| **Spawn on start** | `true` |
 | **Set Position Only** | `false` |
 | **[Player Gravity](../../../types/horizon_core.d.ts#L1798)** | `0` |
 | **[Player Speed](../../../types/horizon_core.d.ts#L1805)** | `0` |

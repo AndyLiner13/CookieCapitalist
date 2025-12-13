@@ -4,7 +4,7 @@ applyTo: 'Milk Foreground.ts'
 
 # Milk Foreground Entity
 
-**Hierarchy**: `root` / [`Noesis Gizmos`](Noesis%20Gizmos.instructions.md) / [`Milk Foreground`](Milk%20Foreground.instructions.md)
+**Hierarchy**: `root` / [`Milk Foreground`](Milk%20Foreground.instructions.md)
 
 ## Metadata
 
@@ -39,8 +39,8 @@ thead { display: none; }
 ## [Noesis UI settings](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `Noesis` |
-| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `MilkForeground.xaml` |
+| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`MilkForeground.xaml`](../../../Noesis/MilkForeground.xaml) |
 | **[Display Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `SpatialDefault` |
 | **[Width](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `1024` |
 | **[Height](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `1024` |

@@ -4,7 +4,7 @@ applyTo: '[Environment].ts'
 
 # [Environment] Entity
 
-**Hierarchy**: `root` / [`[Environment]`]([Environment].instructions.md)
+**Hierarchy**: `root` / [`[Environment]`](%5BEnvironment%5D.instructions.md)
 
 ## Metadata
 

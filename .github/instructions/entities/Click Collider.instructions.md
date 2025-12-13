@@ -25,7 +25,7 @@ thead { display: none; }
 ## [Attributes](../../../hw-docs/Desktop%20editor/Physics%20Overview.md)
 | |  |
 |---|--:|
-| **[Position](../../../types/horizon_core.d.ts#L1371)** | `x: 0`, `y: 10`, `z: 0` |
+| **[Position](../../../types/horizon_core.d.ts#L1371)** | `x: 0`, `y: 0`, `z: 0` |
 | **[Rotation](../../../types/horizon_core.d.ts#L1379)** | `x: 0`, `y: 0`, `z: 0` |
 | **[Scale](../../../types/horizon_core.d.ts#L1375)** | `x: 0.25`, `y: 0.25`, `z: 0.25` |
 | **[Sphere Collider Radius](https://docs.unity3d.com/Manual/class-SphereCollider.html)** | `0.5` |
