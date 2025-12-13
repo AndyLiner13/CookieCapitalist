@@ -1,4 +1,4 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with WelcomeBack.xaml. Use Shared execution mode.
+// Welcome Back Modal Entity Configuration: file://./.github/instructions/entities/Welcome Back Modal.instructions.md
 
 // #region 📋 README
 // WelcomeBack modal controller - displays offline earnings when a player rejoins.

@@ -1,4 +1,5 @@
-// Desktop Editor Setup: Attach to Empty Object entity. Use Local execution mode.
+// Player Controller Entity Configuration: file://./.github/instructions/entities/Player Controller.instructions.md
+
 // #region 📋 README
 // Local controller for each player.
 // Handles mobile gesture detection and forces interaction mode.

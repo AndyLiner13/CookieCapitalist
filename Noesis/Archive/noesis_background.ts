@@ -1,6 +1,3 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Background.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Screen Overlay, Render Order = 0, Input Mode = No Interaction
-
 // #region 📋 README
 // Background overlay with blue gradient and falling cookie rain.
 // Listens for cookie click events (1 cookie) and batch completion events (queued cookies).

@@ -1,5 +1,6 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Overlay.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Screen Overlay, Render Order = 10, Input Mode = Interactive nonblocking
+// Overlay Entity Configuration: file://./.github/instructions/entities/Overlay.instructions.md
+
+// file://./.github/instructions/entities/Overlay.instructions.md
 
 // #region 📋 README
 // Overlay controller - combines Header and Navigation.

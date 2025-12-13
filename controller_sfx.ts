@@ -1,4 +1,4 @@
-// Desktop Editor Setup: Attach to Empty Object entity. Use Local execution mode.
+// SFX Manager Entity Configuration: file://./.github/instructions/entities/SFX Manager.instructions.md
 
 // #region 📋 README
 // SFX Controller - Centralized sound effect handler for Cookie Clicker.

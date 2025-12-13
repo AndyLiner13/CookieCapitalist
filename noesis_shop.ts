@@ -1,5 +1,4 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Shop.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Screen Overlay, Render Order = 5, Input Mode = Interactive blocking
+// Shop Entity Configuration: file://./.github/instructions/entities/Shop.instructions.md
 
 // #region 📋 README
 // Shop UI controller - manages upgrade cards and production timers.

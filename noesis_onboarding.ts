@@ -1,4 +1,5 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Onboarding.xaml. Use Shared execution mode.
+// Onboarding Entity Configuration: file://./.github/instructions/entities/Onboarding.instructions.md
+
 // Display Mode: Screen Overlay, Render Order: 150, Input Mode: Interactive blocking
 
 // #region 📋 README

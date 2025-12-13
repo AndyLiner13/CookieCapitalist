@@ -1,4 +1,4 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with MobileOnly.xaml. Use Shared execution mode.
+// MobileOnly Modal Entity Configuration: file://./.github/instructions/entities/MobileOnly Modal.instructions.md
 
 // #region 📋 README
 // MobileOnly overlay controller - shows a blocking warning for non-mobile users.

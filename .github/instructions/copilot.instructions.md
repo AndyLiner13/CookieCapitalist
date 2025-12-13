@@ -30,3 +30,6 @@ Follow the [Noesis Instructions](./instructions/noesis.instructions.md)
 
 Do not make summary .md files unless specifically requested by the user.
 
+Always be sure to review the relevant [Entity Configurations](./entities/) to ensure that your changes will work with the user's Entity configuration.
+
+Each script's corresponding entity configuration is linked at the top of their corresponding .ts file in the [root](../../) directory.

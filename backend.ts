@@ -1,4 +1,4 @@
-// Desktop Editor Setup: Attach to Empty Object entity. Use Default (server) execution mode.
+// Noesis Gizmos Entity Configuration: file://./.github/instructions/entities/Noesis Gizmos.instructions.md
 
 // #region 📋 README
 // Backend - Server-side game manager for Cookie Clicker.

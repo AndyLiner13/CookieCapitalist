@@ -1,5 +1,4 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Cookie.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Spatial, Render Order = 5, Input Mode = No Interaction
+// Cookie Entity Configuration: file://./.github/instructions/entities/Cookie.instructions.md
 
 // #region 📋 README
 // Cookie UI controller - handles cookie clicks, popups, and dunk animation.

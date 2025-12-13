@@ -1,5 +1,4 @@
-// Desktop Editor Setup: Attach to NoesisUI entity with Clickers.xaml. Use Shared execution mode.
-// NoesisUI Settings: Display Mode = Screen Overlay, Render Order = 2, Input Mode = No Interaction
+// Clickers Entity Configuration: file://./.github/instructions/entities/Clickers.instructions.md
 
 // #region 📋 README
 // Controller for the Clickers Noesis overlay (rotating finger ring).
