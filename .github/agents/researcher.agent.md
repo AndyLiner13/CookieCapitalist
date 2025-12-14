@@ -48,8 +48,11 @@ Every property in an entity JSON file must be configured according to ONE of the
 **Required fields**:
 - `editorOnly`: Must be `true`
 - `docs`: A `file://` URL pointing to documentation that **specifically** explains this property
-  - Can link to a specific line: `file://./../../../hw-docs/[path].md#L[line]`
-  - Can link to a header anchor: `file://./../../../hw-docs/[path].md#[header-anchor]`
+  - **MUST use header anchors for markdown files**, NOT line numbers
+  - Format: `file://./../../../hw-docs/[path].md#[header-anchor]`
+  - Header anchors are **case-sensitive** and must match the exact casing in the markdown file
+  - Spaces in header anchors MUST be URL-encoded as `%20`
+  - Example: `#Opening%20the%20GenAI%20Texture%20Generating%20Tool` for header `## Opening the GenAI Texture Generating Tool`
   - Documentation must specifically mention or explain this property
 
 **Example**:
@@ -112,11 +115,25 @@ Documentation is NOT specific enough if:
 - ❌ It's generic information that doesn't explain this particular property
 - ❌ It mentions the property only in passing without explanation
 
-## Important Notes
+## URL Formatting Rules
 
+### For TypeScript `.d.ts` Files (Pattern 1)
+- Use line number anchors: `#L[line_number]`
+- Format: `file://./../../../types/horizon_core.d.ts#L1371`
+- Line numbers must point to the **exact line** where the property is declared (not the JSDoc comment)
+
+### For Markdown `.md` Files (Pattern 2)
+- **ALWAYS use header anchors**, NEVER use line numbers
+- Format: `file://./../../../hw-docs/[path].md#[header-anchor]`
+- Header anchors are **case-sensitive** and must match the exact header casing
+- Spaces in headers MUST be URL-encoded as `%20`
+- Convert header to anchor format: lowercase, replace spaces with `-`, remove special characters
+- Example header: `## Opening the GenAI Tool` → anchor: `#opening-the-genai-tool`
+- But spaces in the path portion of URLs use `%20`: `Desktop%20editor/Physics%20Overview.md`
+
+### General URL Rules
 - All `file://` URLs must use relative paths starting with `file://./../../../`
-- Spaces in filenames must be URL-encoded (e.g., `%20`)
-- Line numbers in `.d.ts` files must point to the **exact line** where the property is declared
+- Spaces in **file/folder names** must be URL-encoded as `%20`
 - The `type` field should match the TypeScript type from the `.d.ts` file exactly (e.g., `HorizonProperty<Vec3>`, `WritableHorizonProperty<boolean>`)
 - Never mix patterns - a property should have EITHER (`api` + `type` + `docs`) OR (`editorOnly` + optional `docs`) OR (just `editorOnly`)
 
