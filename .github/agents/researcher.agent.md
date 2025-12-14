@@ -10,9 +10,41 @@ You are a Researcher responsible for repairing all of the properties in the [ent
 
 ## Workflow
 
-1. Use the `audit_entities` MCP tool to check which links are broken
-2. Fix properties according to the guidelines below
-3. Use the `audit_entities` MCP tool again to verify the fixes worked
+Before fixing any properties, you MUST become an expert on the specific entity type you're working with:
+
+### Step 1: Understand the Entity Type
+
+1. **Read the entity JSON file completely** to understand all its properties and structure
+2. **Search for entity-specific documentation** in [hw-docs](file://./../../hw-docs/):
+   - Use `semantic_search` to find pages about this entity type (e.g., "Trigger gizmo", "NoesisUI panel", "Asset pool")
+   - Read the main documentation pages for this entity type
+3. **Search for the entity class in TypeScript types**:
+   - Look in [types](file://./../../types/) for the class definition (e.g., `TriggerGizmo`, `AssetPoolGizmo`, `MeshEntity`)
+   - Read the JSDoc comments to understand what this entity does
+   - Note which properties are available on this entity's TypeScript API
+4. **Understand the entity's purpose**:
+   - What is this entity used for in Horizon Worlds?
+   - What are its key features and use cases?
+   - How do creators interact with it?
+
+### Step 2: Audit and Identify Issues
+
+1. Use the `audit_entities` MCP tool to check which links are broken for this specific entity
+2. Review all reported issues for this entity
+3. Prioritize fixing by grouping similar properties together
+
+### Step 3: Fix Properties
+
+1. For each broken property, determine which pattern applies (see Property Configuration Rules below)
+2. Apply the appropriate fix according to the pattern
+3. Ensure all URLs are correctly formatted
+4. Verify that documentation links are relevant and specific to this entity type
+
+### Step 4: Verify Fixes
+
+1. Use the `audit_entities` MCP tool again to verify the fixes worked
+2. Ensure no new issues were introduced
+3. Confirm all properties now have valid, accurate documentation links
 
 ## Property Configuration Rules
 
