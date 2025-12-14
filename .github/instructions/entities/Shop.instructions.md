@@ -4,7 +4,7 @@ applyTo: 'noesis_shop.ts'
 
 # Shop Entity
 
-**Hierarchy**: `root` / [`Shop`](Shop.instructions.md)
+**Hierarchy**: `root` / [`Noesis Gizmos`](<Noesis Gizmos.instructions.md>) / [`Shop`](<Shop.instructions.md>)
 
 ## Metadata
 
@@ -22,30 +22,30 @@ table { margin-top: 0; }
 thead { display: none; }
 </style>
 
-## [Attributes](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
+## [Attributes](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Position](../../../types/horizon_core.d.ts#L1371)** | `x: 0`, `y: 0`, `z: 0` |
+| **[Position](../../../../types/horizon_core.d.ts#L1371)** | `x: 0`, `y: 0`, `z: 0` |
 | **[Rotation](../../../types/horizon_core.d.ts#L1379)** | `x: 0`, `y: 0`, `z: 0` |
 | **[Scale](../../../types/horizon_core.d.ts#L1375)** | `x: 1`, `y: 1`, `z: 1` |
 
-## [Behavior](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
+## [Behavior](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Visible](../../../types/horizon_core.d.ts#L1518)** | `true` |
-| **[Collidable](../../../types/horizon_core.d.ts#L1523)** | `false` |
+| **[Visible](../../../../types/horizon_core.d.ts#L1518)** | `true` |
+| **[Collidable](../../../../types/horizon_core.d.ts#L1523)** | `false` |
 | **Allow Children to Override Collision** | `false` |
 
-## [Noesis UI settings](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
+## [Noesis UI settings](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`CookieCapitalist`](../../../Noesis/) |
-| **[Root XAML](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | [`Shop.xaml`](../../../Noesis/Shop.xaml) |
-| **[Display Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `ScreenOverlay` |
-| **[Input Mode](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `No Interaction` |
-| **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#L43)** | `3` |
+| **[Noesis Project](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | [`Shop.xaml`](../../../Noesis/Shop.xaml) |
+| **[Display Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `ScreenOverlay` |
+| **[Input Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `Interactive, Blocking` |
+| **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `3` |
 
-## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)
+## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |
 |---|--:|
 | **[Gameplay Tags](../../../types/horizon_core.d.ts#L1568)** | `[]` |
