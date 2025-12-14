@@ -47,18 +47,18 @@ thead { display: none; }
 ## [Navigation](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md)
 | |  |
 |---|--:|
-| **[Include in Bakes](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md#L20)** | `false` |
+| **[Include in Bakes](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md)** | `false` |
 
 ## [Navigation Locomotion](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md)
 | |  |
 |---|--:|
-| **[Enabled](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md#L20)** | `false` |
+| **[Enabled](../../../hw-docs/Desktop%20editor/NPCs/Nav%20Mesh%20Agents.md)** | `false` |
 
 ## More
 | |  |
 |---|--:|
 | **Who Can Grab** | `Anyone` |
-| **[Keep Ownership On Collision](../../../hw-docs/Scripting/Local%20scripting/Ownership%20in%20Meta%20Horizon%20Worlds.md#L85)** | `false` |
+| **[Keep Ownership On Collision](../../../hw-docs/Scripting/Local%20scripting/Ownership%20in%20Meta%20Horizon%20Worlds.md)** | `false` |
 
 ## [backend.ts:Default](../../../backend.ts)
 | |  |

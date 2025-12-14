@@ -32,10 +32,10 @@ thead { display: none; }
 ## [Behavior](../../../hw-docs/Gizmos/Raycast%20gizmo.md)
 | |  |
 |---|--:|
-| **[Collide With](../../../hw-docs/Gizmos/Raycast%20gizmo.md#L23)** | `Objects Tagged` |
-| **[Object Tag](../../../hw-docs/Gizmos/Raycast%20gizmo.md#L23)** | `Cookie` |
-| **[Raycast Distance](../../../hw-docs/Gizmos/Raycast%20gizmo.md#L23)** | `3` |
-| **[Stop On First Hit](../../../hw-docs/Gizmos/Raycast%20gizmo.md#L23)** | `true` |
+| **[Collide With](../../../hw-docs/Gizmos/Raycast%20gizmo.md)** | `Objects Tagged` |
+| **[Object Tag](../../../hw-docs/Gizmos/Raycast%20gizmo.md)** | `Cookie` |
+| **[Raycast Distance](../../../hw-docs/Gizmos/Raycast%20gizmo.md)** | `3` |
+| **[Stop On First Hit](../../../hw-docs/Gizmos/Raycast%20gizmo.md)** | `true` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |

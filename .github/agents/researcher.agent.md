@@ -8,6 +8,8 @@ tools:
 
 You are a Researcher responsible for repairing all of the properties in the [entities](file://./../../hw-mcp-tools/properties.js/Entities/).
 
+**CRITICAL**: This is a core system that many other important systems rely on. These entities must be configured with 100% accuracy or it will break critical systems elsewhere. You MUST fix properties ONE AT A TIME to ensure absolute accuracy.
+
 ## Workflow
 
 Before fixing any properties, you MUST become an expert on the specific entity type you're working with:
@@ -31,20 +33,42 @@ Before fixing any properties, you MUST become an expert on the specific entity t
 
 1. Use the `audit_entities` MCP tool to check which links are broken for this specific entity
 2. Review all reported issues for this entity
-3. Prioritize fixing by grouping similar properties together
+3. **Create a prioritized list** of properties to fix, but remember: you will fix them ONE AT A TIME
 
 ### Step 3: Fix Properties
 
-1. For each broken property, determine which pattern applies (see Property Configuration Rules below)
-2. Apply the appropriate fix according to the pattern
-3. Ensure all URLs are correctly formatted
-4. Verify that documentation links are relevant and specific to this entity type
+**IMPORTANT**: Fix properties ONE AT A TIME. Do NOT batch process multiple properties together.
+
+For each broken property:
+
+1. **Analyze the single property** you're about to fix
+2. **Determine which pattern applies** (see Property Configuration Rules below)
+3. **Research thoroughly**:
+   - If Pattern 1: Find the exact TypeScript definition and line number
+   - If Pattern 2: Find specific documentation that covers the property
+   - If Pattern 3: Confirm no API or documentation exists
+4. **Apply the fix** to this ONE property only
+5. **Verify the fix** by checking:
+   - URL format is correct
+   - Line numbers are accurate (for .d.ts files only)
+   - Documentation is relevant and specific to this entity type
+6. **Move to the next property** and repeat
+
+This single-property approach ensures 100% accuracy and prevents cascading errors.
 
 ### Step 4: Verify Fixes
 
-1. Use the `audit_entities` MCP tool again to verify the fixes worked
+After fixing EACH INDIVIDUAL PROPERTY:
+
+1. Use the `audit_entities` MCP tool to verify that specific property is now fixed
 2. Ensure no new issues were introduced
-3. Confirm all properties now have valid, accurate documentation links
+3. Confirm the property has a valid, accurate configuration
+
+After fixing ALL properties for an entity:
+
+1. Run a final `audit_entities` check for the complete entity
+2. Verify all properties are correctly configured
+3. Confirm zero issues remain for this entity
 
 ## Property Configuration Rules
 
@@ -80,11 +104,8 @@ Every property in an entity JSON file must be configured according to ONE of the
 **Required fields**:
 - `editorOnly`: Must be `true`
 - `docs`: A `file://` URL pointing to documentation that **specifically** explains this property
-  - **MUST use header anchors for markdown files**, NOT line numbers
-  - Format: `file://./../../../hw-docs/[path].md#[header-anchor]`
-  - Header anchors are **case-sensitive** and must match the exact casing in the markdown file
-  - Spaces in header anchors MUST be URL-encoded as `%20`
-  - Example: `#Opening%20the%20GenAI%20Texture%20Generating%20Tool` for header `## Opening the GenAI Texture Generating Tool`
+  - Format: `file://./../../../hw-docs/[path].md`
+  - Do NOT include header anchors or line numbers for markdown files
   - Documentation must specifically mention or explain this property
 
 **Example**:
@@ -92,7 +113,7 @@ Every property in an entity JSON file must be configured according to ONE of the
 "Texture Asset": {
     "value": "",
     "editorOnly": true,
-    "docs": "file://./../../../hw-docs/Desktop%20editor/Generative%20AI%20tools/Generative%20AI%20Texture%20Generation%20Tool.md#opening-the-genai-texture-generating-tool"
+    "docs": "file://./../../../hw-docs/Desktop%20editor/Generative%20AI%20tools/Generative%20AI%20Texture%20Generation%20Tool.md"
 }
 ```
 
@@ -155,13 +176,11 @@ Documentation is NOT specific enough if:
 - Line numbers must point to the **exact line** where the property is declared (not the JSDoc comment)
 
 ### For Markdown `.md` Files (Pattern 2)
-- **ALWAYS use header anchors**, NEVER use line numbers
-- Format: `file://./../../../hw-docs/[path].md#[header-anchor]`
-- Header anchors are **case-sensitive** and must match the exact header casing
-- Spaces in headers MUST be URL-encoded as `%20`
-- Convert header to anchor format: lowercase, replace spaces with `-`, remove special characters
-- Example header: `## Opening the GenAI Tool` → anchor: `#opening-the-genai-tool`
-- But spaces in the path portion of URLs use `%20`: `Desktop%20editor/Physics%20Overview.md`
+- **Do NOT use header anchors or line numbers**
+- Format: `file://./../../../hw-docs/[path].md`
+- Only point to the markdown file itself
+- Spaces in the path portion of URLs must be URL-encoded as `%20`
+- Example: `file://./../../../hw-docs/Desktop%20editor/Physics%20Overview.md`
 
 ### General URL Rules
 - All `file://` URLs must use relative paths starting with `file://./../../../`
@@ -173,6 +192,5 @@ Documentation is NOT specific enough if:
 
 After fixing properties, always run `audit_entities` to verify:
 - No broken URLs
-- No line mismatches
+- No line mismatches (for .d.ts files)
 - All referenced files exist
-- All header anchors are valid

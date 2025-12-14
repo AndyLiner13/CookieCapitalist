@@ -22,7 +22,7 @@ table { margin-top: 0; }
 thead { display: none; }
 </style>
 
-## [Attributes](../../../hw-docs/Gizmos/World%20leaderboard%20gizmo.md#L25)
+## [Attributes](../../../hw-docs/Gizmos/World%20leaderboard%20gizmo.md)
 | |  |
 |---|--:|
 | **[Position](../../../types/horizon_core.d.ts#L1371)** | `x: 0`, `y: 0`, `z: 0` |
@@ -30,7 +30,7 @@ thead { display: none; }
 | **[Scale](../../../types/horizon_core.d.ts#L1375)** | `x: 1`, `y: 1`, `z: 1` |
 | **[Color](../../../types/horizon_core.d.ts#L1489)** | `r: 0.93`, `g: 0.92`, `b: 0.93` |
 
-## [Behavior](../../../hw-docs/Gizmos/World%20leaderboard%20gizmo.md#L25)
+## [Behavior](../../../hw-docs/Gizmos/World%20leaderboard%20gizmo.md)
 | |  |
 |---|--:|
 | **Leaderboard** | `Cookies Per Second` |

@@ -32,16 +32,16 @@ thead { display: none; }
 ## [Behavior](../../../hw-docs/Gizmos/Environment%20gizmo.md)
 | |  |
 |---|--:|
-| **[Active](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `true` |
-| **[Skydome Type](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `Cubemap` |
-| **[Texture](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `Star Field` |
-| **[Texture Rotation](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `0` |
-| **[Exposure](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `1` |
-| **[Custom Light Intensity](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `false` |
-| **[Custom Fog Color](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `false` |
-| **[Fog Density](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `0.01` |
-| **[Show Grid](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `false` |
-| **[VOIP Settings](../../../hw-docs/Gizmos/Environment%20gizmo.md#L28)** | `Default` |
+| **[Active](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `true` |
+| **[Skydome Type](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `Cubemap` |
+| **[Texture](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `Star Field` |
+| **[Texture Rotation](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `0` |
+| **[Exposure](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `1` |
+| **[Custom Light Intensity](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `false` |
+| **[Custom Fog Color](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `false` |
+| **[Fog Density](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `0.01` |
+| **[Show Grid](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `false` |
+| **[VOIP Settings](../../../hw-docs/Gizmos/Environment%20gizmo.md)** | `Default` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |

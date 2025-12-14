@@ -36,7 +36,7 @@ thead { display: none; }
 | **Set Position Only** | `false` |
 | **[Player Gravity](../../../types/horizon_core.d.ts#L1798)** | `0` |
 | **[Player Speed](../../../types/horizon_core.d.ts#L1805)** | `0` |
-| **[Mobile Camera](../../../hw-docs/Gizmos/Spawn%20point%20gizmo.md#L27)** | `Third Person` |
+| **[Mobile Camera](../../../hw-docs/Gizmos/Spawn%20point%20gizmo.md)** | `Third Person` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |

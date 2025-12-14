@@ -34,7 +34,7 @@ thead { display: none; }
 | |  |
 |---|--:|
 | **[Collidable](../../../types/horizon_core.d.ts#L1523)** | `true` |
-| **[Collission Layer](../../../hw-docs/Desktop%20editor/Physics%20Overview.md#L74)** | `Everything` |
+| **[Collission Layer](../../../hw-docs/Desktop%20editor/Physics%20Overview.md)** | `Everything` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20Tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |

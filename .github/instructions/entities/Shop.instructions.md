@@ -39,11 +39,11 @@ thead { display: none; }
 ## [Noesis UI settings](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)
 | |  |
 |---|--:|
-| **[Noesis Project](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | [`CookieCapitalist`](../../../Noesis/) |
-| **[Root XAML](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | [`Shop.xaml`](../../../Noesis/Shop.xaml) |
-| **[Display Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `ScreenOverlay` |
-| **[Input Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `Interactive, Blocking` |
-| **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md#import-the-noesis-project)** | `3` |
+| **[Noesis Project](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)** | [`CookieCapitalist`](../../../Noesis/) |
+| **[Root XAML](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)** | [`Shop.xaml`](../../../Noesis/Shop.xaml) |
+| **[Display Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)** | `ScreenOverlay` |
+| **[Input Mode](../../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)** | `Interactive, Blocking` |
+| **[Render Order](../../../hw-docs/Desktop%20editor/NoesisUI/Create%20a%20Noesis%20UI%20Panel.md)** | `3` |
 
 ## [Gameplay Tags](../../../hw-docs/Scripting/Gameplay%20tags%20API/Introduction%20to%20Gameplay%20Tags.md)
 | |  |
